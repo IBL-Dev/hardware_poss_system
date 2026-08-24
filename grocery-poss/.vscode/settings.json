@@ -1,0 +1,23 @@
+{
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "files.watcherExclude": {
+    "**/release/**": true,
+    "**/out/**": true,
+    "**/node_modules/**": true
+  },
+  "search.exclude": {
+    "**/release": true,
+    "**/out": true
+  },
+  "files.exclude": {
+    "**/release": true
+  }
+}

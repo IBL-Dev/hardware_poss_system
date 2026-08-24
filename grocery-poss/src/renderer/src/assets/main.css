@@ -1,0 +1,91 @@
+@import 'tailwindcss';
+
+@theme {
+  /* Surfaces - clean white and gray for POS work screens */
+  --color-bg: #f3f4f6;
+  --color-card: #ffffff;
+  --color-subtle: #f9fafb;
+  --color-hover: #eaf4ff;
+
+  /* Text */
+  --color-ink: #1f2937;
+  --color-muted: #6b7280;
+  --color-faint: #9ca3af;
+
+  /* Borders - light and quiet, shadows carry the separation */
+  --color-line: #e5e7eb;
+  --color-line-strong: #d1d5db;
+
+  /* Semantic accents - muted, calm */
+  --color-primary: #4a7c94;
+  --color-primary-hover: #3c6579;
+  --color-success: #4f9d69;
+  --color-success-hover: #3f7f54;
+  --color-danger: #c1584a;
+  --color-danger-hover: #a8493d;
+  --color-warning: #d9a441;
+  --color-accent: #8577b3;
+
+  /* Brand - deep navy for app chrome (header/nav), paired with primary teal for active state */
+  --color-brand: #16283d;
+  --color-brand-hover: #1f3a56;
+  --color-brand-muted: #93aac1;
+
+  /* Radius scale - softer than Tailwind defaults */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+
+  /* Shadows - soft, low-contrast; replace heavy borders */
+  --shadow-sm: 0 1px 2px rgba(31, 41, 55, 0.05);
+  --shadow-md: 0 4px 16px rgba(31, 41, 55, 0.06);
+  --shadow-lg: 0 16px 40px rgba(31, 41, 55, 0.1);
+
+  --font-sans:
+    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
+    'Open Sans', 'Helvetica Neue', sans-serif;
+
+  --header-height: 64px;
+
+  --animate-slide-up: slideUp 0.4s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@layer base {
+  body {
+    @apply bg-bg text-ink font-sans antialiased;
+    line-height: 1.55;
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-line-strong);
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-faint);
+  }
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+}

@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="2b038783-d0e2-4a9b-bf5b-0feca423ebff" name="Changes" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
+  <component name="NextEditCompletionFeaturesState">
+    <decayedCancelled>
+      <entry key="MS100" value="1.8296658594112318" />
+      <entry key="MS500" value="4.346011587813074" />
+      <entry key="S2" value="11.174166365688063" />
+      <entry key="S5" value="22.452368885257815" />
+      <entry key="S10" value="40.36927040018987" />
+      <entry key="S30" value="78.00121871717774" />
+      <entry key="S60" value="96.219036008006" />
+      <entry key="M2" value="108.47496872008003" />
+      <entry key="M5" value="141.51503641474073" />
+      <entry key="M10" value="213.37669399804042" />
+      <entry key="M15" value="270.4221772171419" />
+      <entry key="M30" value="376.96228716122135" />
+      <entry key="H1" value="519.7360733519425" />
+      <entry key="H2" value="711.4431217588345" />
+      <entry key="H4" value="894.4497056186299" />
+      <entry key="D1" value="1132.9098025242358" />
+      <entry key="W1" value="1184.9468287820648" />
+    </decayedCancelled>
+    <decayedSelected>
+      <entry key="MS100" value="0.0" />
+      <entry key="MS500" value="0.0" />
+      <entry key="S2" value="0.0" />
+      <entry key="S5" value="0.0" />
+      <entry key="S10" value="5.968575226252977E-238" />
+      <entry key="S30" value="8.419576048456246E-80" />
+      <entry key="S60" value="2.9016505731145643E-40" />
+      <entry key="M2" value="1.7034231926079177E-20" />
+      <entry key="M5" value="1.237453881937048E-8" />
+      <entry key="M10" value="1.11240904434342E-4" />
+      <entry key="M15" value="0.002313003770879947" />
+      <entry key="M30" value="0.0480936978291325" />
+      <entry key="H1" value="0.21930275381110337" />
+      <entry key="H2" value="0.46829771920339447" />
+      <entry key="H4" value="0.6843228179765718" />
+      <entry key="D1" value="0.9387360657416559" />
+      <entry key="W1" value="0.9910091021125639" />
+    </decayedSelected>
+    <decayedShown>
+      <entry key="MS100" value="1.7739702428750717" />
+      <entry key="MS500" value="4.319552943973107" />
+      <entry key="S2" value="11.157360306219616" />
+      <entry key="S5" value="22.438941327286177" />
+      <entry key="S10" value="40.357324657395935" />
+      <entry key="S30" value="77.99361740158892" />
+      <entry key="S60" value="96.21436318871388" />
+      <entry key="M2" value="108.4723369991133" />
+      <entry key="M5" value="141.51362947817108" />
+      <entry key="M10" value="213.3757007121556" />
+      <entry key="M15" value="270.42353931058955" />
+      <entry key="M30" value="377.0096928150194" />
+      <entry key="H1" value="519.9548599901913" />
+      <entry key="H2" value="711.9110303453979" />
+      <entry key="H4" value="895.1337679348086" />
+      <entry key="D1" value="1133.8484804357151" />
+      <entry key="W1" value="1185.9378291107848" />
+    </decayedShown>
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 6,
+  &quot;fromUser&quot;: false
+}</component>
+  <component name="ProjectId" id="3HcbySBgkJNOmFRYfnM59rGowCC" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.go.formatter.settings.were.checked": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "dart.analysis.tool.window.visible": "false",
+    "git-widget-placeholder": "LoginRestric",
+    "ignore.virus.scanning.warn.message": "true",
+    "junie.onboarding.icon.badge.shown": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/ANJANA TINUSH/Desktop/Github/glosary_shop_poss_system/grocery-poss",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "show.migrate.to.gradle.popup": "false",
+    "to.speed.mode.migration.done": "true",
+    "ts.external.directory.path": "C:\\Users\\ANJANA TINUSH\\AppData\\Roaming\\npm\\node_modules\\typescript\\lib"
+  }
+}]]></component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-30f59d01ecdd-63390994e64e-intellij.indexing.shared.core-IU-262.8665.258" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="2b038783-d0e2-4a9b-bf5b-0feca423ebff" name="Changes" comment="" />
+      <created>1786170558828</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1786170558828</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+    <option name="exactExcludedFiles">
+      <list>
+        <option value="$PROJECT_DIR$/src/preload/index.d.ts" />
+      </list>
+    </option>
+  </component>
+</project>
