@@ -14,8 +14,6 @@ import { registerSupplierHandlers } from './suppliers/supplierIpc'
 import { registerCustomerHandlers } from './customers/customerIpc'
 import { registerLicenseHandlers } from './licenseIpc'
 
-let mainWindowRef: BrowserWindow | null = null
-
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -31,8 +29,6 @@ function createWindow(): void {
       sandbox: false
     }
   })
-
-  mainWindowRef = mainWindow
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.maximize()
@@ -71,7 +67,7 @@ app.whenReady().then(() => {
   registerCategoryHandlers()
   registerSupplierHandlers()
   registerCustomerHandlers()
-  registerLicenseHandlers(() => mainWindowRef)
+  registerLicenseHandlers()
 
   /*
    * Open the Electron window.

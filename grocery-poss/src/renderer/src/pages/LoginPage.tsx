@@ -1,10 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ShoppingCart, LogIn, Lock, User, AlertCircle, Loader2 } from 'lucide-react'
 
-const ACCOUNT_LOCKED_MESSAGE = 'This account has been locked. Please contact support.'
-const ACCOUNT_VERIFY_FAILED_MESSAGE =
-  'Could not verify account status. Please check your internet connection or contact support.'
 const CURRENT_USER_STORAGE_KEY = 'grocery-pos-current-user'
 
 export default function LoginPage() {
@@ -12,57 +9,12 @@ export default function LoginPage() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
-  const [checkingLicense, setCheckingLicense] = useState(true)
-  const [loginBlocked, setLoginBlocked] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
-
-  useEffect(() => {
-    let isMounted = true
-
-    async function checkAccountStatus() {
-      try {
-        const license = await window.posAPI.checkLicense()
-        if (!isMounted) return
-
-        if (license.status === 'DISABLED') {
-          setLoginBlocked(true)
-          setErrorMessage(ACCOUNT_LOCKED_MESSAGE)
-          return
-        }
-
-        if (!license.allowed || license.status !== 'ACTIVE') {
-          setLoginBlocked(true)
-          setErrorMessage(license.message || ACCOUNT_VERIFY_FAILED_MESSAGE)
-          return
-        }
-
-        setLoginBlocked(false)
-        setErrorMessage(null)
-      } catch {
-        if (!isMounted) return
-        setLoginBlocked(true)
-        setErrorMessage(ACCOUNT_VERIFY_FAILED_MESSAGE)
-      } finally {
-        if (isMounted) {
-          setCheckingLicense(false)
-        }
-      }
-    }
-
-    checkAccountStatus()
-
-    return () => {
-      isMounted = false
-    }
-  }, [])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (loginBlocked) return
-
-    setLoading(false)
-    setErrorMessage(null)
     setLoading(true)
+    setErrorMessage(null)
 
     try {
       const res = await window.posAPI.login(username, password)
@@ -139,15 +91,11 @@ export default function LoginPage() {
 
           <button
             type="submit"
-            disabled={loading || checkingLicense || loginBlocked}
+            disabled={loading}
             className="mt-2.5 flex h-11.5 w-full items-center justify-center gap-2 rounded-md bg-success text-base font-semibold text-white transition-colors hover:bg-success-hover disabled:opacity-50"
           >
-            {loading || checkingLicense ? (
-              <Loader2 size={18} className="animate-spin" />
-            ) : (
-              <LogIn size={18} />
-            )}
-            {checkingLicense ? 'Checking...' : 'Sign In'}
+            {loading ? <Loader2 size={18} className="animate-spin" /> : <LogIn size={18} />}
+            Sign In
           </button>
         </form>
       </div>

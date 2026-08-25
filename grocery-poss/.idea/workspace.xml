@@ -10,9 +10,16 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="EmbeddingIndexingInfo">
+    <option name="cachedIndexableFilesCount" value="246" />
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
+  <component name="KmpPackageLockUpdaterState"><![CDATA[{
+  "jsModulesKotlinGradlePluginVersion": {},
+  "wasmModulesKotlinGradlePluginVersion": {}
+}]]></component>
   <component name="McpProjectServerCommands">
     <commands />
     <urls />
@@ -76,6 +83,9 @@
       <entry key="W1" value="1185.9378291107848" />
     </decayedShown>
   </component>
+  <component name="NoctuleProjectWorkspaceSettings">
+    <option name="migratedAutodetectionSetting" value="true" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 6,
   &quot;fromUser&quot;: false
@@ -87,20 +97,24 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "CidrDebugProfileConversion": "true",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.MCP Project settings loaded": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.go.formatter.settings.were.checked": "true",
+    "RunOnceActivity.readMode.enableVisualFormatting": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "cidr.known.project.marker": "true",
     "codeWithMe.voiceChat.enabledByDefault": "false",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
     "dart.analysis.tool.window.visible": "false",
-    "git-widget-placeholder": "LoginRestric",
+    "git-widget-placeholder": "main",
     "ignore.virus.scanning.warn.message": "true",
     "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/ANJANA TINUSH/Desktop/Github/glosary_shop_poss_system/grocery-poss",
+    "last_opened_file_path": "C:/Users/ANJANA TINUSH/Desktop/Github/IBL/hardware_poss_system/grocery-poss",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -108,7 +122,7 @@
     "nodejs_package_manager_path": "npm",
     "show.migrate.to.gradle.popup": "false",
     "to.speed.mode.migration.done": "true",
-    "ts.external.directory.path": "C:\\Users\\ANJANA TINUSH\\AppData\\Roaming\\npm\\node_modules\\typescript\\lib"
+    "ts.external.directory.path": "C:\\Users\\ANJANA TINUSH\\Desktop\\Github\\IBL\\hardware_poss_system\\grocery-poss\\node_modules\\typescript\\lib"
   }
 }]]></component>
   <component name="SharedIndexes">

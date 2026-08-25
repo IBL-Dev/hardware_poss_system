@@ -333,11 +333,11 @@ function createDatabaseSchema(database: Database.Database): void {
 }
 
 function seedAdminUser(database: Database.Database): void {
-  const adminEmail = 'hani@gmail.com'
+  const adminEmail = 'admin@gmail.com'
   const existing = database.prepare('SELECT id FROM users WHERE email = ?').get(adminEmail)
   if (!existing) {
     const salt = randomBytes(16).toString('hex')
-    const hash = scryptSync('hani123', salt, 64).toString('hex')
+    const hash = scryptSync('Test@123', salt, 64).toString('hex')
     const passwordHash = `scrypt:${salt}:${hash}`
     database
       .prepare(
@@ -346,7 +346,7 @@ function seedAdminUser(database: Database.Database): void {
       VALUES (?, ?, ?, ?, ?, ?)
     `
       )
-      .run('hani', '000000000V', adminEmail, '0000000000', 'ADMIN', passwordHash)
+      .run('admin', '000000000V', adminEmail, '0000000000', 'ADMIN', passwordHash)
     console.log(`Seeded default admin user: ${adminEmail}`)
   }
 }
