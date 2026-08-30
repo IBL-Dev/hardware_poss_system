@@ -1,5 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Download, Filter, Plus, RotateCcw, Search, Trash2 } from 'lucide-react'
+import {
+  Boxes,
+  Download,
+  Filter,
+  PackagePlus,
+  Plus,
+  RotateCcw,
+  Search,
+  Trash2
+} from 'lucide-react'
 import { DataTable, Column } from '../components/common/DataTable'
 import { Loader } from '../components/common/Loader'
 import { SearchableSelect } from '../components/common/SearchableSelect'
@@ -106,7 +115,7 @@ const ProductsPage: React.FC = () => {
       key: 'sku',
       header: 'CODE',
       render: (item) => (
-        <span className="rounded-full border border-primary/20 bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
+        <span className="inline-flex items-center rounded-md border border-emerald-200 bg-emerald-50 px-2.5 py-1 font-mono text-xs font-bold text-emerald-700">
           {item.sku}
         </span>
       )
@@ -114,33 +123,61 @@ const ProductsPage: React.FC = () => {
     {
       key: 'barcode',
       header: 'BARCODE',
-      render: (item) => <span className="text-muted">{item.barcode || '-'}</span>
+      render: (item) => (
+        <span className="font-mono text-[0.82rem] font-medium text-slate-500">
+          {item.barcode || '-'}
+        </span>
+      )
     },
     {
       key: 'name',
       header: 'PRODUCT NAME',
-      render: (item) => <span className="font-semibold text-ink">{item.name}</span>
+      render: (item) => (
+        <div className="flex min-w-[170px] items-center gap-2.5">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-emerald-100 bg-emerald-50">
+            <Boxes size={15} className="text-emerald-600" />
+          </div>
+
+          <span className="font-semibold text-slate-800">{item.name}</span>
+        </div>
+      )
     },
     {
       key: 'brandName',
       header: 'BRAND',
-      render: (item) => <span className="text-muted">{item.brandName ?? '-'}</span>
+      render: (item) => (
+        <span className="text-sm font-medium text-slate-600">
+          {item.brandName ?? '-'}
+        </span>
+      )
     },
     {
       key: 'categoryName',
       header: 'CATEGORY',
-      render: (item) => <span className="text-muted">{item.categoryName ?? '-'}</span>
+      render: (item) => (
+        <span className="inline-flex rounded-md bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600">
+          {item.categoryName ?? '-'}
+        </span>
+      )
     },
     {
       key: 'supplierName',
       header: 'SUPPLIER',
-      render: (item) => <span className="text-muted">{item.supplierName ?? '-'}</span>
+      render: (item) => (
+        <span className="text-sm font-medium text-slate-500">
+          {item.supplierName ?? '-'}
+        </span>
+      )
     },
     {
       key: 'sellingPrice',
       header: 'PRICE (LKR)',
       render: (item) => (
-        <span className="font-semibold text-success">{formatLkrAmount(item.sellingPrice)}</span>
+        <div className="min-w-[100px]">
+          <span className="font-bold text-emerald-700">
+            {formatLkrAmount(item.sellingPrice)}
+          </span>
+        </div>
       )
     },
     {
@@ -148,11 +185,11 @@ const ProductsPage: React.FC = () => {
       header: 'DISCOUNT',
       render: (item) =>
         item.discountPercent > 0 ? (
-          <span className="inline-flex rounded-full border border-warning/25 bg-warning/10 px-2.5 py-1 text-xs font-semibold text-warning">
-            {item.discountPercent}%
+          <span className="inline-flex items-center rounded-md border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-700">
+            {item.discountPercent}% OFF
           </span>
         ) : (
-          <span className="text-muted">-</span>
+          <span className="text-sm text-slate-400">-</span>
         )
     },
     {
@@ -160,7 +197,7 @@ const ProductsPage: React.FC = () => {
       header: 'STOCK',
       render: (item) => (
         <span
-          className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${getStockBadgeClass(
+          className={`inline-flex min-w-[74px] items-center justify-center rounded-md px-2.5 py-1.5 text-xs font-bold ${getStockBadgeClass(
             item
           )}`}
         >
@@ -192,20 +229,30 @@ const ProductsPage: React.FC = () => {
 
   const handleSave = async (data: ProductFormData): Promise<void> => {
     setIsSaving(true)
+
     try {
       if (editingProduct) {
         const payload: UpdateProductInput = buildProductPayload(data)
+
         const updatedProduct = await productsApi.update(editingProduct.id, payload)
+
         setProducts((prev) =>
-          prev.map((product) => (product.id === editingProduct.id ? updatedProduct : product))
+          prev.map((product) =>
+            product.id === editingProduct.id ? updatedProduct : product
+          )
         )
+
         toast.success(`"${data.name}" was updated successfully.`)
       } else {
         const payload: CreateProductInput = buildProductPayload(data)
+
         const createdProduct = await productsApi.create(payload)
+
         setProducts((prev) => [createdProduct, ...prev])
+
         toast.success(`"${data.name}" was added successfully.`)
       }
+
       setIsModalOpen(false)
       setEditingProduct(null)
     } catch (error) {
@@ -218,30 +265,49 @@ const ProductsPage: React.FC = () => {
   const deleteProduct = async (product: ProductRecord): Promise<void> => {
     try {
       await productsApi.delete(product.id)
+
       setProducts((prev) => prev.filter((item) => item.id !== product.id))
-      setSelectedProductIds((prev) => prev.filter((id) => id !== product.id))
+
+      setSelectedProductIds((prev) =>
+        prev.filter((id) => id !== product.id)
+      )
+
       toast.success(`"${product.name}" was deleted successfully.`)
     } catch (error) {
       toast.error(getErrorMessage(error))
     }
   }
 
-  const deleteProducts = async (productsToDelete: ProductRecord[]): Promise<void> => {
+  const deleteProducts = async (
+    productsToDelete: ProductRecord[]
+  ): Promise<void> => {
     const deletedIds = new Set<number>()
 
     try {
       for (const product of productsToDelete) {
         await productsApi.delete(product.id)
+
         deletedIds.add(product.id)
       }
 
-      setProducts((prev) => prev.filter((product) => !deletedIds.has(product.id)))
+      setProducts((prev) =>
+        prev.filter((product) => !deletedIds.has(product.id))
+      )
+
       setSelectedProductIds([])
-      toast.success(`${productsToDelete.length} product(s) were deleted successfully.`)
+
+      toast.success(
+        `${productsToDelete.length} product(s) were deleted successfully.`
+      )
     } catch (error) {
       if (deletedIds.size > 0) {
-        setProducts((prev) => prev.filter((product) => !deletedIds.has(product.id)))
-        setSelectedProductIds((prev) => prev.filter((id) => !deletedIds.has(id)))
+        setProducts((prev) =>
+          prev.filter((product) => !deletedIds.has(product.id))
+        )
+
+        setSelectedProductIds((prev) =>
+          prev.filter((id) => !deletedIds.has(id))
+        )
       }
 
       toast.error(getErrorMessage(error))
@@ -259,7 +325,9 @@ const ProductsPage: React.FC = () => {
   }
 
   const handleDeleteSelected = (): void => {
-    const productsToDelete = products.filter((product) => selectedProductIds.includes(product.id))
+    const productsToDelete = products.filter((product) =>
+      selectedProductIds.includes(product.id)
+    )
 
     if (productsToDelete.length === 0) {
       return
@@ -277,7 +345,11 @@ const ProductsPage: React.FC = () => {
   const handleImported = (createdProducts: ProductRecord[]): void => {
     setProducts((prev) => [...createdProducts, ...prev])
 
-    Promise.all([brandsApi.list(), categoriesApi.list(), suppliersApi.list()])
+    Promise.all([
+      brandsApi.list(),
+      categoriesApi.list(),
+      suppliersApi.list()
+    ])
       .then(([loadedBrands, loadedCategories, loadedSuppliers]) => {
         setBrands(loadedBrands)
         setCategories(loadedCategories)
@@ -288,95 +360,143 @@ const ProductsPage: React.FC = () => {
       })
   }
 
-  const handleCreateBrand = async (name: string): Promise<BrandRecord> => {
+  const handleCreateBrand = async (
+    name: string
+  ): Promise<BrandRecord> => {
     try {
       const createdBrand = await brandsApi.create({ name })
+
       setBrands((prev) =>
-        sortByName([createdBrand, ...prev.filter((brand) => brand.id !== createdBrand.id)])
+        sortByName([
+          createdBrand,
+          ...prev.filter((brand) => brand.id !== createdBrand.id)
+        ])
       )
-      toast.success(`Brand "${createdBrand.name}" was added successfully.`)
+
+      toast.success(
+        `Brand "${createdBrand.name}" was added successfully.`
+      )
 
       return createdBrand
     } catch (error) {
       const refreshedBrands = await brandsApi.list().catch(() => null)
+
       const existingBrand = refreshedBrands?.find(
-        (brand) => normalizeName(brand.name) === normalizeName(name)
+        (brand) =>
+          normalizeName(brand.name) === normalizeName(name)
       )
 
       if (existingBrand && refreshedBrands) {
         setBrands(refreshedBrands)
-        toast.info(`Brand "${existingBrand.name}" already exists.`)
+
+        toast.info(
+          `Brand "${existingBrand.name}" already exists.`
+        )
 
         return existingBrand
       }
 
       toast.error(getErrorMessage(error))
+
       throw error
     }
   }
 
-  const handleCreateCategory = async (name: string): Promise<CategoryRecord> => {
+  const handleCreateCategory = async (
+    name: string
+  ): Promise<CategoryRecord> => {
     try {
       const createdCategory = await categoriesApi.create({ name })
+
       setCategories((prev) =>
         sortByName([
           createdCategory,
-          ...prev.filter((category) => category.id !== createdCategory.id)
+          ...prev.filter(
+            (category) => category.id !== createdCategory.id
+          )
         ])
       )
-      toast.success(`Category "${createdCategory.name}" was added successfully.`)
+
+      toast.success(
+        `Category "${createdCategory.name}" was added successfully.`
+      )
 
       return createdCategory
     } catch (error) {
-      const refreshedCategories = await categoriesApi.list().catch(() => null)
+      const refreshedCategories = await categoriesApi
+        .list()
+        .catch(() => null)
+
       const existingCategory = refreshedCategories?.find(
-        (category) => normalizeName(category.name) === normalizeName(name)
+        (category) =>
+          normalizeName(category.name) === normalizeName(name)
       )
 
       if (existingCategory && refreshedCategories) {
         setCategories(refreshedCategories)
-        toast.info(`Category "${existingCategory.name}" already exists.`)
+
+        toast.info(
+          `Category "${existingCategory.name}" already exists.`
+        )
 
         return existingCategory
       }
 
       toast.error(getErrorMessage(error))
+
       throw error
     }
   }
 
-  const handleCreateSupplier = async (name: string): Promise<SupplierRecord> => {
+  const handleCreateSupplier = async (
+    name: string
+  ): Promise<SupplierRecord> => {
     try {
       const createdSupplier = await suppliersApi.create({ name })
+
       setSuppliers((prev) =>
         sortByName([
           createdSupplier,
-          ...prev.filter((supplier) => supplier.id !== createdSupplier.id)
+          ...prev.filter(
+            (supplier) => supplier.id !== createdSupplier.id
+          )
         ])
       )
-      toast.success(`Supplier "${createdSupplier.name}" was added successfully.`)
+
+      toast.success(
+        `Supplier "${createdSupplier.name}" was added successfully.`
+      )
 
       return createdSupplier
     } catch (error) {
-      const refreshedSuppliers = await suppliersApi.list().catch(() => null)
+      const refreshedSuppliers = await suppliersApi
+        .list()
+        .catch(() => null)
+
       const existingSupplier = refreshedSuppliers?.find(
-        (supplier) => normalizeName(supplier.name) === normalizeName(name)
+        (supplier) =>
+          normalizeName(supplier.name) === normalizeName(name)
       )
 
       if (existingSupplier && refreshedSuppliers) {
         setSuppliers(refreshedSuppliers)
-        toast.info(`Supplier "${existingSupplier.name}" already exists.`)
+
+        toast.info(
+          `Supplier "${existingSupplier.name}" already exists.`
+        )
 
         return existingSupplier
       }
 
       toast.error(getErrorMessage(error))
+
       throw error
     }
   }
 
   const exportProductsCsv = async (): Promise<void> => {
     setIsExporting(true)
+
     try {
       const result = await productsApi.exportCsv()
 
@@ -408,138 +528,294 @@ const ProductsPage: React.FC = () => {
   }
 
   return (
-    <div>
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-ink">Products</h1>
-          <p className="mt-1 text-[0.95rem] text-muted">Manage the store product catalog</p>
-        </div>
-        <div className="flex flex-wrap items-center justify-end gap-3">
-          <button
-            className="flex items-center gap-2 rounded-md border border-danger/30 bg-card px-4 py-2.5 text-[0.95rem] font-semibold text-danger transition-colors hover:bg-danger/10 disabled:cursor-not-allowed disabled:opacity-60"
-            onClick={handleDeleteSelected}
-            disabled={selectedProductIds.length === 0}
-          >
-            <Trash2 size={18} />
-            {selectedProductIds.length > 0
-              ? `Delete Selected (${selectedProductIds.length})`
-              : 'Delete Selected'}
-          </button>
-          <button
-            className="flex items-center gap-2 rounded-md border border-line bg-card px-4 py-2.5 text-[0.95rem] font-semibold text-ink transition-colors hover:bg-hover disabled:cursor-not-allowed disabled:opacity-60"
-            onClick={handleExportClick}
-            disabled={isExporting || products.length === 0}
-          >
-            <Download size={18} />
-            {isExporting ? 'Exporting...' : 'Export CSV'}
-          </button>
-          <button
-            className="flex items-center gap-2 rounded-md bg-success px-4 py-2.5 text-[0.95rem] font-semibold text-white transition-[background-color,transform] duration-150 hover:-translate-y-0.5 hover:bg-success-hover"
-            onClick={handleAddClick}
-          >
-            <Plus size={18} />
-            Add Product
-          </button>
-        </div>
-      </div>
+    <div className="min-h-full">
+      {/* ======================================================
+          PAGE HEADER
+      ====================================================== */}
 
-      {!isLoading && products.length > 0 && (
-        <div className="mb-5 rounded-lg border border-line bg-card p-4 shadow-sm">
-          <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center gap-2 text-[0.9rem] font-semibold text-muted">
-              <Filter size={16} />
-              Product Filters
+      <div className="mb-5 rounded-xl border border-slate-200 bg-white px-5 py-5 shadow-sm sm:px-6">
+        <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
+          <div className="flex items-start gap-3.5">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-emerald-600 shadow-sm">
+              <Boxes size={21} className="text-white" />
             </div>
-            <span className="text-sm text-muted">
-              Showing <span className="font-semibold text-ink">{filteredProducts.length}</span> of{' '}
-              <span className="font-semibold text-ink">{products.length}</span>
-            </span>
+
+            <div>
+              <div className="flex flex-wrap items-center gap-2">
+                <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+                  Products
+                </h1>
+
+                {!isLoading && (
+                  <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700">
+                    {products.length} Items
+                  </span>
+                )}
+              </div>
+
+              <p className="mt-1 text-[0.92rem] text-slate-500">
+                Manage products, prices, suppliers and stock inventory
+              </p>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1.4fr_0.9fr_0.9fr_auto]">
-            <div className="flex items-center gap-2 rounded-md border border-line bg-bg px-3 py-2.5 focus-within:border-primary">
-              <Search size={17} className="shrink-0 text-faint" />
-              <input
-                type="text"
-                className="min-w-0 flex-1 border-none bg-transparent text-[0.95rem] text-ink outline-none placeholder:text-faint"
-                placeholder="Search code, barcode, product, supplier"
-                value={productSearch}
-                onChange={(event) => setProductSearch(event.target.value)}
-              />
-            </div>
+          <div className="flex flex-wrap items-center gap-2.5">
+            <button
+              type="button"
+              className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-red-200 bg-white px-3.5 text-sm font-semibold text-red-600 shadow-sm transition-colors hover:border-red-300 hover:bg-red-50 disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-50 disabled:text-slate-400 disabled:shadow-none"
+              onClick={handleDeleteSelected}
+              disabled={selectedProductIds.length === 0}
+            >
+              <Trash2 size={17} />
 
-            <SearchableSelect
-              options={[
-                { value: '', label: 'All Brands' },
-                ...brands.map((brand) => ({ value: String(brand.id), label: brand.name }))
-              ]}
-              value={brandFilterId}
-              onChange={setBrandFilterId}
-              placeholder="All Brands"
-              searchPlaceholder="Search brand..."
-              ariaLabel="Filter products by brand"
-              triggerClassName="flex w-full items-center justify-between rounded-md border border-line bg-bg px-3 py-2.5 text-[0.95rem] text-ink outline-none focus:border-primary"
-            />
-
-            <SearchableSelect
-              options={[
-                { value: '', label: 'All Categories' },
-                ...categories.map((category) => ({
-                  value: String(category.id),
-                  label: category.name
-                }))
-              ]}
-              value={categoryFilterId}
-              onChange={setCategoryFilterId}
-              placeholder="All Categories"
-              searchPlaceholder="Search category..."
-              ariaLabel="Filter products by category"
-              triggerClassName="flex w-full items-center justify-between rounded-md border border-line bg-bg px-3 py-2.5 text-[0.95rem] text-ink outline-none focus:border-primary"
-            />
+              {selectedProductIds.length > 0
+                ? `Delete (${selectedProductIds.length})`
+                : 'Delete Selected'}
+            </button>
 
             <button
               type="button"
-              className="flex items-center justify-center gap-2 rounded-md border border-line bg-card px-4 py-2.5 text-[0.95rem] font-semibold text-ink transition-colors hover:bg-hover disabled:cursor-not-allowed disabled:opacity-60"
-              onClick={handleResetFilters}
-              disabled={!hasActiveFilters}
+              className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-3.5 text-sm font-semibold text-slate-700 shadow-sm transition-colors hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400 disabled:shadow-none"
+              onClick={handleExportClick}
+              disabled={isExporting || products.length === 0}
             >
-              <RotateCcw size={16} />
-              Reset
+              <Download size={17} />
+
+              {isExporting ? 'Exporting...' : 'Export CSV'}
             </button>
+
+            <button
+              type="button"
+              className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 text-sm font-bold text-white shadow-sm shadow-emerald-600/20 transition-all hover:-translate-y-px hover:bg-emerald-700 hover:shadow-md hover:shadow-emerald-600/20 active:translate-y-0"
+              onClick={handleAddClick}
+            >
+              <Plus size={18} />
+              Add Product
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* ======================================================
+          PRODUCT FILTERS
+      ====================================================== */}
+
+      {!isLoading && products.length > 0 && (
+        <div className="mb-5 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-5 py-3.5">
+            <div className="flex items-center gap-2">
+              <div className="flex h-7 w-7 items-center justify-center rounded-md bg-emerald-50">
+                <Filter size={14} className="text-emerald-600" />
+              </div>
+
+              <div>
+                <h2 className="text-sm font-bold text-slate-800">
+                  Search & Filter
+                </h2>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 text-xs text-slate-500">
+              <span>Displaying</span>
+
+              <span className="rounded-md bg-emerald-50 px-2 py-1 font-bold text-emerald-700">
+                {filteredProducts.length}
+              </span>
+
+              <span>of</span>
+
+              <span className="font-bold text-slate-700">
+                {products.length}
+              </span>
+
+              <span>products</span>
+            </div>
+          </div>
+
+          <div className="p-4 sm:p-5">
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-[1.5fr_0.8fr_0.8fr_auto]">
+              {/* ==================================================
+                  SEARCH INPUT
+              ================================================== */}
+
+              <div className="group flex h-11 items-center gap-2.5 rounded-lg border border-slate-200 bg-white px-3.5 shadow-sm transition-colors focus-within:border-emerald-400 focus-within:ring-2 focus-within:ring-emerald-500/10">
+                <Search
+                  size={17}
+                  className="shrink-0 text-slate-400 transition-colors group-focus-within:text-emerald-600"
+                />
+
+                <input
+                  type="text"
+                  className="min-w-0 flex-1 border-none bg-transparent text-sm font-medium text-slate-800 outline-none placeholder:font-normal placeholder:text-slate-400"
+                  placeholder="Search code, barcode, product or supplier..."
+                  value={productSearch}
+                  onChange={(event) =>
+                    setProductSearch(event.target.value)
+                  }
+                />
+              </div>
+
+              {/* ==================================================
+                  BRAND FILTER
+              ================================================== */}
+
+              <SearchableSelect
+                options={[
+                  {
+                    value: '',
+                    label: 'All Brands'
+                  },
+                  ...brands.map((brand) => ({
+                    value: String(brand.id),
+                    label: brand.name
+                  }))
+                ]}
+                value={brandFilterId}
+                onChange={setBrandFilterId}
+                placeholder="All Brands"
+                searchPlaceholder="Search brand..."
+                ariaLabel="Filter products by brand"
+                triggerClassName="flex h-11 w-full items-center justify-between rounded-lg border border-slate-200 bg-white px-3.5 text-sm font-medium text-slate-700 shadow-sm outline-none transition-colors hover:border-slate-300 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/10"
+              />
+
+              {/* ==================================================
+                  CATEGORY FILTER
+              ================================================== */}
+
+              <SearchableSelect
+                options={[
+                  {
+                    value: '',
+                    label: 'All Categories'
+                  },
+                  ...categories.map((category) => ({
+                    value: String(category.id),
+                    label: category.name
+                  }))
+                ]}
+                value={categoryFilterId}
+                onChange={setCategoryFilterId}
+                placeholder="All Categories"
+                searchPlaceholder="Search category..."
+                ariaLabel="Filter products by category"
+                triggerClassName="flex h-11 w-full items-center justify-between rounded-lg border border-slate-200 bg-white px-3.5 text-sm font-medium text-slate-700 shadow-sm outline-none transition-colors hover:border-slate-300 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/10"
+              />
+
+              {/* ==================================================
+                  RESET
+              ================================================== */}
+
+              <button
+                type="button"
+                className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-4 text-sm font-semibold text-slate-600 transition-colors hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700 disabled:cursor-not-allowed disabled:border-slate-100 disabled:bg-slate-50 disabled:text-slate-300"
+                onClick={handleResetFilters}
+                disabled={!hasActiveFilters}
+              >
+                <RotateCcw size={15} />
+                Reset
+              </button>
+            </div>
           </div>
         </div>
       )}
 
+      {/* ======================================================
+          PRODUCT TABLE / STATES
+      ====================================================== */}
+
       {isLoading ? (
-        <div className="rounded-lg border border-line bg-card p-6">
+        <div className="rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
           <Loader label="Loading products..." size="sm" />
         </div>
       ) : products.length === 0 ? (
-        <div className="rounded-lg border border-line bg-card p-6 text-center text-muted">
-          No products found.
+        <div className="flex min-h-[330px] flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white px-6 py-10 text-center">
+          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-emerald-50">
+            <PackagePlus size={27} className="text-emerald-600" />
+          </div>
+
+          <h3 className="text-base font-bold text-slate-800">
+            No products available
+          </h3>
+
+          <p className="mt-1 max-w-md text-sm leading-6 text-slate-500">
+            Your product inventory is currently empty. Add your first
+            hardware product to start managing your store inventory.
+          </p>
+
+          <button
+            type="button"
+            className="mt-5 inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 text-sm font-bold text-white shadow-sm transition-colors hover:bg-emerald-700"
+            onClick={handleAddClick}
+          >
+            <Plus size={17} />
+            Add First Product
+          </button>
         </div>
       ) : filteredProducts.length === 0 ? (
-        <div className="rounded-lg border border-line bg-card p-6 text-center text-muted">
-          No products match the selected filters.
+        <div className="flex min-h-[260px] flex-col items-center justify-center rounded-xl border border-slate-200 bg-white px-6 py-10 text-center shadow-sm">
+          <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100">
+            <Search size={22} className="text-slate-400" />
+          </div>
+
+          <h3 className="font-bold text-slate-800">
+            No matching products
+          </h3>
+
+          <p className="mt-1 max-w-sm text-sm leading-6 text-slate-500">
+            No products match your current search or filter selection.
+          </p>
+
+          <button
+            type="button"
+            className="mt-4 inline-flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3.5 py-2 text-sm font-semibold text-emerald-700 transition-colors hover:bg-emerald-100"
+            onClick={handleResetFilters}
+          >
+            <RotateCcw size={15} />
+            Clear Filters
+          </button>
         </div>
       ) : (
-        <DataTable
-          columns={columns}
-          data={filteredProducts}
-          selectedIds={selectedProductIds}
-          onSelectionChange={setSelectedProductIds}
-          onView={handleView}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-        />
+        <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 bg-slate-50/70 px-5 py-3">
+            <div className="flex items-center gap-2">
+              <Boxes size={16} className="text-emerald-600" />
+
+              <span className="text-sm font-bold text-slate-700">
+                Product Inventory
+              </span>
+            </div>
+
+            {selectedProductIds.length > 0 && (
+              <span className="rounded-md border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700">
+                {selectedProductIds.length} selected
+              </span>
+            )}
+          </div>
+
+          <DataTable
+            columns={columns}
+            data={filteredProducts}
+            selectedIds={selectedProductIds}
+            onSelectionChange={setSelectedProductIds}
+            onView={handleView}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
+        </div>
       )}
+
+      {/* ======================================================
+          PRODUCT FORM MODAL
+      ====================================================== */}
 
       <ProductModal
         isOpen={isModalOpen}
         brands={brands}
         categories={categories}
         suppliers={suppliers}
-        existingProductNames={products.map((product) => product.name)}
+        existingProductNames={products.map(
+          (product) => product.name
+        )}
         initialData={
           editingProduct
             ? {
@@ -566,14 +842,27 @@ const ProductsPage: React.FC = () => {
         onCreateSupplier={handleCreateSupplier}
       />
 
-      <ProductDetailsModal product={viewingProduct} onClose={() => setViewingProduct(null)} />
+      {/* ======================================================
+          PRODUCT DETAILS MODAL
+      ====================================================== */}
+
+      <ProductDetailsModal
+        product={viewingProduct}
+        onClose={() => setViewingProduct(null)}
+      />
     </div>
   )
 }
 
 export default ProductsPage
 
-function buildProductPayload(data: ProductFormData): CreateProductInput {
+/* ==========================================================
+   PRODUCT PAYLOAD
+========================================================== */
+
+function buildProductPayload(
+  data: ProductFormData
+): CreateProductInput {
   return {
     sku: data.sku,
     barcode: data.barcode,
@@ -589,15 +878,34 @@ function buildProductPayload(data: ProductFormData): CreateProductInput {
   }
 }
 
+/* ==========================================================
+   NAME NORMALIZER
+========================================================== */
+
 function normalizeName(value: string): string {
   return value.trim().toLowerCase()
 }
 
-function sortByName<T extends { name: string }>(records: T[]): T[] {
-  return [...records].sort((left, right) => left.name.localeCompare(right.name))
+/* ==========================================================
+   SORT BY NAME
+========================================================== */
+
+function sortByName<T extends { name: string }>(
+  records: T[]
+): T[] {
+  return [...records].sort((left, right) =>
+    left.name.localeCompare(right.name)
+  )
 }
 
-function productMatchesSearch(product: ProductRecord, normalizedSearch: string): boolean {
+/* ==========================================================
+   PRODUCT SEARCH
+========================================================== */
+
+function productMatchesSearch(
+  product: ProductRecord,
+  normalizedSearch: string
+): boolean {
   return [
     product.sku,
     product.barcode ?? '',
@@ -612,15 +920,30 @@ function productMatchesSearch(product: ProductRecord, normalizedSearch: string):
     .includes(normalizedSearch)
 }
 
+/* ==========================================================
+   ERROR MESSAGE
+========================================================== */
+
 function getErrorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : 'Something went wrong. Please try again.'
+  return error instanceof Error
+    ? error.message
+    : 'Something went wrong. Please try again.'
 }
 
-function getStockBadgeClass(product: ProductRecord): string {
-  if (product.stockQuantity === 0) return 'border border-danger/20 bg-danger/10 text-danger'
-  if (product.stockQuantity <= product.reorderLevel) {
-    return 'border border-warning/25 bg-warning/10 text-warning'
+/* ==========================================================
+   STOCK BADGE
+========================================================== */
+
+function getStockBadgeClass(
+  product: ProductRecord
+): string {
+  if (product.stockQuantity === 0) {
+    return 'border border-red-200 bg-red-50 text-red-700'
   }
 
-  return 'border border-success/20 bg-success/10 text-success'
+  if (product.stockQuantity <= product.reorderLevel) {
+    return 'border border-amber-200 bg-amber-50 text-amber-700'
+  }
+
+  return 'border border-emerald-200 bg-emerald-50 text-emerald-700'
 }

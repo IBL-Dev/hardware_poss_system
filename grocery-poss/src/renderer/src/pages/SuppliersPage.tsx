@@ -81,24 +81,50 @@ const SuppliersPage: React.FC = () => {
   const columns: Column<SupplierRecord>[] = [
     {
       key: 'name',
-      header: 'SUPPLIER NAME',
+      header: 'SUPPLIER',
       render: (item) => (
-        <span className="inline-flex rounded-full border border-primary/20 bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
-          {item.name}
-        </span>
+        <div className="flex min-w-[190px] items-center gap-3">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-emerald-100 bg-emerald-50">
+            <Building2 size={17} className="text-emerald-600" />
+          </div>
+          <div className="min-w-0">
+            <span className="block truncate font-semibold text-slate-800">{item.name}</span>
+            <span className="mt-0.5 block text-[0.7rem] font-semibold uppercase tracking-wide text-slate-400">
+              Hardware Supplier
+            </span>
+          </div>
+        </div>
       )
     },
-    { key: 'contactName', header: 'CONTACT', render: (item) => item.contactName || '-' },
-    { key: 'phone', header: 'PHONE', render: (item) => item.phone || '-' },
-    { key: 'email', header: 'EMAIL', render: (item) => item.email || '-' },
+    {
+      key: 'contactName',
+      header: 'CONTACT PERSON',
+      render: (item) => <span className="text-sm font-medium text-slate-600">{item.contactName || '-'}</span>
+    },
+    {
+      key: 'phone',
+      header: 'PHONE',
+      render: (item) => <span className="whitespace-nowrap text-sm font-medium text-slate-600">{item.phone || '-'}</span>
+    },
+    {
+      key: 'email',
+      header: 'EMAIL',
+      render: (item) => <span className="block max-w-[220px] truncate text-sm text-slate-500">{item.email || '-'}</span>
+    },
     {
       key: 'productCount',
-      header: 'PRODUCTS',
-      render: (item) => (
-        <span className="inline-flex rounded-full border border-line-strong bg-subtle px-2.5 py-1 text-xs font-semibold text-muted">
-          {item.productCount}
-        </span>
-      )
+      header: 'LINKED PRODUCTS',
+      render: (item) =>
+        item.productCount > 0 ? (
+          <span className="inline-flex min-w-[76px] items-center justify-center gap-1.5 rounded-md border border-emerald-200 bg-emerald-50 px-2.5 py-1.5 text-xs font-bold text-emerald-700">
+            <PackageCheck size={13} />
+            {item.productCount}
+          </span>
+        ) : (
+          <span className="inline-flex min-w-[76px] items-center justify-center rounded-md border border-amber-200 bg-amber-50 px-2.5 py-1.5 text-xs font-semibold text-amber-700">
+            None
+          </span>
+        )
     }
   ]
 
@@ -107,27 +133,31 @@ const SuppliersPage: React.FC = () => {
       key: 'voucherNumber',
       header: 'VOUCHER NO',
       render: (item) => (
-        <span className="inline-flex rounded-full border border-primary/20 bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
+        <span className="inline-flex rounded-md border border-emerald-200 bg-emerald-50 px-2.5 py-1.5 font-mono text-xs font-bold text-emerald-700">
           {item.voucherNumber}
         </span>
       )
     },
-    { key: 'supplierName', header: 'SUPPLIER', render: (item) => item.supplierName || '-' },
-    { key: 'voucherDate', header: 'DATE', render: (item) => formatShortDate(item.voucherDate) },
+    {
+      key: 'supplierName',
+      header: 'SUPPLIER',
+      render: (item) => <span className="font-semibold text-slate-700">{item.supplierName || '-'}</span>
+    },
+    {
+      key: 'voucherDate',
+      header: 'DATE',
+      render: (item) => <span className="whitespace-nowrap text-sm font-medium text-slate-500">{formatShortDate(item.voucherDate)}</span>
+    },
     {
       key: 'amount',
       header: 'AMOUNT (LKR)',
-      render: (item) => <span className="font-semibold text-ink">{formatLkr(item.amount)}</span>
+      render: (item) => <span className="font-bold text-emerald-700">{formatLkr(item.amount)}</span>
     },
     {
       key: 'status',
       header: 'STATUS',
       render: (item) => (
-        <span
-          className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold ${getVoucherStatusClassName(
-            item.status
-          )}`}
-        >
+        <span className={`inline-flex rounded-md border px-2.5 py-1.5 text-xs font-bold ${getVoucherStatusClassName(item.status)}`}>
           {formatVoucherStatus(item.status)}
         </span>
       )
@@ -135,9 +165,7 @@ const SuppliersPage: React.FC = () => {
     {
       key: 'note',
       header: 'NOTES',
-      render: (item) => (
-        <span className="block max-w-64 truncate text-sm text-muted">{item.note || '-'}</span>
-      )
+      render: (item) => <span className="block max-w-64 truncate text-sm text-slate-500">{item.note || '-'}</span>
     }
   ]
 
@@ -341,258 +369,314 @@ const SuppliersPage: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col gap-5">
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-ink">Suppliers</h1>
-          <p className="mt-1 text-[0.95rem] text-muted">
-            Manage supplier activity and contact readiness
-          </p>
+    <div className="flex min-h-full flex-col gap-5">
+      {/* ======================================================
+          PAGE HEADER
+      ====================================================== */}
+
+      <div className="rounded-xl border border-slate-200 bg-white px-5 py-5 shadow-sm sm:px-6">
+        <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
+          <div className="flex items-start gap-3.5">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-emerald-600 shadow-sm">
+              <Building2 size={21} className="text-white" />
+            </div>
+            <div>
+              <div className="flex flex-wrap items-center gap-2">
+                <h1 className="text-2xl font-bold tracking-tight text-slate-900">Suppliers</h1>
+                {!isLoading && (
+                  <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700">
+                    {suppliers.length} Suppliers
+                  </span>
+                )}
+              </div>
+              <p className="mt-1 text-[0.92rem] text-slate-500">
+                Manage hardware suppliers, purchasing contacts, stock value and payment vouchers
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 text-sm font-bold text-white shadow-sm shadow-emerald-600/20 transition-all hover:-translate-y-px hover:bg-emerald-700 hover:shadow-md disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none disabled:hover:translate-y-0"
+            onClick={handleAddClick}
+            disabled={activeView === 'vouchers' && suppliers.length === 0}
+            title={
+              activeView === 'vouchers' && suppliers.length === 0
+                ? 'Create a supplier before adding vouchers'
+                : undefined
+            }
+          >
+            <Plus size={18} />
+            {activeView === 'vouchers' ? 'Add Voucher' : 'Add Supplier'}
+          </button>
         </div>
-        <button
-          className="flex items-center gap-2 rounded-md bg-success px-4 py-2.5 text-[0.95rem] font-semibold text-white transition-[background-color,transform] duration-150 hover:-translate-y-0.5 hover:bg-success-hover disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:bg-success"
-          onClick={handleAddClick}
-          disabled={activeView === 'vouchers' && suppliers.length === 0}
-          title={
-            activeView === 'vouchers' && suppliers.length === 0
-              ? 'Create a supplier before adding vouchers'
-              : undefined
-          }
-        >
-          <Plus size={18} />
-          {activeView === 'vouchers' ? 'Add Voucher' : 'Add Supplier'}
-        </button>
       </div>
 
-      <div className="flex gap-1 border-b border-line">
-        <button
-          type="button"
-          className={`-mb-px flex items-center gap-2 border-b-2 px-4 py-2 text-[0.9rem] font-semibold transition-colors ${
-            activeView === 'overview'
-              ? 'border-primary text-primary'
-              : 'border-transparent text-muted hover:text-ink'
-          }`}
-          onClick={() => setActiveView('overview')}
-        >
-          <ClipboardList size={16} />
-          Overview
-        </button>
-        <button
-          type="button"
-          className={`-mb-px flex items-center gap-2 border-b-2 px-4 py-2 text-[0.9rem] font-semibold transition-colors ${
-            activeView === 'list'
-              ? 'border-primary text-primary'
-              : 'border-transparent text-muted hover:text-ink'
-          }`}
-          onClick={() => setActiveView('list')}
-        >
-          <Building2 size={16} />
-          Supplier List
-        </button>
-        <button
-          type="button"
-          className={`-mb-px flex items-center gap-2 border-b-2 px-4 py-2 text-[0.9rem] font-semibold transition-colors ${
-            activeView === 'vouchers'
-              ? 'border-primary text-primary'
-              : 'border-transparent text-muted hover:text-ink'
-          }`}
-          onClick={() => setActiveView('vouchers')}
-        >
-          <FileText size={16} />
-          Vouchers
-        </button>
+      {/* ======================================================
+          VIEW NAVIGATION
+      ====================================================== */}
+
+      <div className="rounded-xl border border-slate-200 bg-white p-1.5 shadow-sm">
+        <div className="grid grid-cols-1 gap-1 sm:grid-cols-3">
+          <SupplierViewButton
+            active={activeView === 'overview'}
+            icon={<ClipboardList size={16} />}
+            title="Overview"
+            description="Supplier health & stock value"
+            onClick={() => setActiveView('overview')}
+          />
+          <SupplierViewButton
+            active={activeView === 'list'}
+            icon={<Building2 size={16} />}
+            title="Supplier List"
+            description="Contacts & linked products"
+            onClick={() => setActiveView('list')}
+          />
+          <SupplierViewButton
+            active={activeView === 'vouchers'}
+            icon={<FileText size={16} />}
+            title="Vouchers"
+            description="Supplier payment records"
+            onClick={() => setActiveView('vouchers')}
+          />
+        </div>
       </div>
+
+      {/* ======================================================
+          CONTENT
+      ====================================================== */}
 
       {isLoading ? (
-        <div className="rounded-lg border border-line bg-card p-6">
+        <div className="rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
           <Loader label="Loading suppliers..." size="sm" />
         </div>
       ) : activeView === 'overview' ? (
         <div className="flex flex-col gap-5">
-          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
+          {/* ==================================================
+              PROCUREMENT METRICS
+          ================================================== */}
+
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <SupplierMetricCard
               title="Total Suppliers"
               value={suppliers.length.toString()}
-              meta={`${activeSupplierCount} linked to products`}
-              icon={<Building2 size={20} />}
-              iconClassName="bg-primary"
+              meta={`${activeSupplierCount} actively supplying products`}
+              icon={<Building2 size={19} />}
+              tone="green"
             />
             <SupplierMetricCard
               title="Linked Products"
               value={totalProductLinks.toString()}
-              meta={`${stockedUnits} stock units tracked`}
-              icon={<PackageCheck size={20} />}
-              iconClassName="bg-success"
+              meta={`${stockedUnits} stock units currently tracked`}
+              icon={<PackageCheck size={19} />}
+              tone="green"
             />
             <SupplierMetricCard
-              title="Payment Estimate (LKR)"
+              title="Stock Purchase Value"
               value={formatLkr(estimatedPayable)}
-              meta="Stock value at buying price"
-              icon={<WalletCards size={20} />}
-              iconClassName="bg-warning"
+              meta="Current stock valued at buying price"
+              icon={<WalletCards size={19} />}
+              tone="amber"
             />
             <SupplierMetricCard
-              title="Payment Contacts"
+              title="Contact Ready"
               value={`${contactReadyCount}/${suppliers.length}`}
-              meta={`${missingContactCount} need phone or email`}
-              icon={<PhoneCall size={20} />}
-              iconClassName="bg-accent"
+              meta={`${missingContactCount} supplier contact record(s) incomplete`}
+              icon={<PhoneCall size={19} />}
+              tone="slate"
             />
           </div>
 
-          <div className="grid grid-cols-1 gap-5 xl:grid-cols-3">
-            <div className="rounded-lg border border-line bg-card p-5 shadow-sm xl:col-span-1">
-              <div className="mb-5 flex items-center justify-between">
-                <div>
-                  <h2 className="text-lg font-bold text-ink">Payment Readiness</h2>
-                  <p className="mt-1 text-sm text-muted">
-                    Supplier contact and stock-value summary
-                  </p>
-                </div>
-                <WalletCards size={20} className="text-primary" />
-              </div>
+          {/* ==================================================
+              READINESS + RECENT SUPPLIERS
+          ================================================== */}
 
-              <div className="space-y-4">
-                <SupplierProgressRow
-                  label="Contact ready"
-                  value={`${Math.round(contactReadyPercent)}%`}
-                  percent={contactReadyPercent}
-                  tone="success"
-                />
-                <SupplierProgressRow
-                  label="Active suppliers"
-                  value={`${Math.round(activeSupplierPercent)}%`}
-                  percent={activeSupplierPercent}
-                  tone="primary"
-                />
-
-                <div className="grid grid-cols-2 gap-3 pt-1">
-                  <MiniMetric
-                    label="Avg. stock value (LKR)"
-                    value={formatLkr(averageSupplierValue)}
+          <div className="grid grid-cols-1 gap-5 xl:grid-cols-[0.85fr_1.65fr]">
+            <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+              <SectionHeader
+                icon={<WalletCards size={16} />}
+                title="Procurement Readiness"
+                description="Supplier activity and payment-contact readiness"
+              />
+              <div className="p-5">
+                <div className="space-y-5">
+                  <SupplierProgressRow
+                    label="Payment contact ready"
+                    value={`${Math.round(contactReadyPercent)}%`}
+                    percent={contactReadyPercent}
+                    tone="success"
                   />
-                  <MiniMetric label="Needs contact" value={missingContactCount.toString()} />
+                  <SupplierProgressRow
+                    label="Suppliers linked to stock"
+                    value={`${Math.round(activeSupplierPercent)}%`}
+                    percent={activeSupplierPercent}
+                    tone="primary"
+                  />
+                  <div className="grid grid-cols-2 gap-3 pt-1">
+                    <MiniMetric label="Avg. supplier stock value" value={formatLkr(averageSupplierValue)} />
+                    <MiniMetric label="Contacts missing" value={missingContactCount.toString()} />
+                  </div>
                 </div>
               </div>
-            </div>
+            </section>
 
-            <div className="rounded-lg border border-line bg-card p-5 shadow-sm xl:col-span-2">
-              <div className="mb-5 flex items-center justify-between">
-                <div>
-                  <h2 className="text-lg font-bold text-ink">Recent Suppliers</h2>
-                  <p className="mt-1 text-sm text-muted">Newest supplier records in the system</p>
-                </div>
-                <Clock size={20} className="text-primary" />
+            <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+              <SectionHeader
+                icon={<Clock size={16} />}
+                title="Recent Suppliers"
+                description="Newest hardware supplier records added to the system"
+              />
+              <div className="p-5">
+                {recentSuppliers.length === 0 ? (
+                  <CompactEmptyState icon={<Building2 size={22} />} text="No suppliers found." />
+                ) : (
+                  <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
+                    {recentSuppliers.map((supplier) => (
+                      <SupplierSummaryItem
+                        key={supplier.id}
+                        supplier={supplier}
+                        status={hasPaymentContact(supplier) ? 'Ready' : 'Needs contact'}
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
-
-              {recentSuppliers.length === 0 ? (
-                <div className="rounded-md border border-line bg-bg p-4 text-center text-sm text-muted">
-                  No suppliers found.
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
-                  {recentSuppliers.map((supplier) => (
-                    <SupplierSummaryItem
-                      key={supplier.id}
-                      supplier={supplier}
-                      status={hasPaymentContact(supplier) ? 'Ready' : 'Needs contact'}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
+            </section>
           </div>
 
-          <div className="grid grid-cols-1 gap-5 xl:grid-cols-3">
-            <div className="rounded-lg border border-line bg-card p-5 shadow-sm xl:col-span-2">
-              <div className="mb-5 flex items-center justify-between">
-                <div>
-                  <h2 className="text-lg font-bold text-ink">Supplier Product Load</h2>
-                  <p className="mt-1 text-sm text-muted">
-                    Stock value (LKR) and product coverage by supplier
-                  </p>
-                </div>
-                <PackageCheck size={20} className="text-primary" />
+          {/* ==================================================
+              SUPPLIER LOAD + ACTIONS
+          ================================================== */}
+
+          <div className="grid grid-cols-1 gap-5 xl:grid-cols-[1.65fr_0.85fr]">
+            <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+              <SectionHeader
+                icon={<PackageCheck size={16} />}
+                title="Supplier Stock Exposure"
+                description="Buying-value and product coverage by hardware supplier"
+              />
+              <div className="p-5">
+                {supplierLoad.length === 0 ? (
+                  <CompactEmptyState
+                    icon={<PackageCheck size={22} />}
+                    text="No products are linked to suppliers yet."
+                  />
+                ) : (
+                  <div className="space-y-3">
+                    {supplierLoad.slice(0, 6).map((supplier) => (
+                      <SupplierLoadRow
+                        key={supplier.id}
+                        supplier={supplier}
+                        maxValue={topSupplierValue}
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
+            </section>
 
-              {supplierLoad.length === 0 ? (
-                <div className="rounded-md border border-line bg-bg p-4 text-center text-sm text-muted">
-                  No linked supplier products yet.
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {supplierLoad.slice(0, 6).map((supplier) => (
-                    <SupplierLoadRow
-                      key={supplier.id}
-                      supplier={supplier}
-                      maxValue={topSupplierValue}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className="rounded-lg border border-line bg-card p-5 shadow-sm">
-              <div className="mb-5 flex items-center justify-between">
-                <div>
-                  <h2 className="text-lg font-bold text-ink">Action Queue</h2>
-                  <p className="mt-1 text-sm text-muted">Suppliers needing product assignment</p>
-                </div>
-                <AlertTriangle size={20} className="text-warning" />
-              </div>
-
-              {unassignedSuppliers.length === 0 ? (
-                <div className="flex items-center gap-3 rounded-md border border-success/20 bg-success/10 p-4 text-sm text-success">
-                  <BadgeCheck size={18} />
-                  <span>All suppliers are linked to products.</span>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {unassignedSuppliers.map((supplier) => (
-                    <div
-                      key={supplier.id}
-                      className="rounded-md border border-line bg-bg px-3 py-2.5"
-                    >
-                      <div className="truncate font-semibold text-ink">{supplier.name}</div>
-                      <div className="text-xs text-muted">
-                        {supplier.phone || supplier.email || 'No contact saved'}
-                      </div>
+            <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+              <SectionHeader
+                icon={<AlertTriangle size={16} />}
+                title="Supplier Action Queue"
+                description="Records that still need product assignment"
+              />
+              <div className="p-5">
+                {unassignedSuppliers.length === 0 ? (
+                  <div className="flex items-start gap-3 rounded-lg border border-emerald-200 bg-emerald-50 p-4">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white text-emerald-600">
+                      <BadgeCheck size={17} />
                     </div>
-                  ))}
-                </div>
-              )}
-            </div>
+                    <div>
+                      <p className="text-sm font-bold text-emerald-800">Supplier assignments complete</p>
+                      <p className="mt-1 text-xs leading-5 text-emerald-600">
+                        Every supplier is currently linked to at least one product.
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-2.5">
+                    {unassignedSuppliers.map((supplier) => (
+                      <div key={supplier.id} className="rounded-lg border border-amber-200 bg-amber-50/60 px-3.5 py-3">
+                        <div className="flex items-start gap-2.5">
+                          <AlertTriangle size={15} className="mt-0.5 shrink-0 text-amber-600" />
+                          <div className="min-w-0">
+                            <div className="truncate text-sm font-bold text-slate-700">{supplier.name}</div>
+                            <div className="mt-0.5 truncate text-xs text-slate-500">
+                              {supplier.phone || supplier.email || 'No contact saved'}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </section>
           </div>
         </div>
       ) : activeView === 'list' ? (
         suppliers.length === 0 ? (
-          <div className="rounded-lg border border-line bg-card p-6 text-center text-muted">
-            No suppliers found.
-          </div>
-        ) : (
-          <DataTable
-            columns={columns}
-            data={suppliers}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
+          <LargeEmptyState
+            icon={<Building2 size={28} />}
+            title="No suppliers available"
+            description="Add hardware suppliers to link products, manage purchasing contacts and track supplier stock value."
+            actionLabel="Add First Supplier"
+            onAction={handleAddClick}
           />
+        ) : (
+          <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 bg-slate-50/70 px-5 py-3.5">
+              <div className="flex items-center gap-2">
+                <Building2 size={16} className="text-emerald-600" />
+                <span className="text-sm font-bold text-slate-700">Hardware Supplier Directory</span>
+              </div>
+              <span className="rounded-md bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700">
+                {suppliers.length} supplier{suppliers.length === 1 ? '' : 's'}
+              </span>
+            </div>
+            <DataTable columns={columns} data={suppliers} onEdit={handleEdit} onDelete={handleDelete} />
+          </div>
         )
       ) : suppliers.length === 0 ? (
-        <div className="rounded-lg border border-line bg-card p-6 text-center text-muted">
-          Create a supplier before adding vouchers.
-        </div>
-      ) : vouchers.length === 0 ? (
-        <div className="rounded-lg border border-line bg-card p-6 text-center text-muted">
-          No vouchers found.
-        </div>
-      ) : (
-        <DataTable
-          columns={voucherColumns}
-          data={vouchers}
-          onView={handleVoucherView}
-          onEdit={handleVoucherEdit}
-          onDelete={handleVoucherDelete}
+        <LargeEmptyState
+          icon={<FileText size={28} />}
+          title="Supplier required first"
+          description="Create at least one supplier before recording supplier payment vouchers."
+          actionLabel="Add Supplier"
+          onAction={() => {
+            setActiveView('list')
+            setEditingSupplier(null)
+            setIsModalOpen(true)
+          }}
         />
+      ) : vouchers.length === 0 ? (
+        <LargeEmptyState
+          icon={<WalletCards size={28} />}
+          title="No supplier vouchers available"
+          description="Create a voucher to track pending, paid or cancelled supplier payment records."
+          actionLabel="Add First Voucher"
+          onAction={handleAddClick}
+        />
+      ) : (
+        <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 bg-slate-50/70 px-5 py-3.5">
+            <div className="flex items-center gap-2">
+              <FileText size={16} className="text-emerald-600" />
+              <span className="text-sm font-bold text-slate-700">Supplier Payment Vouchers</span>
+            </div>
+            <span className="rounded-md bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700">
+              {vouchers.length} voucher{vouchers.length === 1 ? '' : 's'}
+            </span>
+          </div>
+          <DataTable
+            columns={voucherColumns}
+            data={vouchers}
+            onView={handleVoucherView}
+            onEdit={handleVoucherEdit}
+            onDelete={handleVoucherDelete}
+          />
+        </div>
       )}
 
       <SupplierModal
@@ -670,9 +754,9 @@ function formatVoucherStatus(status: SupplierVoucherStatus): string {
 
 function getVoucherStatusClassName(status: SupplierVoucherStatus): string {
   const classNames: Record<SupplierVoucherStatus, string> = {
-    PENDING: 'border-warning/25 bg-warning/10 text-warning',
-    PAID: 'border-success/20 bg-success/10 text-success',
-    CANCELLED: 'border-danger/20 bg-danger/10 text-danger'
+    PENDING: 'border-amber-200 bg-amber-50 text-amber-700',
+    PAID: 'border-emerald-200 bg-emerald-50 text-emerald-700',
+    CANCELLED: 'border-red-200 bg-red-50 text-red-700'
   }
 
   return classNames[status]
@@ -683,26 +767,71 @@ interface SupplierLoadItem extends SupplierRecord {
   stockValue: number
 }
 
+const SupplierViewButton: React.FC<{
+  active: boolean
+  icon: React.ReactNode
+  title: string
+  description: string
+  onClick: () => void
+}> = ({ active, icon, title, description, onClick }) => (
+  <button
+    type="button"
+    className={`flex items-center gap-3 rounded-lg px-3.5 py-3 text-left transition-colors ${
+      active
+        ? 'bg-emerald-600 text-white shadow-sm'
+        : 'bg-white text-slate-600 hover:bg-emerald-50 hover:text-emerald-700'
+    }`}
+    onClick={onClick}
+  >
+    <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-md ${active ? 'bg-white/15' : 'bg-slate-100'}`}>
+      {icon}
+    </div>
+    <div className="min-w-0">
+      <div className="text-sm font-bold">{title}</div>
+      <div className={`mt-0.5 truncate text-[0.7rem] font-medium ${active ? 'text-emerald-50' : 'text-slate-400'}`}>
+        {description}
+      </div>
+    </div>
+  </button>
+)
+
+const SectionHeader: React.FC<{
+  icon: React.ReactNode
+  title: string
+  description: string
+}> = ({ icon, title, description }) => (
+  <div className="flex items-center gap-3 border-b border-slate-100 bg-slate-50/70 px-5 py-3.5">
+    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
+      {icon}
+    </div>
+    <div>
+      <h2 className="text-sm font-bold text-slate-800">{title}</h2>
+      <p className="mt-0.5 text-xs text-slate-400">{description}</p>
+    </div>
+  </div>
+)
+
 const SupplierMetricCard: React.FC<{
   title: string
   value: string
   meta: string
   icon: React.ReactNode
-  iconClassName: string
-}> = ({ title, value, meta, icon, iconClassName }) => (
-  <div className="rounded-lg border border-line bg-card p-5 shadow-sm">
-    <div className="mb-4 flex items-start justify-between gap-4">
+  tone: 'green' | 'amber' | 'slate'
+}> = ({ title, value, meta, icon, tone }) => (
+  <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+    <div className={`absolute inset-x-0 top-0 h-[3px] ${tone === 'green' ? 'bg-emerald-500' : tone === 'amber' ? 'bg-amber-400' : 'bg-slate-300'}`} />
+    <div className="flex items-start justify-between gap-3">
       <div className="min-w-0">
-        <span className="text-[0.9rem] font-medium text-muted">{title}</span>
-        <h3 className="mt-2 break-words text-2xl font-semibold text-ink">{value}</h3>
+        <p className="text-[0.7rem] font-bold uppercase tracking-wider text-slate-400">{title}</p>
+        <h3 className={`mt-1.5 break-words text-xl font-bold tracking-tight ${tone === 'green' ? 'text-emerald-700' : tone === 'amber' ? 'text-amber-700' : 'text-slate-800'}`}>
+          {value}
+        </h3>
+        <p className="mt-1 text-xs leading-5 text-slate-400">{meta}</p>
       </div>
-      <div
-        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white ${iconClassName}`}
-      >
+      <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${tone === 'green' ? 'bg-emerald-50 text-emerald-600' : tone === 'amber' ? 'bg-amber-50 text-amber-600' : 'bg-slate-100 text-slate-500'}`}>
         {icon}
       </div>
     </div>
-    <div className="text-[0.9rem] text-muted">{meta}</div>
   </div>
 )
 
@@ -713,13 +842,13 @@ const SupplierProgressRow: React.FC<{
   tone: 'primary' | 'success'
 }> = ({ label, value, percent, tone }) => (
   <div>
-    <div className="mb-2 flex items-center justify-between text-sm">
-      <span className="font-medium text-ink">{label}</span>
-      <span className="text-muted">{value}</span>
+    <div className="mb-2 flex items-center justify-between gap-3 text-sm">
+      <span className="font-semibold text-slate-700">{label}</span>
+      <span className="font-bold text-slate-500">{value}</span>
     </div>
-    <div className="h-2 overflow-hidden rounded-full bg-subtle">
+    <div className="h-2 overflow-hidden rounded-full bg-slate-100">
       <div
-        className={`h-full rounded-full ${tone === 'success' ? 'bg-success' : 'bg-primary'}`}
+        className={`h-full rounded-full ${tone === 'success' ? 'bg-emerald-500' : 'bg-emerald-600'}`}
         style={{ width: `${Math.min(100, Math.max(0, percent))}%` }}
       />
     </div>
@@ -727,69 +856,92 @@ const SupplierProgressRow: React.FC<{
 )
 
 const MiniMetric: React.FC<{ label: string; value: string }> = ({ label, value }) => (
-  <div className="rounded-md border border-line bg-bg p-3">
-    <div className="text-xs font-medium text-muted">{label}</div>
-    <div className="mt-1 break-words text-sm font-bold text-ink">{value}</div>
+  <div className="rounded-lg border border-slate-200 bg-slate-50 p-3.5">
+    <div className="text-[0.68rem] font-bold uppercase tracking-wide text-slate-400">{label}</div>
+    <div className="mt-1.5 break-words text-sm font-bold text-slate-700">{value}</div>
   </div>
 )
 
-const SupplierSummaryItem: React.FC<{ supplier: SupplierRecord; status: string }> = ({
-  supplier,
-  status
-}) => (
-  <div className="rounded-md border border-line bg-bg p-4">
+const SupplierSummaryItem: React.FC<{ supplier: SupplierRecord; status: string }> = ({ supplier, status }) => (
+  <div className="rounded-lg border border-slate-200 bg-white p-4 transition-shadow hover:shadow-sm">
     <div className="flex items-start justify-between gap-3">
-      <div className="min-w-0">
-        <div className="truncate font-semibold text-ink">{supplier.name}</div>
-        <div className="mt-1 truncate text-xs text-muted">
-          {supplier.contactName || supplier.phone || supplier.email || 'No contact saved'}
+      <div className="flex min-w-0 items-start gap-3">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
+          <Building2 size={16} />
+        </div>
+        <div className="min-w-0">
+          <div className="truncate text-sm font-bold text-slate-800">{supplier.name}</div>
+          <div className="mt-1 truncate text-xs text-slate-400">
+            {supplier.contactName || supplier.phone || supplier.email || 'No contact saved'}
+          </div>
         </div>
       </div>
-      <span
-        className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold ${
-          status === 'Ready'
-            ? 'border border-success/20 bg-success/10 text-success'
-            : 'border border-warning/25 bg-warning/10 text-warning'
-        }`}
-      >
+      <span className={`shrink-0 rounded-md border px-2 py-1 text-[0.68rem] font-bold ${status === 'Ready' ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-amber-200 bg-amber-50 text-amber-700'}`}>
         {status}
       </span>
     </div>
-    <div className="mt-3 flex items-center justify-between text-xs text-muted">
-      <span>{supplier.productCount} product(s)</span>
+    <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-3 text-xs text-slate-400">
+      <span>{supplier.productCount} linked product{supplier.productCount === 1 ? '' : 's'}</span>
       <span>{formatShortDate(supplier.createdAt)}</span>
     </div>
   </div>
 )
 
-const SupplierLoadRow: React.FC<{ supplier: SupplierLoadItem; maxValue: number }> = ({
-  supplier,
-  maxValue
-}) => {
+const SupplierLoadRow: React.FC<{ supplier: SupplierLoadItem; maxValue: number }> = ({ supplier, maxValue }) => {
   const percent = maxValue > 0 ? (supplier.stockValue / maxValue) * 100 : 0
 
   return (
-    <div className="rounded-md border border-line bg-bg p-4">
+    <div className="rounded-lg border border-slate-200 bg-white p-4">
       <div className="mb-3 flex items-start justify-between gap-4">
         <div className="min-w-0">
-          <div className="truncate font-semibold text-ink">{supplier.name}</div>
-          <div className="mt-1 text-xs text-muted">
-            {supplier.productCount} product(s) - {supplier.stockUnits} stock units
+          <div className="truncate text-sm font-bold text-slate-800">{supplier.name}</div>
+          <div className="mt-1 text-xs text-slate-400">
+            {supplier.productCount} product{supplier.productCount === 1 ? '' : 's'} • {supplier.stockUnits} stock units
           </div>
         </div>
-        <div className="shrink-0 text-right text-sm font-bold text-ink">
-          {formatLkr(supplier.stockValue)}
+        <div className="shrink-0 text-right">
+          <div className="text-sm font-bold text-emerald-700">{formatLkr(supplier.stockValue)}</div>
+          <div className="mt-0.5 text-[0.68rem] font-semibold uppercase tracking-wide text-slate-400">Stock value</div>
         </div>
       </div>
-      <div className="h-2 overflow-hidden rounded-full bg-subtle">
+      <div className="h-2 overflow-hidden rounded-full bg-slate-100">
         <div
-          className="h-full rounded-full bg-primary"
+          className="h-full rounded-full bg-emerald-500"
           style={{ width: `${Math.min(100, Math.max(0, percent))}%` }}
         />
       </div>
     </div>
   )
 }
+
+const CompactEmptyState: React.FC<{ icon: React.ReactNode; text: string }> = ({ icon, text }) => (
+  <div className="flex min-h-32 flex-col items-center justify-center gap-2.5 rounded-lg border border-dashed border-slate-200 bg-slate-50 px-4 py-6 text-center">
+    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white text-slate-400">{icon}</div>
+    <p className="text-sm font-medium text-slate-500">{text}</p>
+  </div>
+)
+
+const LargeEmptyState: React.FC<{
+  icon: React.ReactNode
+  title: string
+  description: string
+  actionLabel: string
+  onAction: () => void
+}> = ({ icon, title, description, actionLabel, onAction }) => (
+  <div className="flex min-h-[320px] flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white px-6 py-10 text-center">
+    <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">{icon}</div>
+    <h3 className="text-base font-bold text-slate-800">{title}</h3>
+    <p className="mt-1 max-w-md text-sm leading-6 text-slate-500">{description}</p>
+    <button
+      type="button"
+      className="mt-5 inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 text-sm font-bold text-white shadow-sm transition-colors hover:bg-emerald-700"
+      onClick={onAction}
+    >
+      <Plus size={17} />
+      {actionLabel}
+    </button>
+  </div>
+)
 
 function buildSupplierLoad(
   suppliers: SupplierRecord[],

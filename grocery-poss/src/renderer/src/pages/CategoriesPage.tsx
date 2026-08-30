@@ -1,5 +1,15 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Download, Filter, Plus, RotateCcw, Search, Trash2 } from 'lucide-react'
+import {
+  Boxes,
+  Download,
+  Filter,
+  FolderTree,
+  PackageSearch,
+  Plus,
+  RotateCcw,
+  Search,
+  Trash2
+} from 'lucide-react'
 import { DataTable, Column } from '../components/common/DataTable'
 import { Loader } from '../components/common/Loader'
 import { CategoryModal, CategoryFormData } from '../components/classifications/CategoryModal'
@@ -28,6 +38,10 @@ const CategoriesPage: React.FC = () => {
   const confirm = useConfirm()
   const toast = useToast()
 
+  /* ==========================================================
+     LOAD CATEGORIES
+  ========================================================== */
+
   useEffect(() => {
     let isActive = true
     setIsLoading(true)
@@ -35,19 +49,29 @@ const CategoriesPage: React.FC = () => {
     categoriesApi
       .list()
       .then((loadedCategories) => {
-        if (isActive) setCategories(loadedCategories)
+        if (isActive) {
+          setCategories(loadedCategories)
+        }
       })
       .catch((error) => {
-        if (isActive) toast.error(getErrorMessage(error))
+        if (isActive) {
+          toast.error(getErrorMessage(error))
+        }
       })
       .finally(() => {
-        if (isActive) setIsLoading(false)
+        if (isActive) {
+          setIsLoading(false)
+        }
       })
 
     return () => {
       isActive = false
     }
   }, [toast])
+
+  /* ==========================================================
+     FILTERED CATEGORIES
+  ========================================================== */
 
   const filteredCategories = useMemo(() => {
     const normalizedSearch = normalizeText(categorySearch)
@@ -69,10 +93,17 @@ const CategoriesPage: React.FC = () => {
     })
   }, [categories, categorySearch, productFilter])
 
-  const hasActiveFilters = categorySearch.trim().length > 0 || productFilter !== 'ALL'
+  const hasActiveFilters =
+    categorySearch.trim().length > 0 || productFilter !== 'ALL'
+
+  /* ==========================================================
+     CLEAR HIDDEN SELECTIONS
+  ========================================================== */
 
   useEffect(() => {
-    const visibleCategoryIds = new Set(filteredCategories.map((category) => category.id))
+    const visibleCategoryIds = new Set(
+      filteredCategories.map((category) => category.id)
+    )
 
     setSelectedCategoryIds((current) => {
       const next = current.filter((id) => visibleCategoryIds.has(id))
@@ -81,66 +112,132 @@ const CategoriesPage: React.FC = () => {
     })
   }, [filteredCategories])
 
+  /* ==========================================================
+     TABLE COLUMNS
+  ========================================================== */
+
   const columns: Column<CategoryRecord>[] = [
     {
       key: 'name',
       header: 'CATEGORY NAME',
       render: (item) => (
-        <span className="inline-flex rounded-full border border-primary/20 bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
-          {item.name}
+        <div className="flex min-w-[200px] items-center gap-3">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-emerald-100 bg-emerald-50">
+            <FolderTree size={17} className="text-emerald-600" />
+          </div>
+
+          <div className="min-w-0">
+            <span className="block truncate font-semibold text-slate-800">
+              {item.name}
+            </span>
+
+            <span className="mt-0.5 block text-[0.7rem] font-semibold uppercase tracking-wide text-slate-400">
+              Product Category
+            </span>
+          </div>
+        </div>
+      )
+    },
+    {
+      key: 'description',
+      header: 'DESCRIPTION',
+      render: (item) => (
+        <span className="block max-w-[460px] truncate text-sm leading-6 text-slate-500">
+          {item.description || '-'}
         </span>
       )
     },
-    { key: 'description', header: 'DESCRIPTION', render: (item) => item.description || '-' },
     {
       key: 'productCount',
       header: 'PRODUCTS',
-      render: (item) => (
-        <span className="inline-flex rounded-full border border-line-strong bg-subtle px-2.5 py-1 text-xs font-semibold text-muted">
-          {item.productCount}
-        </span>
-      )
+      render: (item) =>
+        item.productCount > 0 ? (
+          <span className="inline-flex min-w-[76px] items-center justify-center gap-1.5 rounded-md border border-emerald-200 bg-emerald-50 px-2.5 py-1.5 text-xs font-bold text-emerald-700">
+            <Boxes size={13} />
+            {item.productCount}
+          </span>
+        ) : (
+          <span className="inline-flex min-w-[76px] items-center justify-center rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-xs font-semibold text-slate-500">
+            0
+          </span>
+        )
     }
   ]
+
+  /* ==========================================================
+     ADD CATEGORY
+  ========================================================== */
 
   const handleAddClick = (): void => {
     setEditingCategory(null)
     setIsModalOpen(true)
   }
 
+  /* ==========================================================
+     EDIT CATEGORY
+  ========================================================== */
+
   const handleEdit = (category: CategoryRecord): void => {
     setEditingCategory(category)
     setIsModalOpen(true)
   }
 
+  /* ==========================================================
+     CLOSE MODAL
+  ========================================================== */
+
   const handleModalClose = (): void => {
     if (isSaving) return
+
     setIsModalOpen(false)
     setEditingCategory(null)
   }
 
+  /* ==========================================================
+     SAVE CATEGORY
+  ========================================================== */
+
   const handleSave = async (data: CategoryFormData): Promise<void> => {
     setIsSaving(true)
+
     try {
       if (editingCategory) {
         const payload: UpdateCategoryInput = {
           name: data.name,
           description: data.description
         }
-        const updatedCategory = await categoriesApi.update(editingCategory.id, payload)
-        setCategories((prev) =>
-          sortCategories(prev.map((cat) => (cat.id === editingCategory.id ? updatedCategory : cat)))
+
+        const updatedCategory = await categoriesApi.update(
+          editingCategory.id,
+          payload
         )
+
+        setCategories((prev) =>
+          sortCategories(
+            prev.map((category) =>
+              category.id === editingCategory.id
+                ? updatedCategory
+                : category
+            )
+          )
+        )
+
         toast.success(`"${data.name}" was updated successfully.`)
       } else {
         const payload: CreateCategoryInput = {
           name: data.name,
           description: data.description
         }
+
         const createdCategory = await categoriesApi.create(payload)
-        setCategories((prev) => sortCategories([...prev, createdCategory]))
+
+        setCategories((prev) =>
+          sortCategories([...prev, createdCategory])
+        )
+
         toast.success(`"${data.name}" was added successfully.`)
       }
+
       setIsModalOpen(false)
       setEditingCategory(null)
     } catch (error) {
@@ -150,38 +247,73 @@ const CategoriesPage: React.FC = () => {
     }
   }
 
-  const deleteCategory = async (category: CategoryRecord): Promise<void> => {
+  /* ==========================================================
+     DELETE CATEGORY
+  ========================================================== */
+
+  const deleteCategory = async (
+    category: CategoryRecord
+  ): Promise<void> => {
     try {
       await categoriesApi.delete(category.id)
-      setCategories((prev) => prev.filter((item) => item.id !== category.id))
-      setSelectedCategoryIds((prev) => prev.filter((id) => id !== category.id))
+
+      setCategories((prev) =>
+        prev.filter((item) => item.id !== category.id)
+      )
+
+      setSelectedCategoryIds((prev) =>
+        prev.filter((id) => id !== category.id)
+      )
+
       toast.success(`"${category.name}" was deleted successfully.`)
     } catch (error) {
       toast.error(getErrorMessage(error))
     }
   }
 
-  const deleteCategories = async (categoriesToDelete: CategoryRecord[]): Promise<void> => {
+  /* ==========================================================
+     DELETE MULTIPLE CATEGORIES
+  ========================================================== */
+
+  const deleteCategories = async (
+    categoriesToDelete: CategoryRecord[]
+  ): Promise<void> => {
     const deletedIds = new Set<number>()
 
     try {
       for (const category of categoriesToDelete) {
         await categoriesApi.delete(category.id)
+
         deletedIds.add(category.id)
       }
 
-      setCategories((prev) => prev.filter((category) => !deletedIds.has(category.id)))
+      setCategories((prev) =>
+        prev.filter((category) => !deletedIds.has(category.id))
+      )
+
       setSelectedCategoryIds([])
-      toast.success(`${categoriesToDelete.length} category(s) were deleted successfully.`)
+
+      toast.success(
+        `${categoriesToDelete.length} category(s) were deleted successfully.`
+      )
     } catch (error) {
       if (deletedIds.size > 0) {
-        setCategories((prev) => prev.filter((category) => !deletedIds.has(category.id)))
-        setSelectedCategoryIds((prev) => prev.filter((id) => !deletedIds.has(id)))
+        setCategories((prev) =>
+          prev.filter((category) => !deletedIds.has(category.id))
+        )
+
+        setSelectedCategoryIds((prev) =>
+          prev.filter((id) => !deletedIds.has(id))
+        )
       }
 
       toast.error(getErrorMessage(error))
     }
   }
+
+  /* ==========================================================
+     DELETE CONFIRMATION
+  ========================================================== */
 
   const handleDelete = (category: CategoryRecord): void => {
     confirm({
@@ -192,6 +324,10 @@ const CategoriesPage: React.FC = () => {
       onConfirm: () => deleteCategory(category)
     })
   }
+
+  /* ==========================================================
+     DELETE SELECTED
+  ========================================================== */
 
   const handleDeleteSelected = (): void => {
     const categoriesToDelete = categories.filter((category) =>
@@ -211,12 +347,25 @@ const CategoriesPage: React.FC = () => {
     })
   }
 
-  const handleImported = (createdCategories: CategoryRecord[]): void => {
-    setCategories((prev) => sortCategories([...prev, ...createdCategories]))
+  /* ==========================================================
+     IMPORT CATEGORIES
+  ========================================================== */
+
+  const handleImported = (
+    createdCategories: CategoryRecord[]
+  ): void => {
+    setCategories((prev) =>
+      sortCategories([...prev, ...createdCategories])
+    )
   }
+
+  /* ==========================================================
+     EXPORT CATEGORIES
+  ========================================================== */
 
   const exportCategoriesCsv = async (): Promise<void> => {
     setIsExporting(true)
+
     try {
       const result = await categoriesApi.exportCsv()
 
@@ -241,121 +390,309 @@ const CategoriesPage: React.FC = () => {
     })
   }
 
+  /* ==========================================================
+     RESET FILTERS
+  ========================================================== */
+
   const handleResetFilters = (): void => {
     setCategorySearch('')
     setProductFilter('ALL')
   }
 
   return (
-    <div>
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-ink">Categories</h1>
-          <p className="mt-1 text-[0.95rem] text-muted">Manage your product categories</p>
-        </div>
-        <div className="flex flex-wrap items-center justify-end gap-3">
-          <button
-            className="flex items-center gap-2 rounded-md border border-danger/30 bg-card px-4 py-2.5 text-[0.95rem] font-semibold text-danger transition-colors hover:bg-danger/10 disabled:cursor-not-allowed disabled:opacity-60"
-            onClick={handleDeleteSelected}
-            disabled={selectedCategoryIds.length === 0}
-          >
-            <Trash2 size={18} />
-            {selectedCategoryIds.length > 0
-              ? `Delete Selected (${selectedCategoryIds.length})`
-              : 'Delete Selected'}
-          </button>
-          <button
-            className="flex items-center gap-2 rounded-md border border-line bg-card px-4 py-2.5 text-[0.95rem] font-semibold text-ink transition-colors hover:bg-hover disabled:cursor-not-allowed disabled:opacity-60"
-            onClick={handleExportClick}
-            disabled={isExporting || categories.length === 0}
-          >
-            <Download size={18} />
-            {isExporting ? 'Exporting...' : 'Export CSV'}
-          </button>
-          <button
-            className="flex items-center gap-2 rounded-md bg-success px-4 py-2.5 text-[0.95rem] font-semibold text-white transition-[background-color,transform] duration-150 hover:-translate-y-0.5 hover:bg-success-hover"
-            onClick={handleAddClick}
-          >
-            <Plus size={18} />
-            Add Category
-          </button>
-        </div>
-      </div>
+    <div className="min-h-full">
+      {/* ======================================================
+          PAGE HEADER
+      ====================================================== */}
 
-      {!isLoading && categories.length > 0 && (
-        <div className="mb-5 rounded-lg border border-line bg-card p-4 shadow-sm">
-          <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center gap-2 text-[0.9rem] font-semibold text-muted">
-              <Filter size={16} />
-              Category Filters
+      <div className="mb-5 rounded-xl border border-slate-200 bg-white px-5 py-5 shadow-sm sm:px-6">
+        <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
+          <div className="flex items-start gap-3.5">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-emerald-600 shadow-sm">
+              <FolderTree size={21} className="text-white" />
             </div>
-            <span className="text-sm text-muted">
-              Showing <span className="font-semibold text-ink">{filteredCategories.length}</span> of{' '}
-              <span className="font-semibold text-ink">{categories.length}</span>
-            </span>
+
+            <div>
+              <div className="flex flex-wrap items-center gap-2">
+                <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+                  Categories
+                </h1>
+
+                {!isLoading && (
+                  <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700">
+                    {categories.length} Categories
+                  </span>
+                )}
+              </div>
+
+              <p className="mt-1 text-[0.92rem] text-slate-500">
+                Organize hardware products into clear inventory categories
+              </p>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1.4fr_0.9fr_auto]">
-            <div className="flex items-center gap-2 rounded-md border border-line bg-bg px-3 py-2.5 focus-within:border-primary">
-              <Search size={17} className="shrink-0 text-faint" />
-              <input
-                type="text"
-                className="min-w-0 flex-1 border-none bg-transparent text-[0.95rem] text-ink outline-none placeholder:text-faint"
-                placeholder="Search category name or description"
-                value={categorySearch}
-                onChange={(event) => setCategorySearch(event.target.value)}
-              />
-            </div>
-
-            <select
-              className="rounded-md border border-line bg-bg px-3 py-2.5 text-[0.95rem] text-ink outline-none focus:border-primary"
-              value={productFilter}
-              onChange={(event) => setProductFilter(event.target.value as CategoryProductFilter)}
+          <div className="flex flex-wrap items-center gap-2.5">
+            <button
+              type="button"
+              className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-red-200 bg-white px-3.5 text-sm font-semibold text-red-600 shadow-sm transition-colors hover:border-red-300 hover:bg-red-50 disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-50 disabled:text-slate-400 disabled:shadow-none"
+              onClick={handleDeleteSelected}
+              disabled={selectedCategoryIds.length === 0}
             >
-              <option value="ALL">All Product Status</option>
-              <option value="WITH_PRODUCTS">With Products</option>
-              <option value="WITHOUT_PRODUCTS">No Products</option>
-            </select>
+              <Trash2 size={17} />
+
+              {selectedCategoryIds.length > 0
+                ? `Delete (${selectedCategoryIds.length})`
+                : 'Delete Selected'}
+            </button>
 
             <button
               type="button"
-              className="flex items-center justify-center gap-2 rounded-md border border-line bg-card px-4 py-2.5 text-[0.95rem] font-semibold text-ink transition-colors hover:bg-hover disabled:cursor-not-allowed disabled:opacity-60"
-              onClick={handleResetFilters}
-              disabled={!hasActiveFilters}
+              className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-3.5 text-sm font-semibold text-slate-700 shadow-sm transition-colors hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400 disabled:shadow-none"
+              onClick={handleExportClick}
+              disabled={isExporting || categories.length === 0}
             >
-              <RotateCcw size={16} />
-              Reset
+              <Download size={17} />
+              {isExporting ? 'Exporting...' : 'Export CSV'}
             </button>
+
+            <button
+              type="button"
+              className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 text-sm font-bold text-white shadow-sm shadow-emerald-600/20 transition-all hover:-translate-y-px hover:bg-emerald-700 hover:shadow-md hover:shadow-emerald-600/20 active:translate-y-0"
+              onClick={handleAddClick}
+            >
+              <Plus size={18} />
+              Add Category
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* ======================================================
+          FILTER SECTION
+      ====================================================== */}
+
+      {!isLoading && categories.length > 0 && (
+        <div className="mb-5 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-5 py-3.5">
+            <div className="flex items-center gap-2">
+              <div className="flex h-7 w-7 items-center justify-center rounded-md bg-emerald-50">
+                <Filter size={14} className="text-emerald-600" />
+              </div>
+
+              <h2 className="text-sm font-bold text-slate-800">
+                Search & Filter
+              </h2>
+            </div>
+
+            <div className="flex items-center gap-2 text-xs text-slate-500">
+              <span>Displaying</span>
+
+              <span className="rounded-md bg-emerald-50 px-2 py-1 font-bold text-emerald-700">
+                {filteredCategories.length}
+              </span>
+
+              <span>of</span>
+
+              <span className="font-bold text-slate-700">
+                {categories.length}
+              </span>
+
+              <span>categories</span>
+            </div>
+          </div>
+
+          <div className="p-4 sm:p-5">
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-[1.5fr_0.8fr_auto]">
+              {/* ==================================================
+                  SEARCH
+              ================================================== */}
+
+              <div className="group flex h-11 items-center gap-2.5 rounded-lg border border-slate-200 bg-white px-3.5 shadow-sm transition-colors focus-within:border-emerald-400 focus-within:ring-2 focus-within:ring-emerald-500/10">
+                <Search
+                  size={17}
+                  className="shrink-0 text-slate-400 transition-colors group-focus-within:text-emerald-600"
+                />
+
+                <input
+                  type="text"
+                  className="min-w-0 flex-1 border-none bg-transparent text-sm font-medium text-slate-800 outline-none placeholder:font-normal placeholder:text-slate-400"
+                  placeholder="Search category name or description..."
+                  value={categorySearch}
+                  onChange={(event) =>
+                    setCategorySearch(event.target.value)
+                  }
+                />
+              </div>
+
+              {/* ==================================================
+                  PRODUCT STATUS FILTER
+              ================================================== */}
+
+              <div className="relative">
+                <Boxes
+                  size={16}
+                  className="pointer-events-none absolute left-3.5 top-1/2 z-10 -translate-y-1/2 text-slate-400"
+                />
+
+                <select
+                  className="h-11 w-full cursor-pointer appearance-none rounded-lg border border-slate-200 bg-white py-2 pl-10 pr-9 text-sm font-medium text-slate-700 shadow-sm outline-none transition-colors hover:border-slate-300 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/10"
+                  value={productFilter}
+                  onChange={(event) =>
+                    setProductFilter(
+                      event.target.value as CategoryProductFilter
+                    )
+                  }
+                >
+                  <option value="ALL">All Product Status</option>
+                  <option value="WITH_PRODUCTS">With Products</option>
+                  <option value="WITHOUT_PRODUCTS">No Products</option>
+                </select>
+
+                <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="text-slate-400"
+                  >
+                    <path d="m6 9 6 6 6-6" />
+                  </svg>
+                </div>
+              </div>
+
+              {/* ==================================================
+                  RESET
+              ================================================== */}
+
+              <button
+                type="button"
+                className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-4 text-sm font-semibold text-slate-600 transition-colors hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700 disabled:cursor-not-allowed disabled:border-slate-100 disabled:bg-slate-50 disabled:text-slate-300"
+                onClick={handleResetFilters}
+                disabled={!hasActiveFilters}
+              >
+                <RotateCcw size={15} />
+                Reset
+              </button>
+            </div>
           </div>
         </div>
       )}
 
+      {/* ======================================================
+          CONTENT
+      ====================================================== */}
+
       {isLoading ? (
-        <div className="rounded-lg border border-line bg-card p-6">
+        <div className="rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
           <Loader label="Loading categories..." size="sm" />
         </div>
       ) : categories.length === 0 ? (
-        <div className="rounded-lg border border-line bg-card p-6 text-center text-muted">
-          No categories found.
+        <div className="flex min-h-[330px] flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white px-6 py-10 text-center">
+          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-emerald-50">
+            <FolderTree size={27} className="text-emerald-600" />
+          </div>
+
+          <h3 className="text-base font-bold text-slate-800">
+            No categories available
+          </h3>
+
+          <p className="mt-1 max-w-md text-sm leading-6 text-slate-500">
+            Create categories to organize hardware products such as
+            power tools, hand tools, plumbing, electrical items and
+            building materials.
+          </p>
+
+          <button
+            type="button"
+            className="mt-5 inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 text-sm font-bold text-white shadow-sm transition-colors hover:bg-emerald-700"
+            onClick={handleAddClick}
+          >
+            <Plus size={17} />
+            Add First Category
+          </button>
         </div>
       ) : filteredCategories.length === 0 ? (
-        <div className="rounded-lg border border-line bg-card p-6 text-center text-muted">
-          No categories match the selected filters.
+        <div className="flex min-h-[260px] flex-col items-center justify-center rounded-xl border border-slate-200 bg-white px-6 py-10 text-center shadow-sm">
+          <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100">
+            <PackageSearch size={22} className="text-slate-400" />
+          </div>
+
+          <h3 className="font-bold text-slate-800">
+            No matching categories
+          </h3>
+
+          <p className="mt-1 max-w-sm text-sm leading-6 text-slate-500">
+            No categories match your current search or product status
+            filter.
+          </p>
+
+          <button
+            type="button"
+            className="mt-4 inline-flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3.5 py-2 text-sm font-semibold text-emerald-700 transition-colors hover:bg-emerald-100"
+            onClick={handleResetFilters}
+          >
+            <RotateCcw size={15} />
+            Clear Filters
+          </button>
         </div>
       ) : (
-        <DataTable
-          columns={columns}
-          data={filteredCategories}
-          selectedIds={selectedCategoryIds}
-          onSelectionChange={setSelectedCategoryIds}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-        />
+        <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+          {/* ==================================================
+              TABLE HEADER
+          ================================================== */}
+
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 bg-slate-50/70 px-5 py-3">
+            <div className="flex items-center gap-2">
+              <FolderTree size={16} className="text-emerald-600" />
+
+              <span className="text-sm font-bold text-slate-700">
+                Hardware Categories
+              </span>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs font-medium text-slate-500">
+                {filteredCategories.length}{' '}
+                categor{filteredCategories.length === 1 ? 'y' : 'ies'}
+              </span>
+
+              {selectedCategoryIds.length > 0 && (
+                <span className="rounded-md border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700">
+                  {selectedCategoryIds.length} selected
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* ==================================================
+              DATA TABLE
+          ================================================== */}
+
+          <DataTable
+            columns={columns}
+            data={filteredCategories}
+            selectedIds={selectedCategoryIds}
+            onSelectionChange={setSelectedCategoryIds}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
+        </div>
       )}
+
+      {/* ======================================================
+          CATEGORY MODAL
+      ====================================================== */}
 
       <CategoryModal
         isOpen={isModalOpen}
-        existingCategoryNames={categories.map((category) => category.name)}
+        existingCategoryNames={categories.map(
+          (category) => category.name
+        )}
         initialData={
           editingCategory
             ? {
@@ -375,20 +712,49 @@ const CategoriesPage: React.FC = () => {
 
 export default CategoriesPage
 
+/* ==========================================================
+   ERROR MESSAGE
+========================================================== */
+
 function getErrorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : 'Something went wrong. Please try again.'
+  return error instanceof Error
+    ? error.message
+    : 'Something went wrong. Please try again.'
 }
 
-function sortCategories(items: CategoryRecord[]): CategoryRecord[] {
-  return [...items].sort((left, right) => left.name.localeCompare(right.name))
+/* ==========================================================
+   SORT CATEGORIES
+========================================================== */
+
+function sortCategories(
+  items: CategoryRecord[]
+): CategoryRecord[] {
+  return [...items].sort((left, right) =>
+    left.name.localeCompare(right.name)
+  )
 }
+
+/* ==========================================================
+   NORMALIZE TEXT
+========================================================== */
 
 function normalizeText(value: string): string {
   return value.trim().toLowerCase()
 }
 
-function categoryMatchesSearch(category: CategoryRecord, normalizedSearch: string): boolean {
-  return [category.name, category.description, category.productCount.toString()]
+/* ==========================================================
+   CATEGORY SEARCH
+========================================================== */
+
+function categoryMatchesSearch(
+  category: CategoryRecord,
+  normalizedSearch: string
+): boolean {
+  return [
+    category.name,
+    category.description,
+    category.productCount.toString()
+  ]
     .join(' ')
     .toLowerCase()
     .includes(normalizedSearch)

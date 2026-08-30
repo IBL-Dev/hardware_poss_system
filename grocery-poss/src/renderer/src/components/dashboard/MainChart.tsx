@@ -1,8 +1,8 @@
 import React from 'react'
 import {
+  Area,
+  AreaChart,
   CartesianGrid,
-  Line,
-  LineChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -24,58 +24,68 @@ export const MainChart: React.FC<MainChartProps> = ({ data, totalSales, isLoadin
       : [{ name: 'No Sales', sales: 0 }]
 
   return (
-    <div className="rounded-lg border border-line bg-white p-6 shadow-md">
-      <div className="mb-6 flex items-start justify-between">
+    <div className="rounded-lg border border-line bg-card p-6 shadow-sm">
+      <div className="mb-5 flex items-center justify-between">
         <div>
-          <div className="mb-2 text-[0.9rem] text-muted">Paid Sales Trend (LKR)</div>
-          <div className="text-2xl font-bold text-ink">
-            {isLoading ? 'Loading...' : formatLkr(totalSales)}
+          <h3 className="text-[0.8rem] font-semibold uppercase tracking-wider text-muted">
+            Daily Sales Trend
+          </h3>
+          <div className="mt-1.5 text-xl font-bold text-ink">
+            {isLoading ? '—' : `Rs. ${formatLkr(totalSales)}`}
           </div>
         </div>
-        <span className="rounded-full border border-success/20 bg-success/10 px-3 py-1 text-xs font-semibold text-success">
-          Live sales data
+        <span className="rounded-md border border-success/20 bg-success/8 px-3 py-1.5 text-xs font-semibold text-success">
+          Total
         </span>
       </div>
-      <div className="h-[18.75rem] w-full">
+      <div className="h-56 w-full">
         {isLoading ? (
-          <div className="flex h-full items-center justify-center text-muted">Loading chart...</div>
+          <div className="flex h-full items-center justify-center text-sm text-muted">
+            Loading...
+          </div>
         ) : (
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={chartData}>
+            <AreaChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+              <defs>
+                <linearGradient id="salesGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="var(--color-primary)" stopOpacity={0.15} />
+                  <stop offset="95%" stopColor="var(--color-primary)" stopOpacity={0.02} />
+                </linearGradient>
+              </defs>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-line)" />
               <XAxis
                 dataKey="name"
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: 'var(--color-ink)' }}
-                dy={10}
+                tick={{ fill: 'var(--color-muted)', fontSize: 11 }}
+                dy={8}
               />
               <YAxis
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: 'var(--color-ink)' }}
-                dx={-10}
+                tick={{ fill: 'var(--color-muted)', fontSize: 11 }}
+                dx={-8}
                 tickFormatter={(value) => formatLkr(Number(value))}
+                width={70}
               />
               <Tooltip
-                formatter={(value) => formatLkr(Number(value))}
+                formatter={(value) => [`Rs. ${formatLkr(Number(value))}`, 'Sales']}
                 contentStyle={{
-                  borderRadius: '10px',
+                  borderRadius: '8px',
                   border: '1px solid var(--color-line)',
                   background: 'var(--color-card)',
-                  boxShadow: 'var(--shadow-md)'
+                  fontSize: '12px'
                 }}
               />
-              <Line
+              <Area
                 type="monotone"
                 dataKey="sales"
-                stroke="var(--color-success)"
+                stroke="var(--color-primary)"
                 strokeWidth={2}
-                dot={false}
-                activeDot={{ r: 6 }}
+                fill="url(#salesGradient)"
                 name="Sales (LKR)"
               />
-            </LineChart>
+            </AreaChart>
           </ResponsiveContainer>
         )}
       </div>

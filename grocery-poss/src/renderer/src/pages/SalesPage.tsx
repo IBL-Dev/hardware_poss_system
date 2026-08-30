@@ -13,7 +13,8 @@ import {
   Save,
   Search,
   ShoppingCart,
-  Trash2
+  Trash2,
+  X
 } from 'lucide-react'
 import { SearchableSelect } from '../components/common/SearchableSelect'
 import { QuantityModal, type QuantitySelection } from '../components/sales/QuantityModal'
@@ -696,27 +697,85 @@ const SalesPage: React.FC = () => {
     : 1
 
   return (
-    <div className="flex h-[calc(100vh-var(--header-height)-56px)] min-h-[42rem] flex-col gap-4 overflow-hidden">
-      <div className="grid min-h-0 flex-1 gap-5 overflow-hidden xl:grid-cols-[minmax(0,2fr)_minmax(20rem,1fr)]">
-        <section className="flex min-h-0 flex-col overflow-hidden rounded-lg border border-line bg-card shadow-sm">
-          <div className="border-b border-line p-4">
-            <div className="flex items-center gap-3">
-              <div className="flex min-w-0 flex-1 items-center gap-3 rounded-md border border-line bg-white px-4 py-3 ring-0 transition-shadow focus-within:border-primary focus-within:shadow-md">
-                <Search size={20} className="text-primary" />
+    <div className="flex h-[calc(100vh-var(--header-height)-40px)] min-h-[44rem] flex-col gap-3 overflow-hidden">
+      <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+        <div className="flex min-w-0 items-center gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-600 shadow-sm">
+            <ShoppingCart size={19} className="text-white" />
+          </div>
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="text-lg font-bold tracking-tight text-slate-900">Hardware POS</h1>
+              <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[0.7rem] font-bold uppercase tracking-wide text-emerald-700">
+                Sales Counter
+              </span>
+            </div>
+            <p className="mt-0.5 truncate text-xs text-slate-500">
+              Search stock, build the bill and complete customer payments
+            </p>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
+            <p className="text-[0.65rem] font-bold uppercase tracking-wider text-slate-400">Cashier</p>
+            <p className="mt-0.5 max-w-36 truncate text-xs font-bold text-slate-700">{cashierName}</p>
+          </div>
+          <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
+            <p className="text-[0.65rem] font-bold uppercase tracking-wider text-slate-400">Available</p>
+            <p className="mt-0.5 text-xs font-bold text-emerald-700">{sellableProducts.length} Products</p>
+          </div>
+          <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
+            <p className="text-[0.65rem] font-bold uppercase tracking-wider text-slate-400">Held Bills</p>
+            <p className="mt-0.5 text-xs font-bold text-slate-700">{heldBills.length}</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid min-h-0 flex-1 gap-4 overflow-hidden xl:grid-cols-[minmax(0,1.65fr)_minmax(23rem,0.85fr)]">
+        <section className="flex min-h-0 flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+          <div className="shrink-0 border-b border-slate-100 p-4">
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <h2 className="text-sm font-bold text-slate-800">Product Lookup</h2>
+                <p className="mt-0.5 text-xs text-slate-500">Search by code, barcode, name, brand or selling price</p>
+              </div>
+              <span className="rounded-md bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700">
+                {hasActiveFilter ? `${matchingProducts.length} Found` : `${sellableProducts.length} In Stock`}
+              </span>
+            </div>
+
+            <div className="flex flex-col gap-2.5 md:flex-row">
+              <div className="group flex h-12 min-w-0 flex-1 items-center gap-3 rounded-lg border border-slate-200 bg-white px-3.5 shadow-sm transition-colors focus-within:border-emerald-400 focus-within:ring-2 focus-within:ring-emerald-500/10">
+                <Search size={19} className="shrink-0 text-slate-400 transition-colors group-focus-within:text-emerald-600" />
                 <input
                   ref={productSearchRef}
                   type="text"
-                  className="min-w-0 flex-1 border-none bg-transparent text-base font-medium text-ink outline-none placeholder:text-faint"
-                  placeholder="Search product code, barcode, name, brand, or price"
+                  className="min-w-0 flex-1 border-none bg-transparent text-[0.95rem] font-medium text-slate-800 outline-none placeholder:font-normal placeholder:text-slate-400"
+                  placeholder="Scan barcode or search hardware product..."
                   value={searchQuery}
                   onChange={handleSearchChange}
                   onKeyDown={handleSearchKeyDown}
                   disabled={Boolean(completedSale)}
                   autoFocus
                 />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
+                    onClick={() => {
+                      setSearchQuery('')
+                      setHighlightedIndex(0)
+                    }}
+                    aria-label="Clear product search"
+                  >
+                    <X size={14} />
+                  </button>
+                )}
               </div>
+
               <SearchableSelect
-                triggerClassName="flex w-44 shrink-0 items-center justify-between rounded-md border border-line bg-white px-3 py-3 text-sm font-semibold text-ink outline-none transition-shadow focus:border-primary focus:shadow-md disabled:bg-subtle disabled:text-muted"
+                triggerClassName="flex h-12 w-full shrink-0 items-center justify-between rounded-lg border border-slate-200 bg-white px-3.5 text-sm font-semibold text-slate-700 shadow-sm outline-none transition-colors hover:border-slate-300 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/10 disabled:bg-slate-50 disabled:text-slate-400 md:w-48"
                 options={[
                   { value: '', label: 'All Brands' },
                   ...brandOptions.map((brandName) => ({ value: brandName, label: brandName }))
@@ -730,20 +789,16 @@ const SalesPage: React.FC = () => {
               />
             </div>
 
-            <div className="mt-3 flex items-center justify-between gap-3 text-[0.8rem] text-muted">
+            <div className="mt-2.5 flex flex-wrap items-center justify-between gap-2 text-[0.75rem] text-slate-500">
               <span>
-                {hasActiveFilter
-                  ? `${matchingProducts.length} matching product(s)`
-                  : `${sellableProducts.length} sellable product(s) available`}
+                {hasActiveFilter ? 'Use ↑ ↓ and Enter for quick keyboard selection' : 'Start typing or select a brand to find products'}
               </span>
-              {matchingProducts.length > MAX_SEARCH_RESULTS && (
-                <span>Showing best {MAX_SEARCH_RESULTS}</span>
-              )}
+              {matchingProducts.length > MAX_SEARCH_RESULTS && <span>Showing first {MAX_SEARCH_RESULTS} results</span>}
             </div>
           </div>
 
-          <div className="grid grid-cols-[1.3fr_0.8fr_0.7fr_0.6fr] border-b border-line bg-subtle px-4 py-3 text-[0.78rem] font-semibold tracking-wide text-muted uppercase">
-            <span>Product</span>
+          <div className="grid shrink-0 grid-cols-[minmax(0,1.45fr)_minmax(7rem,0.7fr)_7.5rem_5.5rem] items-center gap-3 border-b border-slate-200 bg-slate-50 px-4 py-2.5 text-[0.7rem] font-bold uppercase tracking-wider text-slate-500">
+            <span>Hardware Product</span>
             <span>Brand</span>
             <span className="text-right">Price (LKR)</span>
             <span className="text-right">Stock</span>
@@ -751,11 +806,11 @@ const SalesPage: React.FC = () => {
 
           <div className="min-h-0 flex-1 overflow-y-auto">
             {isLoading ? (
-              <EmptyState text="Loading products..." />
+              <EmptyState text="Loading hardware products..." />
             ) : !hasActiveFilter ? (
-              <EmptyState text="Search or select a brand to start billing." />
+              <EmptyState text="Search a product or select a brand to start the bill." />
             ) : visibleProducts.length === 0 ? (
-              <EmptyState text="No matching products found." />
+              <EmptyState text="No matching hardware products found." />
             ) : (
               visibleProducts.map((product, index) => {
                 const isHighlighted = index === activeIndex
@@ -764,41 +819,38 @@ const SalesPage: React.FC = () => {
                   <button
                     key={product.id}
                     type="button"
-                    className={`grid w-full grid-cols-[1.3fr_0.8fr_0.7fr_0.6fr] items-center gap-3 border-b border-line px-4 py-3 text-left transition-colors last:border-b-0 ${
+                    className={`grid w-full grid-cols-[minmax(0,1.45fr)_minmax(7rem,0.7fr)_7.5rem_5.5rem] items-center gap-3 border-b border-slate-100 px-4 py-3 text-left transition-all last:border-b-0 ${
                       isHighlighted
-                        ? 'bg-primary/10 ring-1 ring-inset ring-primary/30'
-                        : 'bg-white hover:bg-hover'
+                        ? 'bg-emerald-50 ring-1 ring-inset ring-emerald-300'
+                        : 'bg-white hover:bg-slate-50'
                     }`}
                     onClick={() => handleProductSelect(product)}
                     onMouseEnter={() => setHighlightedIndex(index)}
                   >
                     <span className="min-w-0">
-                      <span className="block truncate font-semibold text-ink">{product.name}</span>
-                      <span className="mt-1 flex flex-wrap gap-1.5">
-                        <span className="rounded-full border border-primary/20 bg-primary/10 px-2 py-0.5 text-[0.72rem] font-semibold text-primary">
+                      <span className="block truncate text-[0.9rem] font-bold text-slate-800">{product.name}</span>
+                      <span className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                        <span className="rounded-md border border-emerald-200 bg-emerald-50 px-2 py-0.5 font-mono text-[0.68rem] font-bold text-emerald-700">
                           {product.sku}
                         </span>
                         {product.barcode && (
-                          <span className="rounded-full border border-line-strong bg-subtle px-2 py-0.5 text-[0.72rem] font-semibold text-muted">
+                          <span className="max-w-36 truncate rounded-md border border-slate-200 bg-slate-50 px-2 py-0.5 font-mono text-[0.68rem] font-semibold text-slate-500">
                             {product.barcode}
                           </span>
                         )}
                       </span>
                     </span>
-                    <span className="truncate">
-                      <span className="rounded-full border border-accent/20 bg-accent/10 px-2.5 py-1 text-xs font-semibold text-accent">
+
+                    <span className="min-w-0">
+                      <span className="inline-block max-w-full truncate rounded-md bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600">
                         {product.brandName ?? 'No Brand'}
                       </span>
                     </span>
-                    <span className="text-right font-semibold text-success">
-                      {formatLkr(product.sellingPrice)}
-                    </span>
+
+                    <span className="text-right text-sm font-bold text-emerald-700">{formatLkr(product.sellingPrice)}</span>
+
                     <span className="text-right">
-                      <span
-                        className={`rounded-full px-2.5 py-1 text-xs font-semibold ${getStockBadgeClass(
-                          product
-                        )}`}
-                      >
+                      <span className={`inline-flex min-w-12 items-center justify-center rounded-md px-2 py-1 text-xs font-bold ${getStockBadgeClass(product)}`}>
                         {product.stockQuantity}
                       </span>
                     </span>
@@ -809,291 +861,288 @@ const SalesPage: React.FC = () => {
           </div>
         </section>
 
-        <section className="flex min-h-0 flex-col overflow-hidden rounded-lg border border-line bg-card p-5 shadow-md">
-          <div className="mb-4 flex items-start justify-between gap-3 border-b border-line pb-3.5">
-            <div className="min-w-0">
-              <div className="flex items-center gap-2 text-[1.1rem] font-bold">
-                <ShoppingCart size={22} className="text-success" />
-                Current Bill
-              </div>
-              <div className="mt-1 flex items-center gap-1.5 text-[0.8rem] text-muted">
-                <Clock size={14} />
-                <span className="truncate">{activeHeldBill?.name ?? 'New bill'}</span>
-              </div>
-            </div>
-            <span className="shrink-0 rounded-full bg-success/10 px-3 py-1 text-sm font-semibold text-success">
-              {cartItemCount} Items
-            </span>
-          </div>
-
-          <div className="mb-4 grid grid-cols-2 gap-2">
-            <div ref={heldBillMenuRef} className="relative flex min-w-0">
-              <button
-                type="button"
-                className="flex min-w-0 flex-1 items-center justify-center gap-2 rounded-l-md border border-primary/25 bg-primary/10 px-3 py-2.5 text-sm font-semibold text-primary transition-colors hover:bg-primary/15 disabled:cursor-not-allowed disabled:border-line disabled:bg-subtle disabled:text-faint"
-                onClick={handleHoldBill}
-                disabled={cart.length === 0 || Boolean(completedSale)}
-              >
-                <Save size={16} />
-                <span className="truncate">Hold Bill</span>
-              </button>
-              <button
-                type="button"
-                className="flex w-10 shrink-0 items-center justify-center rounded-r-md border border-l-0 border-primary/25 bg-primary/10 text-primary transition-colors hover:bg-primary/15 disabled:cursor-not-allowed disabled:border-line disabled:bg-subtle disabled:text-faint"
-                onClick={() => setIsHeldBillMenuOpen((isOpen) => !isOpen)}
-                disabled={heldBills.length === 0}
-                title={heldBills.length === 0 ? 'No held bills' : 'Continue held bill'}
-                aria-label={heldBills.length === 0 ? 'No held bills' : 'Continue held bill'}
-                aria-haspopup="menu"
-                aria-expanded={isHeldBillMenuVisible}
-              >
-                <ChevronDown
-                  size={16}
-                  className={`transition-transform ${isHeldBillMenuVisible ? 'rotate-180' : ''}`}
-                />
-              </button>
-
-              {isHeldBillMenuVisible && (
-                <div
-                  className="absolute top-full left-0 z-50 mt-2 w-80 max-w-[calc(100vw-2rem)] overflow-hidden rounded-md border border-line bg-white shadow-lg"
-                  role="menu"
-                >
-                  <div className="border-b border-line bg-subtle px-3 py-2 text-[0.72rem] font-semibold tracking-wide text-muted uppercase">
-                    Held Bills
+        <section className="flex min-h-0 flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-md">
+          <div className="shrink-0 border-b border-slate-100 px-4 py-3.5">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <div className="flex items-center gap-2 text-base font-bold text-slate-900">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50">
+                    <ShoppingCart size={17} className="text-emerald-600" />
                   </div>
-                  <div className="max-h-64 overflow-y-auto">
-                    {heldBills.map((bill) => {
-                      const isOpen = bill.id === activeHeldBillId
-
-                      return (
-                        <div key={bill.id} className="flex border-b border-line last:border-b-0">
-                          <button
-                            type="button"
-                            className="flex min-w-0 flex-1 items-center gap-2 px-3 py-2.5 text-left transition-colors hover:bg-hover disabled:cursor-not-allowed disabled:bg-subtle disabled:text-faint"
-                            onClick={() => handleResumeHeldBill(bill)}
-                            disabled={isOpen}
-                            role="menuitem"
-                          >
-                            <RefreshCw size={15} className="shrink-0 text-primary" />
-                            <span className="min-w-0">
-                              <span className="block truncate text-sm font-semibold text-ink">
-                                {bill.name}
-                                {isOpen ? ' (Open)' : ''}
-                              </span>
-                              <span className="mt-0.5 block truncate text-[0.74rem] text-muted">
-                                {formatHeldBillSummary(bill)}
-                              </span>
-                            </span>
-                          </button>
-                          <button
-                            type="button"
-                            className="flex w-10 shrink-0 items-center justify-center border-l border-line text-muted transition-colors hover:bg-danger/10 hover:text-danger"
-                            onClick={() => handleDeleteHeldBill(bill)}
-                            aria-label={`Delete ${bill.name}`}
-                          >
-                            <Trash2 size={15} />
-                          </button>
-                        </div>
-                      )
-                    })}
-                  </div>
+                  Current Bill
                 </div>
-              )}
+                <div className="mt-1.5 flex items-center gap-1.5 pl-10 text-xs text-slate-500">
+                  <Clock size={13} />
+                  <span className="truncate">{activeHeldBill?.name ?? 'New hardware sale'}</span>
+                </div>
+              </div>
+
+              <span className="shrink-0 rounded-lg border border-emerald-200 bg-emerald-50 px-2.5 py-1.5 text-xs font-bold text-emerald-700">
+                {cartItemCount} Items
+              </span>
             </div>
-            <button
-              type="button"
-              className="flex items-center justify-center gap-2 rounded-md border border-line bg-white px-3 py-2.5 text-sm font-semibold text-ink transition-colors hover:bg-hover"
-              onClick={handleNewBill}
-            >
-              <PlusCircle size={16} />
-              New Bill
-            </button>
           </div>
 
-          <div className="flex min-h-0 flex-2 flex-col gap-2.5 overflow-y-auto">
+          <div className="shrink-0 border-b border-slate-100 p-3">
+            <div className="grid grid-cols-2 gap-2">
+              <div ref={heldBillMenuRef} className="relative flex min-w-0">
+                <button
+                  type="button"
+                  className="flex min-w-0 flex-1 items-center justify-center gap-2 rounded-l-lg border border-emerald-200 bg-emerald-50 px-3 py-2.5 text-xs font-bold text-emerald-700 transition-colors hover:bg-emerald-100 disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-50 disabled:text-slate-400"
+                  onClick={handleHoldBill}
+                  disabled={cart.length === 0 || Boolean(completedSale)}
+                >
+                  <Save size={15} />
+                  <span className="truncate">Hold Bill</span>
+                </button>
+                <button
+                  type="button"
+                  className="flex w-10 shrink-0 items-center justify-center rounded-r-lg border border-l-0 border-emerald-200 bg-emerald-50 text-emerald-700 transition-colors hover:bg-emerald-100 disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-50 disabled:text-slate-400"
+                  onClick={() => setIsHeldBillMenuOpen((isOpen) => !isOpen)}
+                  disabled={heldBills.length === 0}
+                  title={heldBills.length === 0 ? 'No held bills' : 'Continue held bill'}
+                  aria-label={heldBills.length === 0 ? 'No held bills' : 'Continue held bill'}
+                  aria-haspopup="menu"
+                  aria-expanded={isHeldBillMenuVisible}
+                >
+                  <ChevronDown size={15} className={`transition-transform ${isHeldBillMenuVisible ? 'rotate-180' : ''}`} />
+                </button>
+
+                {isHeldBillMenuVisible && (
+                  <div className="absolute left-0 top-full z-50 mt-2 w-80 max-w-[calc(100vw-2rem)] overflow-hidden rounded-lg border border-slate-200 bg-white shadow-xl" role="menu">
+                    <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50 px-3 py-2.5">
+                      <span className="text-[0.7rem] font-bold uppercase tracking-wider text-slate-500">Held Bills</span>
+                      <span className="rounded-full bg-white px-2 py-0.5 text-[0.68rem] font-bold text-emerald-700">{heldBills.length}</span>
+                    </div>
+
+                    <div className="max-h-64 overflow-y-auto">
+                      {heldBills.map((bill) => {
+                        const isOpen = bill.id === activeHeldBillId
+
+                        return (
+                          <div key={bill.id} className="flex border-b border-slate-100 last:border-b-0">
+                            <button
+                              type="button"
+                              className="flex min-w-0 flex-1 items-center gap-2.5 px-3 py-3 text-left transition-colors hover:bg-emerald-50 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400"
+                              onClick={() => handleResumeHeldBill(bill)}
+                              disabled={isOpen}
+                              role="menuitem"
+                            >
+                              <RefreshCw size={14} className="shrink-0 text-emerald-600" />
+                              <span className="min-w-0">
+                                <span className="block truncate text-xs font-bold text-slate-800">
+                                  {bill.name}
+                                  {isOpen ? ' (Open)' : ''}
+                                </span>
+                                <span className="mt-0.5 block truncate text-[0.7rem] text-slate-500">{formatHeldBillSummary(bill)}</span>
+                              </span>
+                            </button>
+
+                            <button
+                              type="button"
+                              className="flex w-10 shrink-0 items-center justify-center border-l border-slate-100 text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600"
+                              onClick={() => handleDeleteHeldBill(bill)}
+                              aria-label={`Delete ${bill.name}`}
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <button
+                type="button"
+                className="flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs font-bold text-slate-700 transition-colors hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700"
+                onClick={handleNewBill}
+              >
+                <PlusCircle size={15} />
+                New Bill
+              </button>
+            </div>
+          </div>
+
+          <div className="min-h-0 flex-1 overflow-y-auto bg-slate-50/40 p-3">
             {cart.length === 0 ? (
-              <div className="mt-10 flex flex-col items-center gap-3 text-center text-muted">
-                <PackageSearch size={36} className="text-faint" />
-                <span>No products in this bill.</span>
+              <div className="flex h-full min-h-48 flex-col items-center justify-center px-6 text-center">
+                <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-50">
+                  <PackageSearch size={23} className="text-emerald-600" />
+                </div>
+                <p className="text-sm font-bold text-slate-700">Bill is empty</p>
+                <p className="mt-1 max-w-64 text-xs leading-5 text-slate-500">Search a hardware item from the product panel and add it to this bill.</p>
               </div>
             ) : (
-              cart.map((item) => {
-                const lineGrossTotal = getCartItemGrossTotal(item)
-                const lineDiscountAmount = getCartItemDiscountAmount(item)
-                const lineTotal = getCartItemLineTotal(item)
+              <div className="flex flex-col gap-2.5">
+                {cart.map((item) => {
+                  const lineGrossTotal = getCartItemGrossTotal(item)
+                  const lineDiscountAmount = getCartItemDiscountAmount(item)
+                  const lineTotal = getCartItemLineTotal(item)
 
-                return (
-                  <div
-                    key={item.id}
-                    className="rounded-md border border-line bg-white p-3 shadow-sm transition-shadow hover:shadow-md"
-                  >
-                    <div className="mb-3 flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <span className="block truncate text-[0.95rem] font-semibold text-ink">
-                          {item.name}
-                        </span>
-                        <span className="text-[0.8rem] text-muted">
-                          {item.sku} - {item.brand}
-                        </span>
-                      </div>
-                      <button
-                        type="button"
-                        className="rounded-sm p-1 text-faint transition-colors hover:bg-danger/10 hover:text-danger disabled:cursor-not-allowed disabled:text-line-strong"
-                        onClick={() => handleRemoveItem(item.id)}
-                        disabled={Boolean(completedSale)}
-                        aria-label={`Remove ${item.name}`}
-                      >
-                        <Trash2 size={18} />
-                      </button>
-                    </div>
-
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="flex items-center overflow-hidden rounded-md border border-line bg-white">
-                        <button
-                          type="button"
-                          className="flex h-9 w-9 items-center justify-center text-muted transition-colors hover:bg-hover hover:text-primary disabled:cursor-not-allowed disabled:text-line-strong"
-                          onClick={() => handleCartQuantityChange(item.id, item.quantity - 1)}
-                          disabled={Boolean(completedSale)}
-                          aria-label={`Decrease ${item.name}`}
-                        >
-                          <Minus size={15} />
-                        </button>
-                        <input
-                          type="number"
-                          min={0.001}
-                          step="any"
-                          max={item.stockQuantity}
-                          className="h-9 w-14 border-x border-line text-center text-sm font-semibold text-ink outline-none disabled:bg-subtle disabled:text-muted"
-                          value={item.quantity}
-                          disabled={Boolean(completedSale)}
-                          onChange={(event) =>
-                            handleCartQuantityChange(
-                              item.id,
-                              event.target.value === '' ? 0 : Number(event.target.value)
-                            )
-                          }
-                        />
-                        <button
-                          type="button"
-                          className="flex h-9 w-9 items-center justify-center text-muted transition-colors hover:bg-hover hover:text-primary disabled:cursor-not-allowed disabled:text-line-strong"
-                          onClick={() => handleCartQuantityChange(item.id, item.quantity + 1)}
-                          disabled={Boolean(completedSale)}
-                          aria-label={`Increase ${item.name}`}
-                        >
-                          <Plus size={15} />
-                        </button>
-                      </div>
-
-                      <div className="text-right">
-                        <div className="text-[0.8rem] text-muted">
-                          Each (LKR) {formatLkr(item.price)}
-                        </div>
-                        <div className="text-[0.8rem] text-muted">
-                          Line (LKR) {formatLkr(lineGrossTotal)}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="mt-3 grid grid-cols-[minmax(0,1fr)_8rem] items-center gap-3 border-t border-line pt-3">
-                      <div className="text-[0.8rem] text-muted">Line Total</div>
-                      <div className="text-right text-sm font-bold text-ink">
-                        Total (LKR) {formatLkr(lineTotal)}
-                      </div>
-                      {lineDiscountAmount > 0 && (
-                        <>
-                          <div className="text-[0.78rem] text-success">Discount applied</div>
-                          <div className="text-right text-[0.78rem] font-semibold text-success">
-                            -{formatLkr(lineDiscountAmount)}
+                  return (
+                    <div key={item.id} className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <span className="block truncate text-sm font-bold text-slate-800">{item.name}</span>
+                          <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                            <span className="rounded-md bg-emerald-50 px-2 py-0.5 font-mono text-[0.66rem] font-bold text-emerald-700">{item.sku}</span>
+                            <span className="max-w-28 truncate text-[0.7rem] font-medium text-slate-400">{item.brand}</span>
                           </div>
-                        </>
+                        </div>
+
+                        <button
+                          type="button"
+                          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:text-slate-300"
+                          onClick={() => handleRemoveItem(item.id)}
+                          disabled={Boolean(completedSale)}
+                          aria-label={`Remove ${item.name}`}
+                        >
+                          <Trash2 size={15} />
+                        </button>
+                      </div>
+
+                      <div className="mt-3 flex items-end justify-between gap-3">
+                        <div>
+                          <p className="mb-1 text-[0.65rem] font-bold uppercase tracking-wide text-slate-400">Quantity</p>
+                          <div className="flex items-center overflow-hidden rounded-lg border border-slate-200 bg-white">
+                            <button
+                              type="button"
+                              className="flex h-9 w-9 items-center justify-center text-slate-500 transition-colors hover:bg-emerald-50 hover:text-emerald-700 disabled:cursor-not-allowed disabled:text-slate-300"
+                              onClick={() => handleCartQuantityChange(item.id, item.quantity - 1)}
+                              disabled={Boolean(completedSale)}
+                              aria-label={`Decrease ${item.name}`}
+                            >
+                              <Minus size={14} />
+                            </button>
+                            <input
+                              type="number"
+                              min={0.001}
+                              step="any"
+                              max={item.stockQuantity}
+                              className="h-9 w-16 border-x border-slate-200 bg-white text-center text-sm font-bold text-slate-800 outline-none disabled:bg-slate-50 disabled:text-slate-400"
+                              value={item.quantity}
+                              disabled={Boolean(completedSale)}
+                              onChange={(event) =>
+                                handleCartQuantityChange(
+                                  item.id,
+                                  event.target.value === '' ? 0 : Number(event.target.value)
+                                )
+                              }
+                            />
+                            <button
+                              type="button"
+                              className="flex h-9 w-9 items-center justify-center text-slate-500 transition-colors hover:bg-emerald-50 hover:text-emerald-700 disabled:cursor-not-allowed disabled:text-slate-300"
+                              onClick={() => handleCartQuantityChange(item.id, item.quantity + 1)}
+                              disabled={Boolean(completedSale)}
+                              aria-label={`Increase ${item.name}`}
+                            >
+                              <Plus size={14} />
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="text-right">
+                          <p className="text-[0.68rem] font-medium text-slate-400">Unit {formatLkr(item.price)}</p>
+                          <p className="mt-0.5 text-sm font-bold text-slate-800">{formatLkr(lineTotal)}</p>
+                        </div>
+                      </div>
+
+                      {lineDiscountAmount > 0 && (
+                        <div className="mt-2.5 flex items-center justify-between rounded-md border border-emerald-100 bg-emerald-50 px-2.5 py-1.5 text-[0.7rem]">
+                          <span className="font-semibold text-emerald-700">Discount applied</span>
+                          <span className="font-bold text-emerald-700">-{formatLkr(lineDiscountAmount)}</span>
+                        </div>
                       )}
+
+                      <div className="mt-2 text-right text-[0.66rem] text-slate-400">Gross {formatLkr(lineGrossTotal)}</div>
                     </div>
-                  </div>
-                )
-              })
+                  )
+                })}
+              </div>
             )}
           </div>
 
-          <div className="mt-4 flex flex-1 flex-col justify-center gap-2.5 border-t border-line pt-4">
-            <div className="flex justify-between text-[0.95rem] text-muted">
-              <span>Subtotal (LKR)</span>
-              <span>{formatLkr(subtotal)}</span>
-            </div>
-            {itemDiscountTotal > 0 && (
-              <div className="flex justify-between text-[0.95rem] font-semibold text-success">
-                <span>Item Discounts (LKR)</span>
-                <span>-{formatLkr(itemDiscountTotal)}</span>
+          <div className="shrink-0 border-t border-slate-200 bg-white p-4">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm text-slate-500">
+                <span>Subtotal</span>
+                <span className="font-semibold text-slate-700">{formatLkr(subtotal)}</span>
               </div>
-            )}
-            <div className="mt-1.5 flex justify-between text-[1.35rem] font-bold text-ink">
-              <span>Net Total (LKR)</span>
-              <span>{formatLkr(total)}</span>
+
+              {itemDiscountTotal > 0 && (
+                <div className="flex items-center justify-between text-sm text-emerald-700">
+                  <span className="font-semibold">Item Discounts</span>
+                  <span className="font-bold">-{formatLkr(itemDiscountTotal)}</span>
+                </div>
+              )}
+
+              <div className="flex items-end justify-between border-t border-dashed border-slate-200 pt-3">
+                <span className="text-sm font-bold text-slate-700">Net Total</span>
+                <div className="text-right">
+                  <span className="block text-[0.65rem] font-bold uppercase tracking-wider text-slate-400">LKR</span>
+                  <span className="text-2xl font-extrabold tracking-tight text-emerald-700">{formatLkr(total)}</span>
+                </div>
+              </div>
             </div>
 
-            <div className="mt-2 grid grid-cols-3 gap-2" role="group" aria-label="Payment method">
+            <div className="mt-3 grid grid-cols-3 gap-2" role="group" aria-label="Payment method">
               <button
                 type="button"
-                className={`flex items-center justify-between gap-2 rounded-md border px-3 py-2.5 text-sm font-bold transition-colors ${
+                className={`flex h-10 items-center justify-center gap-1.5 rounded-lg border text-xs font-bold transition-colors ${
                   paymentMethod === 'CASH'
-                    ? 'border-success bg-success/10 text-success'
-                    : 'border-line bg-white text-muted hover:bg-hover hover:text-ink'
+                    ? 'border-emerald-500 bg-emerald-50 text-emerald-700 ring-1 ring-emerald-500/20'
+                    : 'border-slate-200 bg-white text-slate-500 hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700'
                 }`}
                 onClick={() => selectPaymentMethod('CASH')}
                 disabled={Boolean(completedSale)}
               >
-                <span className="flex min-w-0 items-center gap-2">
-                  <Banknote size={17} />
-                  <span>Cash</span>
-                </span>
-                <Check
-                  size={16}
-                  className={paymentMethod === 'CASH' ? 'opacity-100' : 'opacity-0'}
-                />
+                <Banknote size={15} />
+                Cash
+                {paymentMethod === 'CASH' && <Check size={13} />}
               </button>
+
               <button
                 type="button"
-                className={`flex items-center justify-between gap-2 rounded-md border px-3 py-2.5 text-sm font-bold transition-colors ${
+                className={`flex h-10 items-center justify-center gap-1.5 rounded-lg border text-xs font-bold transition-colors ${
                   paymentMethod === 'CARD'
-                    ? 'border-success bg-success/10 text-success'
-                    : 'border-line bg-white text-muted hover:bg-hover hover:text-ink'
+                    ? 'border-emerald-500 bg-emerald-50 text-emerald-700 ring-1 ring-emerald-500/20'
+                    : 'border-slate-200 bg-white text-slate-500 hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700'
                 }`}
                 onClick={() => selectPaymentMethod('CARD')}
                 disabled={Boolean(completedSale)}
               >
-                <span className="flex min-w-0 items-center gap-2">
-                  <CreditCard size={17} />
-                  <span>Card</span>
-                </span>
-                <Check
-                  size={16}
-                  className={paymentMethod === 'CARD' ? 'opacity-100' : 'opacity-0'}
-                />
+                <CreditCard size={15} />
+                Card
+                {paymentMethod === 'CARD' && <Check size={13} />}
               </button>
+
               <button
                 type="button"
-                className={`flex items-center justify-between gap-2 rounded-md border px-3 py-2.5 text-sm font-bold transition-colors ${
+                className={`flex h-10 items-center justify-center gap-1.5 rounded-lg border text-xs font-bold transition-colors ${
                   paymentMethod === 'CREDIT'
-                    ? 'border-success bg-success/10 text-success'
-                    : 'border-line bg-white text-muted hover:bg-hover hover:text-ink'
+                    ? 'border-emerald-500 bg-emerald-50 text-emerald-700 ring-1 ring-emerald-500/20'
+                    : 'border-slate-200 bg-white text-slate-500 hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700'
                 }`}
                 onClick={() => selectPaymentMethod('CREDIT')}
                 disabled={Boolean(completedSale)}
               >
-                <span className="flex min-w-0 items-center gap-2">
-                  <CreditCard size={17} />
-                  <span>Credit</span>
-                </span>
-                <Check
-                  size={16}
-                  className={paymentMethod === 'CREDIT' ? 'opacity-100' : 'opacity-0'}
-                />
+                <CreditCard size={15} />
+                Credit
+                {paymentMethod === 'CREDIT' && <Check size={13} />}
               </button>
             </div>
 
             {paymentMethod === 'CREDIT' && (
-              <div className="mt-2">
+              <div className="mt-3">
+                <p className="mb-1.5 text-[0.68rem] font-bold uppercase tracking-wider text-slate-400">Credit Customer</p>
                 <SearchableSelect
-                  triggerClassName={`flex w-full items-center justify-between rounded-md border px-3 py-2.5 text-sm font-semibold outline-none transition-shadow ${!selectedCustomerId ? 'border-danger/60 bg-danger/5 focus:border-danger focus:shadow-md' : 'border-line bg-white text-ink focus:border-primary focus:shadow-md'} disabled:bg-subtle disabled:text-muted`}
+                  triggerClassName={`flex h-11 w-full items-center justify-between rounded-lg border px-3 text-sm font-semibold outline-none transition-colors ${
+                    !selectedCustomerId
+                      ? 'border-red-300 bg-red-50 text-slate-700 focus:border-red-400'
+                      : 'border-slate-200 bg-white text-slate-700 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/10'
+                  } disabled:bg-slate-50 disabled:text-slate-400`}
                   options={[
                     { value: '', label: 'Select a customer...' },
                     ...customers.map((c) => ({ value: c.id.toString(), label: c.name }))
@@ -1109,57 +1158,46 @@ const SalesPage: React.FC = () => {
             )}
 
             {paymentMethod === 'CASH' && (
-              <div className="grid grid-cols-[minmax(0,1fr)_8.5rem] items-center gap-3 rounded-md border border-line bg-subtle p-3">
-                <label className="text-[0.9rem] font-semibold text-muted" htmlFor="cash-received">
-                  Cash Received (LKR)
-                </label>
-                <input
-                  id="cash-received"
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  className={`h-10 rounded-md border bg-white px-2 text-right text-sm font-bold text-ink outline-none transition-colors disabled:bg-subtle disabled:text-muted ${
-                    hasCashReceivedError
-                      ? 'border-danger focus:border-danger'
-                      : 'border-line focus:border-primary'
-                  }`}
-                  placeholder={formatLkr(total)}
-                  value={cashReceivedInput}
-                  onChange={(event) => setCashReceivedInput(event.target.value)}
-                  disabled={Boolean(completedSale)}
-                />
-                <div
-                  className={
-                    hasCashReceivedError
-                      ? 'text-sm font-semibold text-danger'
-                      : 'text-sm font-semibold text-muted'
-                  }
-                >
-                  Balance
-                </div>
-                <div
-                  className={
-                    hasCashReceivedError
-                      ? 'text-right text-sm font-bold text-danger'
-                      : 'text-right text-sm font-bold text-success'
-                  }
-                >
-                  {hasCashReceivedError ? 'Not enough' : formatLkr(balanceAmount)}
+              <div className={`mt-3 rounded-lg border p-3 ${hasCashReceivedError ? 'border-red-200 bg-red-50' : 'border-slate-200 bg-slate-50'}`}>
+                <div className="grid grid-cols-[minmax(0,1fr)_9rem] items-center gap-3">
+                  <label className="text-xs font-bold text-slate-600" htmlFor="cash-received">
+                    Cash Received (LKR)
+                  </label>
+                  <input
+                    id="cash-received"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    className={`h-10 rounded-lg border bg-white px-3 text-right text-sm font-bold text-slate-800 outline-none transition-colors disabled:bg-slate-100 disabled:text-slate-400 ${
+                      hasCashReceivedError
+                        ? 'border-red-300 focus:border-red-400'
+                        : 'border-slate-200 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/10'
+                    }`}
+                    placeholder={formatLkr(total)}
+                    value={cashReceivedInput}
+                    onChange={(event) => setCashReceivedInput(event.target.value)}
+                    disabled={Boolean(completedSale)}
+                  />
+
+                  <span className={`text-xs font-bold ${hasCashReceivedError ? 'text-red-600' : 'text-slate-500'}`}>Balance</span>
+                  <span className={`text-right text-base font-extrabold ${hasCashReceivedError ? 'text-red-600' : 'text-emerald-700'}`}>
+                    {hasCashReceivedError ? 'Not enough' : formatLkr(balanceAmount)}
+                  </span>
                 </div>
               </div>
             )}
 
             <button
-              className="mt-4 flex items-center justify-center gap-2.5 rounded-md bg-success py-3.5 text-lg font-bold text-white transition-[background-color,transform] duration-150 hover:-translate-y-0.5 hover:bg-success-hover disabled:cursor-not-allowed disabled:bg-line-strong disabled:text-faint disabled:hover:translate-y-0 disabled:hover:bg-line-strong"
+              className="mt-3 flex h-12 w-full items-center justify-center gap-2.5 rounded-lg bg-emerald-600 px-4 text-base font-extrabold text-white shadow-sm shadow-emerald-600/20 transition-all hover:-translate-y-px hover:bg-emerald-700 hover:shadow-md disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400 disabled:shadow-none disabled:hover:translate-y-0"
               onClick={handlePay}
               disabled={cart.length === 0 || isPaying || hasCashReceivedError}
             >
-              <CreditCard size={24} />
+              <CreditCard size={20} />
               {completedSale
                 ? 'VIEW RECEIPT'
                 : isPaying
                   ? 'SAVING...'
-                  : `PREVIEW BILL (LKR) ${formatLkr(total)}`}
+                  : `PREVIEW BILL • LKR ${formatLkr(total)}`}
             </button>
           </div>
         </section>
@@ -1201,9 +1239,12 @@ const SalesPage: React.FC = () => {
 export default SalesPage
 
 const EmptyState: React.FC<{ text: string }> = ({ text }) => (
-  <div className="flex h-full min-h-60 flex-col items-center justify-center gap-3 text-center text-muted">
-    <PackageSearch size={38} className="text-faint" />
-    <span>{text}</span>
+  <div className="flex h-full min-h-60 flex-col items-center justify-center px-6 text-center">
+    <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-xl bg-emerald-50">
+      <PackageSearch size={26} className="text-emerald-600" />
+    </div>
+    <span className="text-sm font-bold text-slate-700">{text}</span>
+    <span className="mt-1 max-w-sm text-xs leading-5 text-slate-400">Use product code, barcode, product name or brand for faster counter billing.</span>
   </div>
 )
 
@@ -1447,12 +1488,12 @@ function getErrorMessage(error: unknown): string {
 
 function getStockBadgeClass(product: ProductRecord): string {
   if (product.stockQuantity === 0) {
-    return 'border border-danger/20 bg-danger/10 text-danger'
+    return 'border border-red-200 bg-red-50 text-red-700'
   }
 
   if (product.stockQuantity <= product.reorderLevel) {
-    return 'border border-warning/25 bg-warning/10 text-warning'
+    return 'border border-amber-200 bg-amber-50 text-amber-700'
   }
 
-  return 'border border-success/20 bg-success/10 text-success'
+  return 'border border-emerald-200 bg-emerald-50 text-emerald-700'
 }

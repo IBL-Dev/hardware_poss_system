@@ -7,7 +7,7 @@ interface LowStockAlertProps {
   isLoading?: boolean
 }
 
-const MAX_VISIBLE = 6
+const MAX_VISIBLE = 5
 const LOW_STOCK_THRESHOLD = 5
 
 export const LowStockAlert: React.FC<LowStockAlertProps> = ({ products, isLoading = false }) => {
@@ -21,63 +21,51 @@ export const LowStockAlert: React.FC<LowStockAlertProps> = ({ products, isLoadin
   const remainingCount = lowStockProducts.length - visibleProducts.length
 
   return (
-    <div className="rounded-lg border border-line bg-white p-5 shadow-sm">
-      <div className="mb-5 flex items-center justify-between">
-        <h3 className="flex items-center gap-2 text-[1.05rem] font-semibold">
-          <AlertTriangle size={18} className="text-warning" />
-          Low Stock Alert
+    <div className="rounded-lg border border-line bg-card p-5 shadow-sm">
+      <div className="mb-4 flex items-center justify-between">
+        <h3 className="flex items-center gap-2 text-[0.8rem] font-semibold uppercase tracking-wider text-muted">
+          <AlertTriangle size={15} className="text-warning" />
+          Low Stock
         </h3>
         {lowStockProducts.length > 0 && (
-          <span className="rounded-full bg-danger/10 px-2.5 py-1 text-xs font-semibold text-danger">
-            {lowStockProducts.length} item{lowStockProducts.length === 1 ? '' : 's'}
+          <span className="rounded-md bg-danger/10 px-2 py-1 text-[0.7rem] font-bold text-danger">
+            {lowStockProducts.length}
           </span>
         )}
       </div>
       <div>
         {isLoading ? (
-          <div className="py-8 text-center text-muted">Loading products...</div>
+          <div className="py-6 text-center text-sm text-muted">Loading...</div>
         ) : lowStockProducts.length === 0 ? (
-          <div className="flex flex-col items-center gap-2 py-8 text-center text-muted">
-            <PackageX size={28} className="text-faint" />
-            <span>All stock levels are healthy.</span>
+          <div className="flex flex-col items-center gap-2 py-6 text-center text-sm text-muted">
+            <PackageX size={24} className="text-faint" />
+            <span>All stock levels healthy.</span>
           </div>
         ) : (
-          <>
-            {visibleProducts.map((product) => {
-              const isOutOfStock = product.stockQuantity === 0
-
-              return (
-                <div
-                  key={product.id}
-                  className={`mb-3 flex items-center justify-between gap-3 rounded-md border px-3 py-2.5 last:mb-0 ${
-                    isOutOfStock ? 'border-danger/20 bg-danger/5' : 'border-warning/25 bg-warning/5'
-                  }`}
-                >
-                  <div className="min-w-0">
-                    <span className="block truncate font-semibold text-ink">{product.name}</span>
-                    <span className="text-[0.8rem] text-muted">
-                      {product.sku} - Reorder at{' '}
-                      {Math.max(product.reorderLevel, LOW_STOCK_THRESHOLD)}
-                    </span>
-                  </div>
-                  <span
-                    className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold ${
-                      isOutOfStock
-                        ? 'border border-danger/20 bg-danger/10 text-danger'
-                        : 'border border-warning/25 bg-warning/10 text-warning'
-                    }`}
-                  >
-                    {isOutOfStock ? 'Out of stock' : `${product.stockQuantity} left`}
+          visibleProducts.map((product) => {
+            const isOutOfStock = product.stockQuantity === 0
+            return (
+              <div
+                key={product.id}
+                className={`mb-2.5 flex items-center justify-between gap-2 rounded-md border px-3 py-2 last:mb-0 ${isOutOfStock ? 'border-danger/20 bg-danger/5' : 'border-warning/20 bg-warning/5'}`}
+              >
+                <div className="min-w-0">
+                  <span className="block truncate text-[0.85rem] font-medium text-ink">
+                    {product.name}
                   </span>
+                  <span className="text-[0.7rem] text-muted">{product.sku}</span>
                 </div>
-              )
-            })}
-            {remainingCount > 0 && (
-              <div className="pt-1 text-center text-[0.8rem] text-muted">
-                +{remainingCount} more low on stock
+                <span
+                  className={`shrink-0 rounded px-2 py-0.5 text-[0.7rem] font-bold ${isOutOfStock ? 'bg-danger/10 text-danger' : 'bg-warning/10 text-warning'}`}
+                >
+                  {isOutOfStock ? 'OUT' : `${product.stockQuantity}`}
+                </span>
               </div>
-            )}
-          </>
+            )
+          })
+        )}
+        {remainingCount > 0 && (
+          <div className="pt-2 text-center text-[0.7rem] text-muted">+{remainingCount} more</div>
         )}
       </div>
     </div>
