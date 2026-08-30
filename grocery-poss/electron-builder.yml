@@ -1,8 +1,8 @@
-appId: com.glosarypos.desktop
+appId: com.hardwareshop.desktop
 
-productName: Glosary POS
+productName: Hardware Shop
 
-copyright: Copyright © 2026 Glosary POS
+copyright: Copyright (c) 2026 Hardware Shop
 
 directories:
   buildResources: build
@@ -10,7 +10,12 @@ directories:
 
 files:
   - out/**/*
+  - resources/hardware_icon.png
   - package.json
+
+extraResources:
+  - from: resources/hardware_icon.png
+    to: hardware_icon.png
 
 asar: true
 
@@ -21,7 +26,7 @@ asarUnpack:
 npmRebuild: true
 
 win:
-  executableName: GlosaryPoss
+  executableName: Hardware Shop
 
   target:
     - target: nsis
@@ -45,9 +50,9 @@ nsis:
 
   createStartMenuShortcut: true
 
-  shortcutName: Glosary POS
+  shortcutName: Hardware Shop
 
-  uninstallDisplayName: Glosary POS
+  uninstallDisplayName: Hardware Shop
 
   deleteAppDataOnUninstall: false
 
@@ -80,7 +85,7 @@ linux:
     - AppImage
     - deb
 
-  maintainer: Grocery POS
+  maintainer: Hardware Shop
 
   category: Office
 

@@ -1,7 +1,8 @@
 {
-  "name": "grocery-pos",
+  "name": "hardware-shop",
+  "productName": "Hardware Shop",
   "version": "1.0.0",
-  "description": "Offline Grocery Shop Point of Sale Desktop Application",
+  "description": "Offline Hardware Shop Point of Sale Desktop Application",
   "main": "./out/main/index.js",
   "author": "Tinush",
   "license": "MIT",

@@ -1,7 +1,8 @@
-import { BrowserWindow, dialog, ipcMain } from 'electron'
+import { app, BrowserWindow, dialog, ipcMain } from 'electron'
 import type { SaveDialogOptions } from 'electron'
 import { readFile, writeFile } from 'fs/promises'
-import logoPath from '../../../resources/icon.png?asset'
+import { join } from 'path'
+import logoPath from '../../../resources/hardware_icon.png?asset'
 import { getDatabase } from '../database'
 import { ProductRepository } from '../products/productRepository'
 import { SaleRepository } from '../sales/saleRepository'
@@ -479,11 +480,15 @@ function isPdfMarginError(error: unknown): boolean {
 
 async function getReportLogoDataUrl(): Promise<string> {
   try {
-    const logo = await readFile(logoPath)
+    const logo = await readFile(getHardwareIconPath())
     return `data:image/png;base64,${logo.toString('base64')}`
   } catch {
     return ''
   }
+}
+
+function getHardwareIconPath(): string {
+  return app.isPackaged ? join(process.resourcesPath, 'hardware_icon.png') : logoPath
 }
 
 function reportLogo(logoDataUrl: string): string {

@@ -1,7 +1,7 @@
 import { app, shell, BrowserWindow } from 'electron'
 import { join } from 'path'
 import { is } from '@electron-toolkit/utils'
-import icon from '../../resources/icon.png?asset'
+import iconAsset from '../../resources/hardware_icon.png?asset'
 import { registerBrandHandlers } from './brands/brandIpc'
 import { initializeDatabase } from './database'
 import { registerProductHandlers } from './products/productIpc'
@@ -15,13 +15,16 @@ import { registerCustomerHandlers } from './customers/customerIpc'
 import { registerLicenseHandlers } from './licenseIpc'
 
 function createWindow(): void {
+  const icon = app.isPackaged ? join(process.resourcesPath, 'hardware_icon.png') : iconAsset
+
   // Create the browser window.
   const mainWindow = new BrowserWindow({
+    title: 'Hardware Shop',
     width: 900,
     height: 670,
     show: false,
     autoHideMenuBar: true,
-    ...(process.platform === 'linux' ? { icon } : {}),
+    icon,
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       nodeIntegration: false,
