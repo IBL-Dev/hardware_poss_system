@@ -4,6 +4,7 @@ import type { CustomerRecord } from '../../shared/customers'
 interface CustomerRow {
   id: number
   name: string
+  business_name: string
   phone: string
   email: string
   address: string
@@ -14,6 +15,7 @@ interface CustomerRow {
 
 interface SaveCustomerPersistence {
   name: string
+  businessName: string
   phone: string
   email: string
   address: string
@@ -27,7 +29,7 @@ export class CustomerRepository {
     const rows = this.database
       .prepare(
         `
-          SELECT id, name, phone, email, address, notes, created_at, updated_at
+          SELECT id, name, business_name, phone, email, address, notes, created_at, updated_at
           FROM customers
           ORDER BY name ASC
         `
@@ -41,7 +43,7 @@ export class CustomerRepository {
     const row = this.database
       .prepare(
         `
-          SELECT id, name, phone, email, address, notes, created_at, updated_at
+          SELECT id, name, business_name, phone, email, address, notes, created_at, updated_at
           FROM customers
           WHERE id = ?
         `
@@ -55,7 +57,7 @@ export class CustomerRepository {
     const row = this.database
       .prepare(
         `
-          SELECT id, name, phone, email, address, notes, created_at, updated_at
+          SELECT id, name, business_name, phone, email, address, notes, created_at, updated_at
           FROM customers
           WHERE lower(name) = lower(?)
         `
@@ -69,8 +71,8 @@ export class CustomerRepository {
     const result = this.database
       .prepare(
         `
-          INSERT INTO customers (name, phone, email, address, notes)
-          VALUES (@name, @phone, @email, @address, @notes)
+          INSERT INTO customers (name, business_name, phone, email, address, notes)
+          VALUES (@name, @businessName, @phone, @email, @address, @notes)
         `
       )
       .run(input)
@@ -85,6 +87,7 @@ export class CustomerRepository {
           UPDATE customers
           SET
             name = @name,
+            business_name = @businessName,
             phone = @phone,
             email = @email,
             address = @address,
@@ -117,6 +120,7 @@ function mapCustomerRow(row: CustomerRow): CustomerRecord {
   return {
     id: row.id,
     name: row.name,
+    businessName: row.business_name,
     phone: row.phone,
     email: row.email,
     address: row.address,

@@ -19,6 +19,7 @@ interface CustomerFormContentProps {
 
 const EMPTY_FORM = {
   name: '',
+  businessName: '',
   phone: '',
   email: '',
   address: '',
@@ -53,6 +54,7 @@ const CustomerFormContent: React.FC<CustomerFormContentProps> = ({
     customer
       ? {
           name: customer.name,
+          businessName: customer.businessName,
           phone: customer.phone,
           email: customer.email,
           address: customer.address,
@@ -133,6 +135,18 @@ const CustomerFormContent: React.FC<CustomerFormContentProps> = ({
               onChange={(event) => updateField('name', event.target.value)}
               onKeyDown={handleKeyDown}
               autoFocus
+            />
+          </label>
+
+          <label className="flex flex-col gap-1 text-sm font-medium text-ink">
+            Business Name
+            <input
+              type="text"
+              className="h-11 w-full rounded-md border border-line px-3 text-sm text-ink outline-none transition-colors focus:border-primary"
+              placeholder="Company or shop name (optional)"
+              value={form.businessName}
+              onChange={(event) => updateField('businessName', event.target.value)}
+              onKeyDown={handleKeyDown}
             />
           </label>
 

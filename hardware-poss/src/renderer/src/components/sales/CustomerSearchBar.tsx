@@ -37,7 +37,7 @@ export const CustomerSearchBar: React.FC<CustomerSearchBarProps> = ({
 
     return customers
       .filter((customer) => {
-        const haystack = `${customer.name} ${customer.phone} ${customer.email}`.toLowerCase()
+        const haystack = `${customer.name} ${customer.businessName} ${customer.phone} ${customer.email}`.toLowerCase()
         return haystack.includes(normalizedQuery)
       })
       .slice(0, MAX_CUSTOMER_RESULTS)
@@ -91,7 +91,9 @@ export const CustomerSearchBar: React.FC<CustomerSearchBarProps> = ({
                 {selectedCustomer.name}
               </span>
               <span className="block truncate text-[0.72rem] text-muted">
-                {selectedCustomer.phone || selectedCustomer.email || 'No contact details'}
+                {[selectedCustomer.businessName, selectedCustomer.phone, selectedCustomer.email]
+                  .filter(Boolean)
+                  .join(' · ') || 'No contact details'}
               </span>
             </div>
             <button
@@ -154,8 +156,9 @@ export const CustomerSearchBar: React.FC<CustomerSearchBarProps> = ({
                   {customer.name}
                 </span>
                 <span className="block truncate text-[0.72rem] text-muted">
-                  {[customer.phone, customer.email].filter(Boolean).join(' · ') ||
-                    'No contact details'}
+                  {[customer.businessName, customer.phone, customer.email]
+                    .filter(Boolean)
+                    .join(' · ') || 'No contact details'}
                 </span>
               </span>
             </button>

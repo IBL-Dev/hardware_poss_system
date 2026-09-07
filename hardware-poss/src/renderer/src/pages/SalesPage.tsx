@@ -17,6 +17,7 @@ import {
   X
 } from 'lucide-react'
 import { SearchableSelect } from '../components/common/SearchableSelect'
+import { CreditCustomerPicker, type CreditCustomerPick } from '../components/sales/CreditCustomerPicker'
 import { QuantityModal, type QuantitySelection } from '../components/sales/QuantityModal'
 import { ReceiptModal } from '../components/sales/ReceiptModal'
 import { onPosShortcutEvent } from '../shortcuts/posShortcutEvents'
@@ -49,6 +50,8 @@ interface HeldBill {
   discountAmount: number
   cashReceivedAmount: number
   customerId: number | null
+  customerName: string
+  customerBusinessName: string
   createdAt: string
   updatedAt: string
 }
@@ -60,6 +63,8 @@ interface CurrentBillDraft {
   cashReceivedAmount: number
   activeHeldBillId: string | null
   customerId: number | null
+  customerName: string
+  customerBusinessName: string
 }
 
 const HELD_BILLS_STORAGE_KEY = 'grocery-pos-held-bills'
@@ -75,6 +80,12 @@ const SalesPage: React.FC = () => {
   const [customers, setCustomers] = useState<CustomerRecord[]>([])
   const [selectedCustomerId, setSelectedCustomerId] = useState<number | null>(
     () => loadCurrentBillDraft()?.customerId ?? null
+  )
+  const [creditCustomerName, setCreditCustomerName] = useState<string>(
+    () => loadCurrentBillDraft()?.customerName ?? ''
+  )
+  const [creditCustomerBusinessName, setCreditCustomerBusinessName] = useState<string>(
+    () => loadCurrentBillDraft()?.customerBusinessName ?? ''
   )
   const [highlightedIndex, setHighlightedIndex] = useState(0)
   const [cart, setCart] = useState<CartItem[]>(() => loadCurrentBillDraft()?.items ?? [])
@@ -211,7 +222,9 @@ const SalesPage: React.FC = () => {
       cashReceivedAmount:
         paymentMethod === 'CASH' && cashReceivedInput.trim() ? cashReceivedAmount : 0,
       activeHeldBillId,
-      customerId: selectedCustomerId
+      customerId: selectedCustomerId,
+      customerName: creditCustomerName,
+      customerBusinessName: creditCustomerBusinessName
     })
   }, [
     cart,
@@ -221,6 +234,8 @@ const SalesPage: React.FC = () => {
     cashReceivedInput,
     activeHeldBillId,
     selectedCustomerId,
+    creditCustomerName,
+    creditCustomerBusinessName,
     completedSale
   ])
 
@@ -456,6 +471,8 @@ const SalesPage: React.FC = () => {
     setPaymentMethod('CASH')
     setCashReceivedInput('')
     setSelectedCustomerId(null)
+    setCreditCustomerName('')
+    setCreditCustomerBusinessName('')
     setIsReceiptModalOpen(false)
     setActiveHeldBillId(null)
     setIsHeldBillMenuOpen(false)
@@ -485,6 +502,8 @@ const SalesPage: React.FC = () => {
       cashReceivedAmount:
         paymentMethod === 'CASH' && cashReceivedInput.trim() ? cashReceivedAmount : 0,
       customerId: selectedCustomerId,
+      customerName: creditCustomerName,
+      customerBusinessName: creditCustomerBusinessName,
       createdAt: currentHeldBill?.createdAt ?? now,
       updatedAt: now
     }
@@ -508,6 +527,8 @@ const SalesPage: React.FC = () => {
     cashReceivedInput,
     cart,
     completedSale,
+    creditCustomerBusinessName,
+    creditCustomerName,
     discountAmount,
     heldBills,
     paymentMethod,
@@ -532,6 +553,8 @@ const SalesPage: React.FC = () => {
       setPaymentMethod(normalizeCheckoutPaymentMethod(heldBillToResume.paymentMethod))
       setCashReceivedInput(formatMoneyInput(heldBillToResume.cashReceivedAmount ?? 0))
       setSelectedCustomerId(heldBillToResume.customerId ?? null)
+      setCreditCustomerName(heldBillToResume.customerName ?? '')
+      setCreditCustomerBusinessName(heldBillToResume.customerBusinessName ?? '')
       setCompletedSale(null)
       setIsReceiptModalOpen(false)
       setSearchQuery('')
@@ -585,21 +608,57 @@ const SalesPage: React.FC = () => {
     })
   }
 
+  const resolveCreditCustomer = async (): Promise<number | null> => {
+    const name = creditCustomerName.trim()
+    if (!name) return null
+
+    const businessName = creditCustomerBusinessName.trim()
+    const existing = customers.find((customer) => customer.name.toLowerCase() === name.toLowerCase())
+
+    if (existing) {
+      if (businessName && businessName.toLowerCase() !== existing.businessName.toLowerCase()) {
+        await customersApi.update(existing.id, { name, businessName })
+        setCustomers((prev) =>
+          prev.map((customer) => (customer.id === existing.id ? { ...customer, businessName } : customer))
+        )
+      }
+
+      return existing.id
+    }
+
+    const created = await customersApi.create({ name, businessName })
+    setCustomers((prev) => [...prev, created])
+
+    return created.id
+  }
+
   const processCurrentBill = async (): Promise<SaleRecord | null> => {
     if (completedSale) return completedSale
     if (cart.length === 0 || isPaying) return null
 
-    if (paymentMethod === 'CREDIT' && !selectedCustomerId) {
-      toast.error('A customer must be selected for CREDIT sales.')
+    if (paymentMethod === 'CREDIT' && !creditCustomerName.trim()) {
+      toast.error('A customer name is required for CREDIT sales.')
       return null
     }
 
     setIsPaying(true)
     try {
+      let customerId = selectedCustomerId
+
+      if (paymentMethod === 'CREDIT') {
+        customerId = await resolveCreditCustomer()
+
+        if (customerId === null) {
+          return null
+        }
+
+        setSelectedCustomerId(customerId)
+      }
+
       const savedSale = await salesApi.create({
         paymentMethod,
         discountAmount,
-        customerId: selectedCustomerId,
+        customerId,
         items: cart.map((item) => ({
           productId: item.id,
           quantity: item.quantity,
@@ -665,8 +724,8 @@ const SalesPage: React.FC = () => {
       return
     }
 
-    if (paymentMethod === 'CREDIT' && !selectedCustomerId) {
-      toast.error('A customer must be selected for CREDIT sales.')
+    if (paymentMethod === 'CREDIT' && !creditCustomerName.trim()) {
+      toast.error('A customer name is required for CREDIT sales.')
       return
     }
 
@@ -1137,22 +1196,20 @@ const SalesPage: React.FC = () => {
             {paymentMethod === 'CREDIT' && (
               <div className="mt-3">
                 <p className="mb-1.5 text-[0.68rem] font-bold uppercase tracking-wider text-slate-400">Credit Customer</p>
-                <SearchableSelect
-                  triggerClassName={`flex h-11 w-full items-center justify-between rounded-lg border px-3 text-sm font-semibold outline-none transition-colors ${
-                    !selectedCustomerId
-                      ? 'border-red-300 bg-red-50 text-slate-700 focus:border-red-400'
-                      : 'border-slate-200 bg-white text-slate-700 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/10'
-                  } disabled:bg-slate-50 disabled:text-slate-400`}
-                  options={[
-                    { value: '', label: 'Select a customer...' },
-                    ...customers.map((c) => ({ value: c.id.toString(), label: c.name }))
-                  ]}
-                  value={selectedCustomerId?.toString() ?? ''}
-                  onChange={(val) => setSelectedCustomerId(val ? Number(val) : null)}
-                  placeholder="Select a customer..."
-                  searchPlaceholder="Search customers..."
+
+                <CreditCustomerPicker
+                  customers={customers}
+                  value={{
+                    customerId: selectedCustomerId,
+                    name: creditCustomerName,
+                    businessName: creditCustomerBusinessName
+                  }}
+                  onChange={(pick: CreditCustomerPick) => {
+                    setSelectedCustomerId(pick.customerId)
+                    setCreditCustomerName(pick.name)
+                    setCreditCustomerBusinessName(pick.businessName)
+                  }}
                   disabled={Boolean(completedSale)}
-                  ariaLabel="Select customer for credit sale"
                 />
               </div>
             )}
@@ -1228,6 +1285,16 @@ const SalesPage: React.FC = () => {
         paidAt={completedSale?.paidAt}
         paymentMethod={completedSale?.paymentMethod ?? paymentMethod}
         cashierName={cashierName}
+        customerName={
+          completedSale?.customerName ??
+          (paymentMethod === 'CREDIT' ? creditCustomerName.trim() || undefined : undefined)
+        }
+        customerBusinessName={
+          completedSale?.customerBusinessName ??
+          (paymentMethod === 'CREDIT'
+            ? creditCustomerBusinessName.trim() || undefined
+            : undefined)
+        }
         onProcessToBill={processCurrentBill}
         onClose={() => setIsReceiptModalOpen(false)}
         onNewSale={resetWorkingBill}
@@ -1299,7 +1366,9 @@ function loadHeldBills(): HeldBill[] {
       paymentMethod: normalizeCheckoutPaymentMethod(bill.paymentMethod),
       discountAmount: 0,
       cashReceivedAmount: bill.cashReceivedAmount ?? 0,
-      customerId: bill.customerId ?? null
+      customerId: bill.customerId ?? null,
+      customerName: bill.customerName ?? '',
+      customerBusinessName: bill.customerBusinessName ?? ''
     }))
   } catch {
     return []
@@ -1327,7 +1396,9 @@ function loadCurrentBillDraft(): CurrentBillDraft | null {
           paymentMethod: normalizeCheckoutPaymentMethod(parsedValue.paymentMethod),
           discountAmount: 0,
           cashReceivedAmount: parsedValue.cashReceivedAmount ?? 0,
-          customerId: parsedValue.customerId ?? null
+          customerId: parsedValue.customerId ?? null,
+          customerName: parsedValue.customerName ?? '',
+          customerBusinessName: parsedValue.customerBusinessName ?? ''
         }
       : null
   } catch {
@@ -1373,6 +1444,9 @@ function isCurrentBillDraft(value: unknown): value is CurrentBillDraft {
     (draft.customerId === undefined ||
       draft.customerId === null ||
       typeof draft.customerId === 'number') &&
+    (draft.customerName === undefined || typeof draft.customerName === 'string') &&
+    (draft.customerBusinessName === undefined ||
+      typeof draft.customerBusinessName === 'string') &&
     (draft.activeHeldBillId === null || typeof draft.activeHeldBillId === 'string')
   )
 }
@@ -1391,6 +1465,8 @@ function isHeldBill(value: unknown): value is HeldBill {
     (bill.customerId === undefined ||
       bill.customerId === null ||
       typeof bill.customerId === 'number') &&
+    (bill.customerName === undefined || typeof bill.customerName === 'string') &&
+    (bill.customerBusinessName === undefined || typeof bill.customerBusinessName === 'string') &&
     typeof bill.createdAt === 'string' &&
     typeof bill.updatedAt === 'string'
   )

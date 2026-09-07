@@ -9,7 +9,8 @@ import {
   RotateCcw,
   Search,
   ShoppingCart,
-  Tags
+  Tags,
+  Users
 } from 'lucide-react'
 import { DataTable, Column } from '../components/common/DataTable'
 import { Loader } from '../components/common/Loader'
@@ -119,6 +120,26 @@ const SalesHistoryPage: React.FC = () => {
           </div>
         </div>
       )
+    },
+    {
+      key: 'customerName',
+      header: 'CUSTOMER',
+      render: (sale) =>
+        sale.customerName ? (
+          <div className="min-w-[140px]">
+            <div className="flex items-center gap-1.5 font-semibold text-slate-700">
+              <Users size={14} className="text-slate-400" />
+              {sale.customerName}
+            </div>
+            {sale.customerBusinessName && (
+              <div className="mt-1 max-w-[180px] truncate pl-5 text-xs font-medium text-slate-400">
+                {sale.customerBusinessName}
+              </div>
+            )}
+          </div>
+        ) : (
+          <span className="text-sm text-slate-400">-</span>
+        )
     },
     {
       key: 'paymentMethod',

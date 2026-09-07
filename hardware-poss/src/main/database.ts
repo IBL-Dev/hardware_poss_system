@@ -190,6 +190,7 @@ function createDatabaseSchema(database: Database.Database): void {
     CREATE TABLE IF NOT EXISTS customers (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL COLLATE NOCASE UNIQUE,
+      business_name TEXT NOT NULL DEFAULT '',
       phone TEXT NOT NULL DEFAULT '',
       email TEXT NOT NULL DEFAULT '',
       address TEXT NOT NULL DEFAULT '',
@@ -198,6 +199,13 @@ function createDatabaseSchema(database: Database.Database): void {
       updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
     )
   `)
+
+  ensureColumn(
+    database,
+    'customers',
+    'business_name',
+    "ALTER TABLE customers ADD COLUMN business_name TEXT NOT NULL DEFAULT ''"
+  )
 
   database.exec(`
     CREATE TABLE IF NOT EXISTS brands (

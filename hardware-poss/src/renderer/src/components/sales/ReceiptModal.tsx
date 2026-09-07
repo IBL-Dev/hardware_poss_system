@@ -28,6 +28,7 @@ interface ReceiptModalProps {
   paymentMethod: SalePaymentMethod
   cashierName?: string
   customerName?: string
+  customerBusinessName?: string
   onProcessToBill?: () => Promise<ReceiptSaleSnapshot | null>
   onClose: () => void
   onNewSale: () => void
@@ -150,6 +151,8 @@ export const ReceiptModal: React.FC<ReceiptModalProps> = ({
   paidAt,
   paymentMethod,
   cashierName = 'CASHIER',
+  customerName = '',
+  customerBusinessName = '',
   onProcessToBill,
   onClose,
   onNewSale,
@@ -463,6 +466,15 @@ export const ReceiptModal: React.FC<ReceiptModalProps> = ({
     )
     lines.push(`Date: ${printDateTime}`.slice(0, textWidth))
     lines.push(`Payment: ${formatPaymentMethod(printPaymentMethod)}`.slice(0, textWidth))
+
+    if (customerName.trim()) {
+      lines.push(`Customer: ${cleanReceiptText(customerName.trim())}`.slice(0, textWidth))
+    }
+
+    if (customerBusinessName.trim()) {
+      lines.push(`Business: ${cleanReceiptText(customerBusinessName.trim())}`.slice(0, textWidth))
+    }
+
     lines.push('')
 
     const productColumnWidths = scaleReceiptColumnWidths([4, 16, 6, 8, 8], textWidth)
@@ -732,6 +744,26 @@ export const ReceiptModal: React.FC<ReceiptModalProps> = ({
 
                 <span className="font-semibold">{formatPaymentMethod(activePaymentMethod)}</span>
               </div>
+
+              {customerName.trim() && (
+                <div className="receipt-meta-row flex">
+                  <span className="receipt-meta-label w-20 text-gray-600">Customer</span>
+
+                  <span className="mr-1 text-gray-600">:</span>
+
+                  <span className="font-semibold">{customerName.trim()}</span>
+                </div>
+              )}
+
+              {customerBusinessName.trim() && (
+                <div className="receipt-meta-row flex">
+                  <span className="receipt-meta-label w-20 text-gray-600">Business</span>
+
+                  <span className="mr-1 text-gray-600">:</span>
+
+                  <span className="font-semibold">{customerBusinessName.trim()}</span>
+                </div>
+              )}
             </div>
 
             {/* DIVIDER */}

@@ -14,6 +14,7 @@ interface SaleRow {
   paid_at: string
   customer_id: number | null
   customer_name: string | null
+  customer_business_name: string | null
 }
 
 interface SaleItemRow {
@@ -75,7 +76,8 @@ export class SaleRepository {
             s.item_count,
             s.paid_at,
             s.customer_id,
-            c.name as customer_name
+            c.name as customer_name,
+            c.business_name as customer_business_name
           FROM sales s
           LEFT JOIN customers c ON s.customer_id = c.id
           ${whereSql}
@@ -103,7 +105,8 @@ export class SaleRepository {
             s.item_count,
             s.paid_at,
             s.customer_id,
-            c.name as customer_name
+            c.name as customer_name,
+            c.business_name as customer_business_name
           FROM sales s
           LEFT JOIN customers c ON s.customer_id = c.id
           WHERE s.id = ?
@@ -540,6 +543,16 @@ function buildSaleWhereClause(filters: SaleQueryFilters): { whereSql: string; pa
       (
         s.sale_number LIKE ?
         OR CAST(s.daily_bill_number AS TEXT) LIKE ?
+        OR s.payment_method LIKE ?
+        OR EXISTS (
+          SELECT 1
+          FROM customers c2
+          WHERE c2.id = s.customer_id
+            AND (
+              c2.name LIKE ?
+              OR c2.business_name LIKE ?
+            )
+        )
         OR EXISTS (
           SELECT 1
           FROM sale_items si
@@ -551,7 +564,7 @@ function buildSaleWhereClause(filters: SaleQueryFilters): { whereSql: string; pa
         )
       )
     `)
-    params.push(search, search, search, search)
+    params.push(search, search, search, search, search, search, search)
   }
 
   return {
@@ -574,7 +587,8 @@ function mapSaleRow(row: SaleRow, items: SaleItemRecord[]): SaleRecord {
     paidAt: row.paid_at,
     items,
     customerId: row.customer_id,
-    customerName: row.customer_name
+    customerName: row.customer_name,
+    customerBusinessName: row.customer_business_name
   }
 }
 

@@ -34,6 +34,7 @@ export interface SaleRecord {
   items: SaleItemRecord[]
   customerId: number | null
   customerName: string | null
+  customerBusinessName: string | null
 }
 
 export interface CreateSaleItemInput {

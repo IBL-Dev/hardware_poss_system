@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="2b038783-d0e2-4a9b-bf5b-0feca423ebff" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/.editorconfig" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/.idea/codeStyles/Project.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/.idea/codeStyles/codeStyleConfig.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/.idea/grocery-poss.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/.idea/noctule.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/.idea/prettier.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/.idea/workspace.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/.prettierignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/.prettierrc.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/.vscode/extensions.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/.vscode/launch.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/.vscode/settings.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/DEVICE_ACTIVATION_GUIDE.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/build/Logo.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/build/entitlements.mac.plist" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/build/icon.icns" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/build/icon.ico" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/build/icon.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/cloud/pos-license-worker/.editorconfig" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/cloud/pos-license-worker/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/cloud/pos-license-worker/.prettierrc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/cloud/pos-license-worker/.vscode/settings.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/cloud/pos-license-worker/AGENTS.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/cloud/pos-license-worker/migrations/0001_create_installations.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/cloud/pos-license-worker/migrations/0002_add_device_details.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/cloud/pos-license-worker/package-lock.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/cloud/pos-license-worker/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/cloud/pos-license-worker/src/index.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/cloud/pos-license-worker/test/env.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/cloud/pos-license-worker/test/index.spec.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/cloud/pos-license-worker/test/tsconfig.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/cloud/pos-license-worker/tsconfig.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/cloud/pos-license-worker/vitest.config.mts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/cloud/pos-license-worker/worker-configuration.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/cloud/pos-license-worker/wrangler.jsonc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/electron-builder.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/electron.vite.config.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/eslint.config.mjs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/package-lock.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/resources/hardware_icon.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/scripts/generate-hardware-icon.mjs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/scripts/run-electron-vite.mjs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/main/brands/brandIpc.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/main/brands/brandRepository.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/main/brands/brandService.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/main/categories/categoryIpc.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/main/categories/categoryRepository.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/main/categories/categoryService.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/main/customers/customerIpc.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/main/customers/customerRepository.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/main/customers/customerService.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/main/database.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/main/index.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/main/licenseIpc.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/main/licenseService.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/main/products/productIpc.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/main/products/productRepository.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/main/products/productService.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/main/receiptIpc.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/main/reports/reportIpc.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/main/sales/saleIpc.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/main/sales/saleRepository.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/main/sales/saleService.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/main/storage/secure-storage.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/main/suppliers/supplierIpc.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/main/suppliers/supplierRepository.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/main/suppliers/supplierService.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/main/users/userIpc.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/main/users/userRepository.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/main/users/userService.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/preload/index.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/preload/index.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/App.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/api/brandsApi.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/api/categoriesApi.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/api/customersApi.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/api/productsApi.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/api/reportsApi.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/api/salesApi.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/api/suppliersApi.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/api/usersApi.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/assets/electron.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/assets/main.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/assets/wavy-lines.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/components/Versions.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/components/brands/BrandCsvImport.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/components/brands/BrandDetailsModal.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/components/brands/BrandModal.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/components/classifications/CategoryCsvImport.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/components/classifications/CategoryModal.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/components/classifications/ClassificationCsvImport.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/components/classifications/SupplierModal.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/components/classifications/SupplierVoucherDetailsModal.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/components/classifications/SupplierVoucherModal.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/components/common/ConfirmDialog.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/components/common/DataTable.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/components/common/Loader.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/components/common/SearchableSelect.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/components/common/Spinner.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/components/common/Toast.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/components/common/ToastContainer.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/components/dashboard/DiversificationChart.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/components/dashboard/DividendChart.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/components/dashboard/LowStockAlert.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/components/dashboard/MainChart.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/components/dashboard/StatCard.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/components/dashboard/TopGainers.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/components/layout/MainLayout.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/components/products/BrandSelect.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/components/products/CategorySelect.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/components/products/ProductCsvImport.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/components/products/ProductDetailsModal.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/components/products/ProductModal.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/components/products/SupplierSelect.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/components/reports/DailyAnalysis.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/components/reports/IncomeExpenseChart.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/components/reports/ReportGenerator.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/components/sales/CashDrawerModal.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/components/sales/CustomerDetailsModal.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/components/sales/CustomerFormModal.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/components/sales/CustomerSearchBar.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/components/sales/QuantityModal.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/components/sales/ReceiptModal.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/components/sales/SaleDetailsModal.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/components/users/UserModal.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/context/ConfirmContext.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/context/ToastContext.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/env.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/main.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/pages/ActivationPage.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/pages/BrandsPage.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/pages/CategoriesPage.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/pages/ClassificationsPage.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/pages/CreditBillsPage.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/pages/DashboardPage.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/pages/LoginPage.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/pages/ProductsPage.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/pages/ReportsPage.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/pages/SalesHistoryPage.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/pages/SalesPage.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/pages/SuppliersPage.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/pages/UsersPage.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/shortcuts/posShortcutEvents.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/shortcuts/shortcutRegistry.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/utils/csvDownload.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/utils/currency.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/renderer/src/utils/simulateRequest.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/shared/brands.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/shared/categories.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/shared/customers.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/shared/license.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/shared/products.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/shared/receipt.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/shared/reports.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/shared/sales.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/shared/suppliers.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/src/shared/users.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/tsconfig.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/tsconfig.node.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/tsconfig.node.tsbuildinfo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/tsconfig.web.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grocery-poss/tsconfig.web.tsbuildinfo" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="EmbeddingIndexingInfo">
+    <option name="cachedIndexableFilesCount" value="262" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="KmpPackageLockUpdaterState">{
+  &quot;jsModulesKotlinGradlePluginVersion&quot;: {},
+  &quot;wasmModulesKotlinGradlePluginVersion&quot;: {}
+}</component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
+  <component name="NextEditCompletionFeaturesState">
+    <decayedCancelled>
+      <entry key="MS100" value="1.0026147692683842" />
+      <entry key="MS500" value="1.747578350952644" />
+      <entry key="S2" value="6.687516480198569" />
+      <entry key="S5" value="19.973827175863136" />
+      <entry key="S10" value="40.03790247029681" />
+      <entry key="S30" value="77.20100787485293" />
+      <entry key="S60" value="98.06081374964933" />
+      <entry key="M2" value="127.49403675073766" />
+      <entry key="M5" value="188.61543587357028" />
+      <entry key="M10" value="272.12075197117326" />
+      <entry key="M15" value="336.6609793680388" />
+      <entry key="M30" value="457.8199263660516" />
+      <entry key="H1" value="612.0066616229417" />
+      <entry key="H2" value="812.0285438510401" />
+      <entry key="H4" value="1001.8393951762708" />
+      <entry key="D1" value="1249.452582765643" />
+      <entry key="W1" value="1303.5795050001502" />
+    </decayedCancelled>
+    <decayedSelected>
+      <entry key="MS100" value="0.0" />
+      <entry key="MS500" value="0.0" />
+      <entry key="S2" value="0.0" />
+      <entry key="S5" value="0.0" />
+      <entry key="S10" value="5.165153922474665E-246" />
+      <entry key="S30" value="1.7285996578400256E-82" />
+      <entry key="S60" value="1.3147622058151797E-41" />
+      <entry key="M2" value="3.6259649830288795E-21" />
+      <entry key="M5" value="6.664528695885179E-9" />
+      <entry key="M10" value="8.163656469919074E-5" />
+      <entry key="M15" value="0.0018818708454978578" />
+      <entry key="M30" value="0.043380535329774636" />
+      <entry key="H1" value="0.2082799446172761" />
+      <entry key="H2" value="0.45637697643206554" />
+      <entry key="H4" value="0.675556789938541" />
+      <entry key="D1" value="0.9367211163370032" />
+      <entry key="W1" value="0.990704943510631" />
+    </decayedSelected>
+    <decayedShown>
+      <entry key="MS100" value="0.9617886996023425" />
+      <entry key="MS500" value="1.733862158605422" />
+      <entry key="S2" value="6.674589121035924" />
+      <entry key="S5" value="19.957581912045296" />
+      <entry key="S10" value="40.020359719787244" />
+      <entry key="S30" value="77.18825358724358" />
+      <entry key="S60" value="98.05249348170032" />
+      <entry key="M2" value="127.48882929560584" />
+      <entry key="M5" value="188.61263187156095" />
+      <entry key="M10" value="272.1189618069814" />
+      <entry key="M15" value="336.6613709185201" />
+      <entry key="M30" value="457.8623231646848" />
+      <entry key="H1" value="612.2142685934423" />
+      <entry key="H2" value="812.4844498849764" />
+      <entry key="H4" value="1002.5146488641324" />
+      <entry key="D1" value="1250.3892381852277" />
+      <entry key="W1" value="1304.5702000773572" />
+    </decayedShown>
+  </component>
+  <component name="NoctuleProjectWorkspaceSettings">
+    <option name="migratedAutodetectionSetting" value="true" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 6,
+  &quot;fromUser&quot;: false
+}</component>
+  <component name="ProjectId" id="3HcbySBgkJNOmFRYfnM59rGowCC" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;CidrDebugProfileConversion&quot;: &quot;true&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/ANJANA TINUSH/Desktop/Github/IBL/hardware_poss_system/hardware-poss&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;prettierjs.PrettierConfiguration.Package&quot;: &quot;C:\\Users\\ANJANA TINUSH\\Desktop\\Github\\IBL\\hardware_poss_system\\hardware-poss\\node_modules\\prettier&quot;,
+    &quot;show.migrate.to.gradle.popup&quot;: &quot;false&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\ANJANA TINUSH\\Desktop\\Github\\IBL\\hardware_poss_system\\hardware-poss\\node_modules\\typescript\\lib&quot;
+  }
+}</component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-30f59d01ecdd-63390994e64e-intellij.indexing.shared.core-IU-262.8665.258" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="2b038783-d0e2-4a9b-bf5b-0feca423ebff" name="Changes" comment="" />
+      <created>1786170558828</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1786170558828</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+    <option name="exactExcludedFiles">
+      <list>
+        <option value="$PROJECT_DIR$/src/preload/index.d.ts" />
+      </list>
+    </option>
+  </component>
+</project>

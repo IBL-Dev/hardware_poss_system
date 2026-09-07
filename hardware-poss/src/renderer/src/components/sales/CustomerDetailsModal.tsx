@@ -23,6 +23,7 @@ export const CustomerDetailsModal: React.FC<CustomerDetailsModalProps> = ({
 
   const details: Array<{ label: string; value: string }> = [
     { label: 'Name', value: customer.name },
+    { label: 'Business Name', value: customer.businessName || '—' },
     { label: 'Phone', value: customer.phone || '—' },
     { label: 'Email', value: customer.email || '—' },
     { label: 'Address', value: customer.address || '—' },

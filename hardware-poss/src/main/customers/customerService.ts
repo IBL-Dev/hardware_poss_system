@@ -3,6 +3,7 @@ import { CustomerRepository } from './customerRepository'
 
 interface NormalizedCustomerInput {
   name: string
+  businessName: string
   phone: string
   email: string
   address: string
@@ -63,6 +64,7 @@ export class CustomerService {
   private normalizeCreateInput(input: CreateCustomerInput): NormalizedCustomerInput {
     return {
       name: this.normalizeRequiredText(input.name, 'Customer name'),
+      businessName: this.normalizeOptionalText(input.businessName),
       phone: this.normalizeOptionalText(input.phone),
       email: this.normalizeOptionalText(input.email),
       address: this.normalizeOptionalText(input.address),
@@ -79,6 +81,10 @@ export class CustomerService {
         input.name === undefined
           ? existingCustomer.name
           : this.normalizeRequiredText(input.name, 'Customer name'),
+      businessName:
+        input.businessName === undefined
+          ? existingCustomer.businessName
+          : this.normalizeOptionalText(input.businessName),
       phone:
         input.phone === undefined
           ? existingCustomer.phone

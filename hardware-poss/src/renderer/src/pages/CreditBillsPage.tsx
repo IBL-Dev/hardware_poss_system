@@ -1,6 +1,7 @@
 ﻿import React, { useEffect, useState, useMemo } from 'react'
 import { Loader } from '../components/common/Loader'
 import { DataTable, Column } from '../components/common/DataTable'
+import { SaleDetailsModal } from '../components/sales/SaleDetailsModal'
 import { useToast } from '../context/ToastContext'
 import { salesApi } from '../api/salesApi'
 import { formatLkr } from '../utils/currency'
@@ -8,6 +9,7 @@ import type { SaleRecord } from '../../../shared/sales'
 
 const CreditBillsPage: React.FC = () => {
   const [sales, setSales] = useState<SaleRecord[]>([])
+  const [selectedSale, setSelectedSale] = useState<SaleRecord | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const toast = useToast()
 
@@ -45,6 +47,13 @@ const CreditBillsPage: React.FC = () => {
         render: (item) => <span className="font-medium text-ink">{item.customerName || '-'}</span>
       },
       {
+        key: 'customerBusinessName',
+        header: 'BUSINESS NAME',
+        render: (item) => (
+          <span className="font-medium text-muted">{item.customerBusinessName || '-'}</span>
+        )
+      },
+      {
         key: 'paidAt',
         header: 'DATE',
         render: (item) => <span className="text-muted">{formatShortDate(item.paidAt)}</span>
@@ -64,7 +73,9 @@ const CreditBillsPage: React.FC = () => {
     <div>
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-ink">Credit Bills</h1>
-        <p className="mt-1 text-[0.95rem] text-muted">View all outstanding credit bills</p>
+        <p className="mt-1 text-[0.95rem] text-muted">
+          View all outstanding credit bills and open the whole bill
+        </p>
       </div>
 
       {isLoading ? (
@@ -76,8 +87,15 @@ const CreditBillsPage: React.FC = () => {
           No credit bills found.
         </div>
       ) : (
-        <DataTable columns={columns} data={sales} />
+        <DataTable
+          columns={columns}
+          data={sales}
+          showSelection={false}
+          onView={setSelectedSale}
+        />
       )}
+
+      <SaleDetailsModal sale={selectedSale} onClose={() => setSelectedSale(null)} />
     </div>
   )
 }
