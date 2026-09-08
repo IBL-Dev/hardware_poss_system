@@ -25,8 +25,6 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({ produc
         </div>
 
         <div className="grid grid-cols-1 gap-3 text-[0.95rem] sm:grid-cols-2">
-          <DetailRow label="Code" value={product.sku} />
-          <DetailRow label="Barcode" value={product.barcode ?? '-'} />
           <DetailRow label="Name" value={product.name} wide />
           <DetailRow label="Brand" value={product.brandName ?? '-'} />
           <DetailRow label="Category" value={product.categoryName ?? '-'} />

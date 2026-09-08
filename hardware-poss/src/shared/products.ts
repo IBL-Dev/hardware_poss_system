@@ -1,4 +1,4 @@
-export const PRODUCT_UNITS = ['PCS', 'KG', 'G', 'L', 'ML', 'PACK', 'BOX', 'BOTTLE'] as const
+export const PRODUCT_UNITS = ['PCS', 'KG', 'L', 'M', 'FT', 'BOX', 'PACK', 'SET', 'ROLL', 'SHEET', 'BAG', 'TUBE', 'CAN', 'BOTTLE', 'DOZEN'] as const
 
 export type ProductUnit = (typeof PRODUCT_UNITS)[number]
 

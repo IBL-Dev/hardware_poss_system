@@ -11,8 +11,6 @@ import type { SupplierRecord } from '../../../../shared/suppliers'
 import type { ProductRecord, ProductUnit } from '../../../../shared/products'
 
 export interface ProductFormData {
-  sku: string
-  barcode: string
   name: string
   brandId: number
   categoryId: number
@@ -25,8 +23,6 @@ export interface ProductFormData {
 }
 
 interface ProductFormState {
-  sku: string
-  barcode: string
   name: string
   brandId: number
   categoryId: number
@@ -55,8 +51,6 @@ interface ProductModalProps {
 }
 
 const emptyForm: ProductFormState = {
-  sku: '',
-  barcode: '',
   name: '',
   brandId: 0,
   categoryId: 0,
@@ -176,8 +170,6 @@ const ProductModalContent: React.FC<Omit<ProductModalProps, 'isOpen'>> = ({
     }
 
     onSave({
-      sku: form.sku,
-      barcode: form.barcode,
       name: form.name,
       brandId: form.brandId,
       categoryId: form.categoryId,
@@ -257,28 +249,6 @@ const ProductModalContent: React.FC<Omit<ProductModalProps, 'isOpen'>> = ({
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-[0.85rem] font-medium text-muted">Product Code</label>
-                <input
-                  type="text"
-                  className="rounded-md border border-line bg-bg px-3 py-2.5 text-base text-ink outline-none focus:border-primary"
-                  placeholder="e.g. MILK-001 (Optional)"
-                  value={form.sku}
-                  onChange={(event) => setForm({ ...form, sku: event.target.value })}
-                />
-              </div>
-
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[0.85rem] font-medium text-muted">Barcode</label>
-                <input
-                  type="text"
-                  className="rounded-md border border-line bg-bg px-3 py-2.5 text-base text-ink outline-none focus:border-primary"
-                  placeholder="e.g. 4791234567890 (Optional)"
-                  value={form.barcode}
-                  onChange={(event) => setForm({ ...form, barcode: event.target.value })}
-                />
-              </div>
-
-              <div className="flex flex-col gap-1.5">
                 <label className="text-[0.85rem] font-medium text-muted">Brand</label>
                 <BrandSelect
                   brands={brands}
@@ -319,12 +289,19 @@ const ProductModalContent: React.FC<Omit<ProductModalProps, 'isOpen'>> = ({
                 >
                   <option value="PCS">Pieces</option>
                   <option value="KG">Kilogram</option>
-                  <option value="G">Gram</option>
                   <option value="L">Liter</option>
-                  <option value="ML">Milliliter</option>
-                  <option value="PACK">Pack</option>
+                  <option value="M">Meter</option>
+                  <option value="FT">Feet</option>
                   <option value="BOX">Box</option>
+                  <option value="PACK">Pack</option>
+                  <option value="SET">Set</option>
+                  <option value="ROLL">Roll</option>
+                  <option value="SHEET">Sheet</option>
+                  <option value="BAG">Bag</option>
+                  <option value="TUBE">Tube</option>
+                  <option value="CAN">Can</option>
                   <option value="BOTTLE">Bottle</option>
+                  <option value="DOZEN">Dozen</option>
                 </select>
               </div>
 

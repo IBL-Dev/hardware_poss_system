@@ -112,24 +112,6 @@ const ProductsPage: React.FC = () => {
 
   const columns: Column<ProductRecord>[] = [
     {
-      key: 'sku',
-      header: 'CODE',
-      render: (item) => (
-        <span className="inline-flex items-center rounded-md border border-emerald-200 bg-emerald-50 px-2.5 py-1 font-mono text-xs font-bold text-emerald-700">
-          {item.sku}
-        </span>
-      )
-    },
-    {
-      key: 'barcode',
-      header: 'BARCODE',
-      render: (item) => (
-        <span className="font-mono text-[0.82rem] font-medium text-slate-500">
-          {item.barcode || '-'}
-        </span>
-      )
-    },
-    {
       key: 'name',
       header: 'PRODUCT NAME',
       render: (item) => (
@@ -647,7 +629,7 @@ const ProductsPage: React.FC = () => {
                 <input
                   type="text"
                   className="min-w-0 flex-1 border-none bg-transparent text-sm font-medium text-slate-800 outline-none placeholder:font-normal placeholder:text-slate-400"
-                  placeholder="Search code, barcode, product or supplier..."
+                  placeholder="Search product, brand, category or supplier..."
                   value={productSearch}
                   onChange={(event) =>
                     setProductSearch(event.target.value)
@@ -819,8 +801,6 @@ const ProductsPage: React.FC = () => {
         initialData={
           editingProduct
             ? {
-                sku: editingProduct.sku,
-                barcode: editingProduct.barcode ?? '',
                 name: editingProduct.name,
                 brandId: editingProduct.brandId ?? 0,
                 categoryId: editingProduct.categoryId,
@@ -864,8 +844,6 @@ function buildProductPayload(
   data: ProductFormData
 ): CreateProductInput {
   return {
-    sku: data.sku,
-    barcode: data.barcode,
     name: data.name,
     brandId: data.brandId,
     categoryId: data.categoryId,
@@ -907,8 +885,6 @@ function productMatchesSearch(
   normalizedSearch: string
 ): boolean {
   return [
-    product.sku,
-    product.barcode ?? '',
     product.name,
     product.brandName ?? '',
     product.categoryName ?? '',
