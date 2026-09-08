@@ -337,6 +337,117 @@ function createDatabaseSchema(database: Database.Database): void {
     'CREATE INDEX IF NOT EXISTS stock_movements_created_at_idx ON stock_movements(created_at)'
   )
 
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS purchases (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      purchase_number TEXT NOT NULL UNIQUE,
+      supplier_id INTEGER REFERENCES suppliers(id) ON DELETE SET NULL,
+      supplier_name TEXT NOT NULL DEFAULT '',
+      supplier_type TEXT NOT NULL CHECK(supplier_type IN ('INDIVIDUAL', 'BUSINESS')) DEFAULT 'INDIVIDUAL',
+      contact_id TEXT NOT NULL DEFAULT '',
+      mobile_no TEXT NOT NULL DEFAULT '',
+      email TEXT NOT NULL DEFAULT '',
+      address TEXT NOT NULL DEFAULT '',
+      status TEXT NOT NULL CHECK(status IN ('RECEIVED', 'PENDING', 'ORDERED')) DEFAULT 'ORDERED',
+      business_location TEXT NOT NULL DEFAULT '',
+      pay_term_value INTEGER NOT NULL DEFAULT 0,
+      pay_term_unit TEXT NOT NULL CHECK(pay_term_unit IN ('MONTHS', 'DAYS')) DEFAULT 'DAYS',
+      attachment_path TEXT NOT NULL DEFAULT '',
+      invoice_pdf_path TEXT NOT NULL DEFAULT '',
+      advance_balance REAL NOT NULL DEFAULT 0,
+      payment_method TEXT NOT NULL DEFAULT 'CASH',
+      paid_on TEXT NOT NULL DEFAULT '',
+      subtotal REAL NOT NULL DEFAULT 0,
+      discount_amount REAL NOT NULL DEFAULT 0,
+      total REAL NOT NULL DEFAULT 0,
+      item_count INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )
+  `)
+
+  database.exec('CREATE INDEX IF NOT EXISTS purchases_supplier_id_idx ON purchases(supplier_id)')
+  database.exec('CREATE INDEX IF NOT EXISTS purchases_created_at_idx ON purchases(created_at)')
+  database.exec('CREATE INDEX IF NOT EXISTS purchases_status_idx ON purchases(status)')
+
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS purchase_items (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      purchase_id INTEGER NOT NULL REFERENCES purchases(id) ON DELETE CASCADE,
+      product_id INTEGER REFERENCES products(id) ON DELETE SET NULL,
+      sku TEXT NOT NULL,
+      product_name TEXT NOT NULL,
+      unit_price REAL NOT NULL DEFAULT 0,
+      quantity INTEGER NOT NULL DEFAULT 0,
+      line_total REAL NOT NULL DEFAULT 0
+    )
+  `)
+
+  database.exec(
+    'CREATE INDEX IF NOT EXISTS purchase_items_purchase_id_idx ON purchase_items(purchase_id)'
+  )
+
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS purchase_payments (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      purchase_id INTEGER NOT NULL REFERENCES purchases(id) ON DELETE CASCADE,
+      amount REAL NOT NULL DEFAULT 0,
+      payment_method TEXT NOT NULL DEFAULT 'CASH',
+      paid_on TEXT NOT NULL DEFAULT '',
+      note TEXT NOT NULL DEFAULT '',
+      created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )
+  `)
+
+  database.exec(
+    'CREATE INDEX IF NOT EXISTS purchase_payments_purchase_id_idx ON purchase_payments(purchase_id)'
+  )
+
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS purchase_returns (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      return_number TEXT NOT NULL UNIQUE,
+      purchase_id INTEGER REFERENCES purchases(id) ON DELETE SET NULL,
+      purchase_number TEXT NOT NULL DEFAULT '',
+      supplier_id INTEGER REFERENCES suppliers(id) ON DELETE SET NULL,
+      supplier_name TEXT NOT NULL DEFAULT '',
+      business_location TEXT NOT NULL DEFAULT '',
+      return_date TEXT NOT NULL,
+      reason TEXT NOT NULL DEFAULT '',
+      subtotal REAL NOT NULL DEFAULT 0,
+      total REAL NOT NULL DEFAULT 0,
+      item_count INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )
+  `)
+
+  database.exec(
+    'CREATE INDEX IF NOT EXISTS purchase_returns_created_at_idx ON purchase_returns(created_at)'
+  )
+  database.exec(
+    'CREATE INDEX IF NOT EXISTS purchase_returns_supplier_id_idx ON purchase_returns(supplier_id)'
+  )
+
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS purchase_return_items (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      return_id INTEGER NOT NULL REFERENCES purchase_returns(id) ON DELETE CASCADE,
+      product_id INTEGER REFERENCES products(id) ON DELETE SET NULL,
+      sku TEXT NOT NULL,
+      product_name TEXT NOT NULL,
+      unit_price REAL NOT NULL DEFAULT 0,
+      quantity INTEGER NOT NULL DEFAULT 0,
+      line_total REAL NOT NULL DEFAULT 0
+    )
+  `)
+
+  database.exec(
+    'CREATE INDEX IF NOT EXISTS purchase_return_items_return_id_idx ON purchase_return_items(return_id)'
+  )
+
+  migrateStockMovementsTable(database)
+
   seedAdminUser(database)
 }
 
@@ -405,6 +516,53 @@ function migrateSalesTable(database: Database.Database): void {
     database.exec('ALTER TABLE sales_new RENAME TO sales')
     database.exec('CREATE INDEX IF NOT EXISTS sales_paid_at_idx ON sales(paid_at)')
   }
+}
+
+function migrateStockMovementsTable(database: Database.Database): void {
+  const tableDefinition = database
+    .prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name='stock_movements'")
+    .get() as { sql: string } | undefined
+
+  if (!tableDefinition || tableDefinition.sql.includes('PURCHASE')) {
+    return
+  }
+
+  database.exec(`
+    CREATE TABLE stock_movements_new (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      product_id INTEGER REFERENCES products(id) ON DELETE SET NULL,
+      movement_type TEXT NOT NULL CHECK(
+        movement_type IN ('OPENING_STOCK', 'ADJUSTMENT', 'SALE', 'RETURN', 'PURCHASE', 'PURCHASE_RETURN')
+      ),
+      quantity_change INTEGER NOT NULL DEFAULT 0,
+      previous_quantity INTEGER NOT NULL DEFAULT 0,
+      new_quantity INTEGER NOT NULL DEFAULT 0,
+      reference_type TEXT NOT NULL DEFAULT '',
+      reference_id INTEGER,
+      note TEXT NOT NULL DEFAULT '',
+      created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )
+  `)
+
+  database.exec(`
+    INSERT INTO stock_movements_new (
+      id, product_id, movement_type, quantity_change, previous_quantity,
+      new_quantity, reference_type, reference_id, note, created_at
+    )
+    SELECT
+      id, product_id, movement_type, quantity_change, previous_quantity,
+      new_quantity, reference_type, reference_id, note, created_at
+    FROM stock_movements
+  `)
+
+  database.exec('DROP TABLE stock_movements')
+  database.exec('ALTER TABLE stock_movements_new RENAME TO stock_movements')
+  database.exec(
+    'CREATE INDEX IF NOT EXISTS stock_movements_product_id_idx ON stock_movements(product_id)'
+  )
+  database.exec(
+    'CREATE INDEX IF NOT EXISTS stock_movements_created_at_idx ON stock_movements(created_at)'
+  )
 }
 
 function migrateProductsTable(database: Database.Database): void {

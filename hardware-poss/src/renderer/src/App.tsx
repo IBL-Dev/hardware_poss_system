@@ -11,6 +11,7 @@ import BrandsPage from './pages/BrandsPage'
 import CategoriesPage from './pages/CategoriesPage'
 import SuppliersPage from './pages/SuppliersPage'
 import ReportsPage from './pages/ReportsPage'
+import PurchasesPage from './pages/PurchasesPage'
 import SalesPage from './pages/SalesPage'
 import SalesHistoryPage from './pages/SalesHistoryPage'
 import CreditBillsPage from './pages/CreditBillsPage'
@@ -51,6 +52,14 @@ function AppContent(): React.JSX.Element {
         element={
           <MainLayout>
             <SuppliersPage />
+          </MainLayout>
+        }
+      />
+      <SingleRoute
+        path="/purchases"
+        element={
+          <MainLayout>
+            <PurchasesPage />
           </MainLayout>
         }
       />

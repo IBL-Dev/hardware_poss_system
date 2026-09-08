@@ -11,7 +11,8 @@ import {
   FolderTree,
   Truck,
   Keyboard,
-  CreditCard
+  CreditCard,
+  ShoppingBag
 } from 'lucide-react'
 import { CashDrawerModal } from '../sales/CashDrawerModal'
 import {
@@ -207,16 +208,14 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     { path: '/brands', label: 'Brands', icon: Tag },
     { path: '/categories', label: 'Categories', icon: FolderTree },
     { path: '/suppliers', label: 'Suppliers', icon: Truck },
+    { path: '/purchases', label: 'Purchases', icon: ShoppingBag },
     { path: '/reports', label: 'Reports', icon: FileBarChart }
   ]
 
   return (
     <div className="flex min-h-screen flex-col bg-bg text-ink">
       <header className="relative flex h-16 items-center bg-brand px-6 shadow-md">
-        <div className="mr-10 flex items-center gap-2 text-[1.15rem] font-bold tracking-tight text-white">
-          <span className="h-2 w-2 rounded-full bg-primary" />
-          <span>POS System</span>
-        </div>
+
         <nav className="flex h-full gap-1">
           {navItems.map((item) => {
             const Icon = item.icon

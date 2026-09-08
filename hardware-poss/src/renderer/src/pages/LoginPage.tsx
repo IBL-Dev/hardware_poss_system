@@ -16,6 +16,8 @@ import {
   Wrench
 } from 'lucide-react'
 
+import loginImage from '../../../../resources/login_image.jpeg'
+
 const CURRENT_USER_STORAGE_KEY = 'grocery-pos-current-user'
 
 export default function LoginPage() {
@@ -96,41 +98,15 @@ export default function LoginPage() {
             }}
           />
 
-          <div className="absolute -right-24 -top-24 h-80 w-80 rounded-full border-[70px] border-emerald-500/5" />
-          <div className="absolute -bottom-32 -left-32 h-96 w-96 rounded-full border-[85px] border-white/[0.025]" />
 
-          {/* ==================================================
-              BRAND
-          ================================================== */}
 
-          <div className="relative z-10 flex items-center gap-3 px-12 pt-10 xl:px-16">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-emerald-400/20 bg-emerald-500/10">
-              <Wrench size={22} className="text-emerald-400" />
-            </div>
-
-            <div>
-              <p className="text-base font-bold tracking-wide text-white">
-                Hardware POS
-              </p>
-
-              <p className="text-xs font-medium text-slate-400">
-                Store Management System
-              </p>
-            </div>
-          </div>
 
           {/* ==================================================
               MAIN LEFT CONTENT
           ================================================== */}
 
           <div className="relative z-10 px-12 xl:px-16">
-            <div className="mb-7 flex h-16 w-16 items-center justify-center rounded-2xl border border-emerald-400/20 bg-emerald-500/10 shadow-2xl shadow-emerald-950/30">
-              <HardHat size={31} className="text-emerald-400" />
-            </div>
 
-            <p className="mb-4 text-xs font-bold uppercase tracking-[0.22em] text-emerald-400">
-              Hardware Store Management
-            </p>
 
             <h1 className="max-w-xl text-[2.65rem] font-bold leading-[1.15] tracking-tight text-white xl:text-[3.2rem]">
               Manage your hardware business
@@ -145,51 +121,24 @@ export default function LoginPage() {
             </p>
 
             {/* ==================================================
+                LEFT HERO IMAGE
+            ================================================== */}
+
+            <img
+              src={loginImage}
+              alt="Hardware store management"
+              className="mt-9 w-full max-w-xl rounded-2xl border border-white/10 bg-slate-900 object-cover shadow-2xl shadow-emerald-950/40"
+            />
+
+            {/* ==================================================
                 FEATURE CARDS
             ================================================== */}
 
             <div className="mt-9 grid max-w-xl grid-cols-3 gap-3">
-              <div className="rounded-xl border border-white/[0.07] bg-white/[0.04] p-4 backdrop-blur-sm">
-                <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-500/10">
-                  <Boxes size={18} className="text-emerald-400" />
-                </div>
 
-                <p className="text-sm font-semibold text-white">
-                  Inventory
-                </p>
 
-                <p className="mt-1 text-[0.7rem] leading-4 text-slate-500">
-                  Track hardware stock
-                </p>
-              </div>
 
-              <div className="rounded-xl border border-white/[0.07] bg-white/[0.04] p-4 backdrop-blur-sm">
-                <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-500/10">
-                  <PackageCheck size={18} className="text-emerald-400" />
-                </div>
 
-                <p className="text-sm font-semibold text-white">
-                  Products
-                </p>
-
-                <p className="mt-1 text-[0.7rem] leading-4 text-slate-500">
-                  Organize store items
-                </p>
-              </div>
-
-              <div className="rounded-xl border border-white/[0.07] bg-white/[0.04] p-4 backdrop-blur-sm">
-                <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-500/10">
-                  <Hammer size={18} className="text-emerald-400" />
-                </div>
-
-                <p className="text-sm font-semibold text-white">
-                  Sales
-                </p>
-
-                <p className="mt-1 text-[0.7rem] leading-4 text-slate-500">
-                  Fast POS operations
-                </p>
-              </div>
             </div>
           </div>
 
@@ -197,16 +146,7 @@ export default function LoginPage() {
               LEFT FOOTER
           ================================================== */}
 
-          <div className="relative z-10 flex items-center justify-between border-t border-white/[0.06] px-12 py-7 xl:px-16">
-            <div className="flex items-center gap-2 text-xs text-slate-500">
-              <ShieldCheck size={14} className="text-emerald-500" />
-              Secure business management
-            </div>
 
-            <span className="text-xs text-slate-600">
-              POS System
-            </span>
-          </div>
         </section>
 
         {/* ====================================================
@@ -224,15 +164,6 @@ export default function LoginPage() {
                 <Wrench size={21} className="text-white" />
               </div>
 
-              <div>
-                <p className="font-bold text-slate-900">
-                  Hardware POS
-                </p>
-
-                <p className="text-xs text-slate-500">
-                  Store Management System
-                </p>
-              </div>
             </div>
 
             {/* ==================================================

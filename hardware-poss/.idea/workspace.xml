@@ -5,11 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2b038783-d0e2-4a9b-bf5b-0feca423ebff" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/resources/login_image.jpeg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/src/components/products/ProductDetailsModal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/src/components/products/ProductDetailsModal.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/src/components/products/ProductModal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/src/components/products/ProductModal.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/src/pages/ProductsPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/src/pages/ProductsPage.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/shared/products.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/shared/products.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/database.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/database.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/src/App.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/src/components/layout/MainLayout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/src/components/layout/MainLayout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/src/pages/LoginPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/src/pages/LoginPage.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -32,23 +34,23 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.6076563083426514" />
-      <entry key="MS500" value="2.555075812290487" />
-      <entry key="S2" value="2.8768481017017464" />
-      <entry key="S5" value="2.9496969622668026" />
-      <entry key="S10" value="2.974671233739307" />
-      <entry key="S30" value="2.9915173562344606" />
-      <entry key="S60" value="2.995753691919276" />
-      <entry key="M2" value="2.9978755978302827" />
-      <entry key="M5" value="2.9991556075668506" />
-      <entry key="M10" value="3.046198834920139" />
-      <entry key="M15" value="4.083564242247819" />
-      <entry key="M30" value="31.408413954606505" />
-      <entry key="H1" value="168.18497124115947" />
-      <entry key="H2" value="453.1450954847908" />
-      <entry key="H4" value="795.577801961366" />
-      <entry key="D1" value="1332.0155490470074" />
-      <entry key="W1" value="1461.938691499549" />
+      <entry key="MS100" value="1.2930915224970434" />
+      <entry key="MS500" value="3.51256997846703" />
+      <entry key="S2" value="10.774330099312762" />
+      <entry key="S5" value="20.799356185715496" />
+      <entry key="S10" value="30.102359858770505" />
+      <entry key="S30" value="41.470031232341434" />
+      <entry key="S60" value="45.43031161093775" />
+      <entry key="M2" value="47.90344971656044" />
+      <entry key="M5" value="55.07148227647803" />
+      <entry key="M10" value="70.35998339496854" />
+      <entry key="M15" value="82.61407723980645" />
+      <entry key="M30" value="117.67285299213185" />
+      <entry key="H1" value="239.5543823319111" />
+      <entry key="H2" value="513.9313241433848" />
+      <entry key="H4" value="866.3674722195102" />
+      <entry key="D1" value="1446.2616460390802" />
+      <entry key="W1" value="1590.3098029164585" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
@@ -56,37 +58,37 @@
       <entry key="S2" value="0.0" />
       <entry key="S5" value="0.0" />
       <entry key="S10" value="0.0" />
-      <entry key="S30" value="1.7756011664479683E-164" />
-      <entry key="S60" value="1.332516854095264E-82" />
-      <entry key="M2" value="1.154346938357456E-41" />
-      <entry key="M5" value="4.2163294917918526E-17" />
-      <entry key="M10" value="6.493326952950887E-9" />
-      <entry key="M15" value="3.4805257198318543E-6" />
-      <entry key="M30" value="0.0018656167130018401" />
-      <entry key="H1" value="0.043192785427683365" />
-      <entry key="H2" value="0.2078287406199703" />
-      <entry key="H4" value="0.4558823758602309" />
-      <entry key="D1" value="0.8772878887626036" />
-      <entry key="W1" value="0.9814709454767502" />
+      <entry key="S30" value="1.5734110835529355E-179" />
+      <entry key="S60" value="3.966624614899806E-90" />
+      <entry key="M2" value="1.99163867578928E-45" />
+      <entry key="M5" value="1.3172985704244486E-18" />
+      <entry key="M10" value="1.147736280869628E-9" />
+      <entry key="M15" value="1.0962124752405925E-6" />
+      <entry key="M30" value="0.0010470016596169137" />
+      <entry key="H1" value="0.03235740501982428" />
+      <entry key="H2" value="0.17988164169760043" />
+      <entry key="H4" value="0.4241245591776064" />
+      <entry key="D1" value="0.8667933488772939" />
+      <entry key="W1" value="0.9797850211984084" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="1.5571615861584258" />
-      <entry key="MS500" value="2.5368437707796545" />
-      <entry key="S2" value="2.871577635400009" />
-      <entry key="S5" value="2.9475238251292013" />
-      <entry key="S10" value="2.973573515113582" />
-      <entry key="S30" value="2.9911489413998886" />
-      <entry key="S60" value="2.995569168977804" />
-      <entry key="M2" value="2.9977832573318475" />
-      <entry key="M5" value="2.999118652302567" />
-      <entry key="M10" value="3.0461800064444993" />
-      <entry key="M15" value="4.083549930992069" />
-      <entry key="M30" value="31.41020349055349" />
-      <entry key="H1" value="168.22795854067462" />
-      <entry key="H2" value="453.35264104192277" />
-      <entry key="H4" value="796.0334298852305" />
-      <entry key="D1" value="1332.8927640305883" />
-      <entry key="W1" value="1462.9201509555662" />
+      <entry key="MS100" value="1.251050459733361" />
+      <entry key="MS500" value="3.491922421701163" />
+      <entry key="S2" value="10.758501892759353" />
+      <entry key="S5" value="20.78660913256714" />
+      <entry key="S10" value="30.092892827180957" />
+      <entry key="S30" value="41.465594372205196" />
+      <entry key="S60" value="45.42786839732954" />
+      <entry key="M2" value="47.90215673737218" />
+      <entry key="M5" value="55.07086820562457" />
+      <entry key="M10" value="70.35956207085704" />
+      <entry key="M15" value="82.61373436631578" />
+      <entry key="M30" value="117.67363870720284" />
+      <entry key="H1" value="239.5864584717859" />
+      <entry key="H2" value="514.1108915450438" />
+      <entry key="H4" value="866.7913239747654" />
+      <entry key="D1" value="1447.1283611192814" />
+      <entry key="W1" value="1591.2895755715008" />
     </decayedShown>
   </component>
   <component name="NoctuleProjectWorkspaceSettings">
@@ -101,37 +103,44 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;CidrDebugProfileConversion&quot;: &quot;true&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/ANJANA TINUSH/Desktop/Github/IBL/hardware_poss_system/hardware-poss&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;prettierjs.PrettierConfiguration.Package&quot;: &quot;C:\\Users\\ANJANA TINUSH\\Desktop\\Github\\IBL\\hardware_poss_system\\hardware-poss\\node_modules\\prettier&quot;,
-    &quot;show.migrate.to.gradle.popup&quot;: &quot;false&quot;,
-    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\ANJANA TINUSH\\Desktop\\Github\\IBL\\hardware_poss_system\\hardware-poss\\node_modules\\typescript\\lib&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "CidrDebugProfileConversion": "true",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.go.formatter.settings.were.checked": "true",
+    "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "cidr.known.project.marker": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "dart.analysis.tool.window.visible": "false",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "junie.onboarding.icon.badge.shown": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/ANJANA TINUSH/Desktop/Github/IBL/hardware_poss_system/hardware-poss",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.jshint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.jshint": "",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "prettierjs.PrettierConfiguration.Package": "C:\\Users\\ANJANA TINUSH\\Desktop\\Github\\IBL\\hardware_poss_system\\hardware-poss\\node_modules\\prettier",
+    "show.migrate.to.gradle.popup": "false",
+    "to.speed.mode.migration.done": "true",
+    "ts.external.directory.path": "C:\\Users\\ANJANA TINUSH\\Desktop\\Github\\IBL\\hardware_poss_system\\hardware-poss\\node_modules\\typescript\\lib"
   }
-}</component>
+}]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\ANJANA TINUSH\Desktop\Github\IBL\hardware_poss_system\hardware-poss\resources" />
+    </key>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>

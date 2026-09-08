@@ -13,6 +13,7 @@ import { registerCategoryHandlers } from './categories/categoryIpc'
 import { registerSupplierHandlers } from './suppliers/supplierIpc'
 import { registerCustomerHandlers } from './customers/customerIpc'
 import { registerLicenseHandlers } from './licenseIpc'
+import { registerPurchaseHandlers } from './purchases/purchaseIpc'
 
 function createWindow(): void {
   const icon = app.isPackaged ? join(process.resourcesPath, 'hardware_icon.png') : iconAsset
@@ -71,6 +72,7 @@ app.whenReady().then(() => {
   registerSupplierHandlers()
   registerCustomerHandlers()
   registerLicenseHandlers()
+  registerPurchaseHandlers()
 
   /*
    * Open the Electron window.
