@@ -280,6 +280,7 @@ function createDatabaseSchema(database: Database.Database): void {
   )
 
   migrateSalesTable(database)
+  backfillWholeSaleFlags(database)
 
   database.exec(`
     CREATE TABLE IF NOT EXISTS sale_items (
@@ -524,6 +525,21 @@ function migrateSalesTable(database: Database.Database): void {
     database.exec('ALTER TABLE sales_new RENAME TO sales')
     database.exec('CREATE INDEX IF NOT EXISTS sales_paid_at_idx ON sales(paid_at)')
   }
+}
+
+// Marks previously recorded whole-sale transactions as wholesale.
+// Before the is_whole_sale column existed, whole-sale bills were only
+// distinguishable by the linked customer having a business name.
+function backfillWholeSaleFlags(database: Database.Database): void {
+  database.exec(`
+    UPDATE sales
+    SET is_whole_sale = 1
+    WHERE customer_id IS NOT NULL
+      AND is_whole_sale = 0
+      AND customer_id IN (
+        SELECT id FROM customers WHERE TRIM(IFNULL(business_name, '')) != ''
+      )
+  `)
 }
 
 function migrateStockMovementsTable(database: Database.Database): void {
