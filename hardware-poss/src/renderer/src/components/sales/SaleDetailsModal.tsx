@@ -1,6 +1,15 @@
 import React, { useState } from 'react'
-import { Briefcase, ListOrdered, ReceiptText, RotateCcw, UserRound, X } from 'lucide-react'
+import {
+  Briefcase,
+  ListOrdered,
+  Printer,
+  ReceiptText,
+  RotateCcw,
+  UserRound,
+  X
+} from 'lucide-react'
 import { useConfirm } from '../../context/ConfirmContext'
+import { useToast } from '../../context/ToastContext'
 import { formatLkr, formatLkrAmount } from '../../utils/currency'
 import type { SaleItemRecord, SalePaymentMethod, SaleRecord } from '../../../../shared/sales'
 
@@ -12,14 +21,24 @@ interface SaleDetailsModalProps {
 
 type DetailTab = 'bill' | 'items'
 
-const STORE_NAME = 'NMS Trade Centre'
+const STORE_NAME = 'Alufix Engineering'
 const STORE_ADDRESS_LINES = [
-  'Master town',
-  'No 1',
-  'Main street, Jayamawaththa junction',
-  'Balaluwewa, palagala,kekirawa'
+  'Kandy Road, Dambulugama, Dambulla'
 ]
-const STORE_PHONE = '077 727 1160'
+const STORE_PHONE = '076 654 5140'
+
+// ===============================
+// PRINT PRESETS
+// ===============================
+const PRINTER_HINT = 'POSPrinter POS80'
+const DEFAULT_PAPER_WIDTH_MM = 72
+const DEFAULT_RECEIPT_TEXT_WIDTH = 42
+
+const PAPER_WIDTH_TEXT_WIDTH_PRESETS: Record<number, number> = {
+  58: 32,
+  72: DEFAULT_RECEIPT_TEXT_WIDTH,
+  80: 48
+}
 
 export const SaleDetailsModal: React.FC<SaleDetailsModalProps> = ({
   sale,
@@ -28,7 +47,9 @@ export const SaleDetailsModal: React.FC<SaleDetailsModalProps> = ({
 }) => {
   const [returnQuantities, setReturnQuantities] = useState<Record<number, number>>({})
   const [activeTab, setActiveTab] = useState<DetailTab>('bill')
+  const [isPrinting, setIsPrinting] = useState(false)
   const confirm = useConfirm()
+  const toast = useToast()
 
   if (!sale) return null
 
@@ -53,6 +74,31 @@ export const SaleDetailsModal: React.FC<SaleDetailsModalProps> = ({
       variant: 'danger',
       onConfirm: () => onReturnItem(item.id, quantity)
     })
+  }
+
+  const handlePrintBill = async (): Promise<void> => {
+    if (isPrinting) return
+
+    setIsPrinting(true)
+
+    try {
+      const result = await window.api.receipt.printReceipt({
+        html: buildBillPrintHtml(sale),
+        text: buildBillPrintText(sale),
+        printerName: PRINTER_HINT
+      })
+
+      if (!result.success) {
+        toast.error(result.message ?? 'Bill could not be printed.')
+        return
+      }
+
+      toast.success(`Bill #${billNumber} was sent to the printer.`)
+    } catch (error) {
+      toast.error(getErrorMessage(error))
+    } finally {
+      setIsPrinting(false)
+    }
   }
 
   const tabStyle = (tab: DetailTab): string =>
@@ -81,13 +127,25 @@ export const SaleDetailsModal: React.FC<SaleDetailsModalProps> = ({
               <span className="max-w-64 truncate text-xs text-muted">{sale.saleNumber}</span>
             </div>
           </div>
-          <button
-            className="flex h-8 w-8 items-center justify-center rounded-md text-muted transition-colors hover:bg-hover hover:text-ink"
-            onClick={onClose}
-            aria-label="Close sale details"
-          >
-            <X size={18} />
-          </button>
+          <div className="flex shrink-0 items-center gap-2">
+            <button
+              className="flex h-8 items-center gap-1.5 rounded-md border border-emerald-200 bg-emerald-50 px-2.5 text-xs font-bold text-emerald-700 transition-colors hover:bg-emerald-100 disabled:cursor-not-allowed disabled:border-line disabled:bg-bg disabled:text-muted"
+              onClick={() => void handlePrintBill()}
+              disabled={isPrinting}
+              title="Print this bill"
+            >
+              <Printer size={15} />
+              {isPrinting ? 'Printing...' : 'Print Bill'}
+            </button>
+
+            <button
+              className="flex h-8 w-8 items-center justify-center rounded-md text-muted transition-colors hover:bg-hover hover:text-ink"
+              onClick={onClose}
+              aria-label="Close sale details"
+            >
+              <X size={18} />
+            </button>
+          </div>
         </div>
 
         <div className="flex gap-2">

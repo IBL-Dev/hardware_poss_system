@@ -12,6 +12,7 @@ interface SaleRow {
   total: number
   item_count: number
   paid_at: string
+  is_whole_sale: number
   customer_id: number | null
   customer_name: string | null
   customer_business_name: string | null
@@ -37,6 +38,7 @@ interface SaveSaleInput {
   discountAmount: number
   total: number
   itemCount: number
+  isWholeSale: boolean
   customerId?: number | null
   items: Array<{
     productId: number
@@ -75,6 +77,7 @@ export class SaleRepository {
             s.total,
             s.item_count,
             s.paid_at,
+            s.is_whole_sale,
             s.customer_id,
             c.name as customer_name,
             c.business_name as customer_business_name
@@ -104,6 +107,7 @@ export class SaleRepository {
             s.total,
             s.item_count,
             s.paid_at,
+            s.is_whole_sale,
             s.customer_id,
             c.name as customer_name,
             c.business_name as customer_business_name
@@ -131,6 +135,7 @@ export class SaleRepository {
               discount_amount,
               total,
               item_count,
+              is_whole_sale,
               customer_id
             )
             VALUES (
@@ -142,12 +147,14 @@ export class SaleRepository {
               @discountAmount,
               @total,
               @itemCount,
+              @isWholeSale,
               @customerId
             )
           `
         )
         .run({
           ...sale,
+          isWholeSale: sale.isWholeSale ? 1 : 0,
           dailyBillNumber: getNextDailyBillNumber(this.database)
         })
 
@@ -586,6 +593,7 @@ function mapSaleRow(row: SaleRow, items: SaleItemRecord[]): SaleRecord {
     itemCount: row.item_count,
     paidAt: row.paid_at,
     items,
+    isWholeSale: row.is_whole_sale === 1,
     customerId: row.customer_id,
     customerName: row.customer_name,
     customerBusinessName: row.customer_business_name

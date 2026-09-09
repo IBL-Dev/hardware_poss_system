@@ -28,9 +28,12 @@ const emptyFilters: Required<SaleFilters> = {
   dateTo: ''
 }
 
+type SalesViewMode = 'ALL' | 'WHOLESALE'
+
 const SalesHistoryPage: React.FC = () => {
   const [sales, setSales] = useState<SaleRecord[]>([])
   const [filters, setFilters] = useState<Required<SaleFilters>>(emptyFilters)
+  const [viewMode, setViewMode] = useState<SalesViewMode>('ALL')
   const [selectedSale, setSelectedSale] = useState<SaleRecord | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
@@ -68,17 +71,26 @@ const SalesHistoryPage: React.FC = () => {
   }, [filters, toast])
 
   /* ==========================================================
+     VISIBLE SALES (RETAIL / WHOLE SALE)
+  ========================================================== */
+
+  const visibleSales = useMemo(
+    () => (viewMode === 'WHOLESALE' ? sales.filter((sale) => sale.isWholeSale) : sales),
+    [sales, viewMode]
+  )
+
+  /* ==========================================================
      SALES TOTALS
   ========================================================== */
 
   const totals = useMemo(
     () => ({
-      revenue: sales.reduce((sum, sale) => sum + sale.total, 0),
-      discounts: sales.reduce((sum, sale) => sum + getSaleDiscountTotal(sale), 0),
-      items: sales.reduce((sum, sale) => sum + sale.itemCount, 0),
-      transactions: sales.length
+      revenue: visibleSales.reduce((sum, sale) => sum + sale.total, 0),
+      discounts: visibleSales.reduce((sum, sale) => sum + getSaleDiscountTotal(sale), 0),
+      items: visibleSales.reduce((sum, sale) => sum + sale.itemCount, 0),
+      transactions: visibleSales.length
     }),
-    [sales]
+    [visibleSales]
   )
 
   /* ==========================================================
@@ -97,6 +109,12 @@ const SalesHistoryPage: React.FC = () => {
             <span className="text-xs font-bold text-emerald-700">
               Bill #{formatBillNumber(sale)}
             </span>
+
+            {sale.isWholeSale && (
+              <span className="rounded-md bg-slate-800 px-1.5 py-0.5 text-[0.6rem] font-bold uppercase tracking-wide text-amber-300">
+                Wholesale
+              </span>
+            )}
           </div>
 
           <div className="mt-1.5 max-w-[160px] truncate font-mono text-[0.7rem] text-slate-400">
@@ -290,7 +308,7 @@ const SalesHistoryPage: React.FC = () => {
 
                 {!isLoading && (
                   <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700">
-                    {sales.length} Transactions
+                    {visibleSales.length} Transactions
                   </span>
                 )}
               </div>
@@ -301,20 +319,32 @@ const SalesHistoryPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="inline-flex w-fit items-center gap-2 rounded-lg border border-emerald-100 bg-emerald-50 px-3.5 py-2">
-            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-white">
-              <ShoppingCart size={14} className="text-emerald-600" />
-            </div>
+          <div className="inline-flex rounded-lg bg-slate-100 p-1">
+            <button
+              type="button"
+              className={`inline-flex items-center gap-1.5 rounded-md px-3.5 py-2 text-xs font-bold transition-colors ${
+                viewMode === 'ALL'
+                  ? 'bg-white text-slate-800 shadow-sm'
+                  : 'text-slate-500 hover:text-slate-700'
+              }`}
+              onClick={() => setViewMode('ALL')}
+            >
+              <ShoppingCart size={14} className={viewMode === 'ALL' ? 'text-emerald-600' : 'text-slate-400'} />
+              All Sales
+            </button>
 
-            <div>
-              <p className="text-[0.67rem] font-bold uppercase tracking-wider text-emerald-600">
-                Sales Register
-              </p>
-
-              <p className="text-xs font-medium text-emerald-800">
-                Hardware POS Transactions
-              </p>
-            </div>
+            <button
+              type="button"
+              className={`inline-flex items-center gap-1.5 rounded-md px-3.5 py-2 text-xs font-bold transition-colors ${
+                viewMode === 'WHOLESALE'
+                  ? 'bg-white text-slate-800 shadow-sm'
+                  : 'text-slate-500 hover:text-slate-700'
+              }`}
+              onClick={() => setViewMode('WHOLESALE')}
+            >
+              <PackageCheck size={14} className={viewMode === 'WHOLESALE' ? 'text-emerald-600' : 'text-slate-400'} />
+              Wholesale
+            </button>
           </div>
         </div>
       </div>
@@ -487,19 +517,20 @@ const SalesHistoryPage: React.FC = () => {
         <div className="rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
           <Loader label="Loading sales history..." size="sm" />
         </div>
-      ) : sales.length === 0 ? (
+      ) : visibleSales.length === 0 ? (
         <div className="flex min-h-[320px] flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white px-6 py-10 text-center">
           <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-emerald-50">
             <ReceiptText size={27} className="text-emerald-600" />
           </div>
 
           <h3 className="text-base font-bold text-slate-800">
-            No sales found
+            {viewMode === 'WHOLESALE' ? 'No wholesale sales found' : 'No sales found'}
           </h3>
 
           <p className="mt-1 max-w-md text-sm leading-6 text-slate-500">
-            No completed hardware sales match the selected filters. New POS transactions will
-            appear here after payment.
+            {viewMode === 'WHOLESALE'
+              ? 'No completed whole sale transactions match the selected filters. Paid wholesale bills will appear here after checkout.'
+              : 'No completed hardware sales match the selected filters. New POS transactions will appear here after payment.'}
           </p>
 
           {hasActiveFilters && (
@@ -532,18 +563,18 @@ const SalesHistoryPage: React.FC = () => {
               <span>Showing</span>
 
               <span className="rounded-md bg-emerald-50 px-2 py-1 font-bold text-emerald-700">
-                {sales.length}
+                {visibleSales.length}
               </span>
 
               <span>
-                transaction{sales.length === 1 ? '' : 's'}
+                transaction{visibleSales.length === 1 ? '' : 's'}
               </span>
             </div>
           </div>
 
           <DataTable
             columns={columns}
-            data={sales}
+            data={visibleSales}
             showSelection={false}
             onView={setSelectedSale}
             onDelete={handleDelete}

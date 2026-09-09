@@ -255,6 +255,7 @@ function createDatabaseSchema(database: Database.Database): void {
       discount_amount REAL NOT NULL DEFAULT 0,
       total REAL NOT NULL DEFAULT 0,
       item_count INTEGER NOT NULL DEFAULT 0,
+      is_whole_sale INTEGER NOT NULL DEFAULT 0,
       paid_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
     )
   `)
@@ -270,6 +271,12 @@ function createDatabaseSchema(database: Database.Database): void {
     'sales',
     'daily_bill_number',
     'ALTER TABLE sales ADD COLUMN daily_bill_number INTEGER NOT NULL DEFAULT 0'
+  )
+  ensureColumn(
+    database,
+    'sales',
+    'is_whole_sale',
+    'ALTER TABLE sales ADD COLUMN is_whole_sale INTEGER NOT NULL DEFAULT 0'
   )
 
   migrateSalesTable(database)
@@ -499,16 +506,17 @@ function migrateSalesTable(database: Database.Database): void {
         total REAL NOT NULL DEFAULT 0,
         item_count INTEGER NOT NULL DEFAULT 0,
         paid_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        customer_id INTEGER REFERENCES customers(id) ON DELETE SET NULL
+        customer_id INTEGER REFERENCES customers(id) ON DELETE SET NULL,
+        is_whole_sale INTEGER NOT NULL DEFAULT 0
       )
     `)
 
     database.exec(`
       INSERT INTO sales_new (
-        id, sale_number, daily_bill_number, payment_method, subtotal, tax, discount_amount, total, item_count, paid_at, customer_id
+        id, sale_number, daily_bill_number, payment_method, subtotal, tax, discount_amount, total, item_count, paid_at, customer_id, is_whole_sale
       )
       SELECT 
-        id, sale_number, daily_bill_number, payment_method, subtotal, tax, discount_amount, total, item_count, paid_at, customer_id 
+        id, sale_number, daily_bill_number, payment_method, subtotal, tax, discount_amount, total, item_count, paid_at, customer_id, is_whole_sale 
       FROM sales
     `)
 

@@ -44,14 +44,11 @@ interface ReceiptSaleSnapshot {
   paymentMethod: SalePaymentMethod
 }
 
-const STORE_NAME = 'NMS Trade Centre'
+const STORE_NAME = 'Alufix Engineering'
 const STORE_ADDRESS_LINES = [
-  'Master town',
-  'No 1',
-  'Main street, Jayamawaththa junction',
-  'Balaluwewa, palagala,kekirawa'
+  'Kandy Road, Dambulugama, Dambulla'
 ]
-const STORE_PHONE = '077 727 1160'
+const STORE_PHONE = '076 654 5140'
 
 // ===============================
 // PAPER WIDTH -> TEXT WIDTH

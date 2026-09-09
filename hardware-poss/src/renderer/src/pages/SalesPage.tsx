@@ -6,7 +6,10 @@ import {
   Clock,
   CreditCard,
   Minus,
+  PackageOpen,
+  PackagePlus,
   PackageSearch,
+  Pencil,
   Plus,
   PlusCircle,
   RefreshCw,
@@ -19,16 +22,27 @@ import {
 import { SearchableSelect } from '../components/common/SearchableSelect'
 import { CreditCustomerPicker, type CreditCustomerPick } from '../components/sales/CreditCustomerPicker'
 import { QuantityModal, type QuantitySelection } from '../components/sales/QuantityModal'
+import {
+  WholeSaleModal,
+  type WholeSaleCustomerInput
+} from '../components/sales/WholeSaleModal'
 import { ReceiptModal } from '../components/sales/ReceiptModal'
+import { ProductModal, type ProductFormData } from '../components/products/ProductModal'
 import { onPosShortcutEvent } from '../shortcuts/posShortcutEvents'
 import { useConfirm } from '../context/ConfirmContext'
 import { useToast } from '../context/ToastContext'
 import { customersApi } from '../api/customersApi'
+import { brandsApi } from '../api/brandsApi'
+import { categoriesApi } from '../api/categoriesApi'
+import { suppliersApi } from '../api/suppliersApi'
 import { productsApi } from '../api/productsApi'
 import { salesApi } from '../api/salesApi'
 import { formatLkr } from '../utils/currency'
 import type { CustomerRecord } from '../../../shared/customers'
 import type { ProductRecord } from '../../../shared/products'
+import type { BrandRecord } from '../../../shared/brands'
+import type { CategoryRecord } from '../../../shared/categories'
+import type { SupplierRecord } from '../../../shared/suppliers'
 import type { SalePaymentMethod, SaleRecord } from '../../../shared/sales'
 
 interface CartItem {
@@ -40,6 +54,7 @@ interface CartItem {
   stockQuantity: number
   quantity: number
   discountAmount: number
+  unit?: string
 }
 
 interface HeldBill {
@@ -52,6 +67,9 @@ interface HeldBill {
   customerId: number | null
   customerName: string
   customerBusinessName: string
+  isWholeSale: boolean
+  wholeSaleCustomerName: string
+  wholeSaleCustomerBusinessName: string
   createdAt: string
   updatedAt: string
 }
@@ -65,6 +83,9 @@ interface CurrentBillDraft {
   customerId: number | null
   customerName: string
   customerBusinessName: string
+  isWholeSale: boolean
+  wholeSaleCustomerName: string
+  wholeSaleCustomerBusinessName: string
 }
 
 const HELD_BILLS_STORAGE_KEY = 'grocery-pos-held-bills'
@@ -78,6 +99,11 @@ const SalesPage: React.FC = () => {
   const [selectedBrand, setSelectedBrand] = useState('')
   const [products, setProducts] = useState<ProductRecord[]>([])
   const [customers, setCustomers] = useState<CustomerRecord[]>([])
+  const [brands, setBrands] = useState<BrandRecord[]>([])
+  const [categories, setCategories] = useState<CategoryRecord[]>([])
+  const [suppliers, setSuppliers] = useState<SupplierRecord[]>([])
+  const [isProductModalOpen, setIsProductModalOpen] = useState(false)
+  const [isProductSaving, setIsProductSaving] = useState(false)
   const [selectedCustomerId, setSelectedCustomerId] = useState<number | null>(
     () => loadCurrentBillDraft()?.customerId ?? null
   )
@@ -98,8 +124,19 @@ const SalesPage: React.FC = () => {
     () => loadCurrentBillDraft()?.activeHeldBillId ?? null
   )
   const [selectedProduct, setSelectedProduct] = useState<ProductRecord | null>(null)
+  const [editingCartItem, setEditingCartItem] = useState<CartItem | null>(null)
   const [isQtyModalOpen, setIsQtyModalOpen] = useState(false)
   const [isReceiptModalOpen, setIsReceiptModalOpen] = useState(false)
+  const [isWholeSale, setIsWholeSale] = useState<boolean>(
+    () => loadCurrentBillDraft()?.isWholeSale ?? false
+  )
+  const [wholeSaleCustomerName, setWholeSaleCustomerName] = useState<string>(
+    () => loadCurrentBillDraft()?.wholeSaleCustomerName ?? ''
+  )
+  const [wholeSaleCustomerBusinessName, setWholeSaleCustomerBusinessName] = useState<string>(
+    () => loadCurrentBillDraft()?.wholeSaleCustomerBusinessName ?? ''
+  )
+  const [isWholeSaleModalOpen, setIsWholeSaleModalOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [isPaying, setIsPaying] = useState(false)
   const [paymentMethod, setPaymentMethod] = useState<SalePaymentMethod>(
@@ -148,13 +185,30 @@ const SalesPage: React.FC = () => {
   useEffect(() => {
     let isActive = true
 
-    Promise.all([productsApi.list(), customersApi.list()])
-      .then(([loadedProducts, loadedCustomers]) => {
-        if (isActive) {
-          setProducts(loadedProducts)
-          setCustomers(loadedCustomers)
+    Promise.all([
+      productsApi.list(),
+      customersApi.list(),
+      brandsApi.list(),
+      categoriesApi.list(),
+      suppliersApi.list()
+    ])
+      .then(
+        ([
+          loadedProducts,
+          loadedCustomers,
+          loadedBrands,
+          loadedCategories,
+          loadedSuppliers
+        ]) => {
+          if (isActive) {
+            setProducts(loadedProducts)
+            setCustomers(loadedCustomers)
+            setBrands(loadedBrands)
+            setCategories(loadedCategories)
+            setSuppliers(loadedSuppliers)
+          }
         }
-      })
+      )
       .catch((error) => {
         if (isActive) {
           toast.error(getErrorMessage(error))
@@ -224,7 +278,10 @@ const SalesPage: React.FC = () => {
       activeHeldBillId,
       customerId: selectedCustomerId,
       customerName: creditCustomerName,
-      customerBusinessName: creditCustomerBusinessName
+      customerBusinessName: creditCustomerBusinessName,
+      isWholeSale,
+      wholeSaleCustomerName,
+      wholeSaleCustomerBusinessName
     })
   }, [
     cart,
@@ -236,6 +293,9 @@ const SalesPage: React.FC = () => {
     selectedCustomerId,
     creditCustomerName,
     creditCustomerBusinessName,
+    isWholeSale,
+    wholeSaleCustomerName,
+    wholeSaleCustomerBusinessName,
     completedSale
   ])
 
@@ -380,6 +440,32 @@ const SalesPage: React.FC = () => {
   }
 
   const handleConfirmQuantity = (selection: QuantitySelection): void => {
+    if (editingCartItem) {
+      const { quantity, discountAmount: newDiscount } = selection
+      const maxQty = Math.max(1, editingCartItem.stockQuantity)
+
+      if (quantity > maxQty) {
+        toast.error(`Only ${maxQty} item(s) available for "${editingCartItem.name}".`)
+        return
+      }
+
+      setCart((currentCart) =>
+        currentCart.map((item) =>
+          item.id === editingCartItem.id
+            ? {
+                ...item,
+                quantity,
+                discountAmount: clampDiscountAmount(newDiscount, item.price * quantity)
+              }
+            : item
+        )
+      )
+
+      setIsQtyModalOpen(false)
+      setEditingCartItem(null)
+      return
+    }
+
     if (!selectedProduct) return
 
     const { quantity } = selection
@@ -423,7 +509,8 @@ const SalesPage: React.FC = () => {
           brand: selectedProduct.brandName ?? 'No Brand',
           stockQuantity: selectedProduct.stockQuantity,
           quantity,
-          discountAmount
+          discountAmount,
+          unit: selectedProduct.unit
         }
       ]
     })
@@ -437,6 +524,13 @@ const SalesPage: React.FC = () => {
   const handleQuantityModalClose = (): void => {
     setIsQtyModalOpen(false)
     setSelectedProduct(null)
+    setEditingCartItem(null)
+  }
+
+  const handleEditCartItem = (item: CartItem): void => {
+    if (completedSale) return
+    setEditingCartItem(item)
+    setIsQtyModalOpen(true)
   }
 
   const handleCartQuantityChange = (id: number, quantity: number): void => {
@@ -473,6 +567,10 @@ const SalesPage: React.FC = () => {
     setSelectedCustomerId(null)
     setCreditCustomerName('')
     setCreditCustomerBusinessName('')
+    setIsWholeSale(false)
+    setWholeSaleCustomerName('')
+    setWholeSaleCustomerBusinessName('')
+    setIsWholeSaleModalOpen(false)
     setIsReceiptModalOpen(false)
     setActiveHeldBillId(null)
     setIsHeldBillMenuOpen(false)
@@ -504,6 +602,9 @@ const SalesPage: React.FC = () => {
       customerId: selectedCustomerId,
       customerName: creditCustomerName,
       customerBusinessName: creditCustomerBusinessName,
+      isWholeSale,
+      wholeSaleCustomerName,
+      wholeSaleCustomerBusinessName,
       createdAt: currentHeldBill?.createdAt ?? now,
       updatedAt: now
     }
@@ -531,9 +632,12 @@ const SalesPage: React.FC = () => {
     creditCustomerName,
     discountAmount,
     heldBills,
+    isWholeSale,
     paymentMethod,
     resetWorkingBill,
-    toast
+    toast,
+    wholeSaleCustomerBusinessName,
+    wholeSaleCustomerName
   ])
 
   useEffect(() => onPosShortcutEvent('pos:hold-invoice', handleHoldBill), [handleHoldBill])
@@ -555,6 +659,9 @@ const SalesPage: React.FC = () => {
       setSelectedCustomerId(heldBillToResume.customerId ?? null)
       setCreditCustomerName(heldBillToResume.customerName ?? '')
       setCreditCustomerBusinessName(heldBillToResume.customerBusinessName ?? '')
+      setIsWholeSale(heldBillToResume.isWholeSale ?? false)
+      setWholeSaleCustomerName(heldBillToResume.wholeSaleCustomerName ?? '')
+      setWholeSaleCustomerBusinessName(heldBillToResume.wholeSaleCustomerBusinessName ?? '')
       setCompletedSale(null)
       setIsReceiptModalOpen(false)
       setSearchQuery('')
@@ -632,6 +739,30 @@ const SalesPage: React.FC = () => {
     return created.id
   }
 
+  const resolveWholeSaleCustomer = async (): Promise<number | null> => {
+    const name = wholeSaleCustomerName.trim()
+    if (!name) return null
+
+    const businessName = wholeSaleCustomerBusinessName.trim()
+    const existing = customers.find((customer) => customer.name.toLowerCase() === name.toLowerCase())
+
+    if (existing) {
+      if (businessName && businessName.toLowerCase() !== existing.businessName.toLowerCase()) {
+        await customersApi.update(existing.id, { name, businessName })
+        setCustomers((prev) =>
+          prev.map((customer) => (customer.id === existing.id ? { ...customer, businessName } : customer))
+        )
+      }
+
+      return existing.id
+    }
+
+    const created = await customersApi.create({ name, businessName })
+    setCustomers((prev) => [...prev, created])
+
+    return created.id
+  }
+
   const processCurrentBill = async (): Promise<SaleRecord | null> => {
     if (completedSale) return completedSale
     if (cart.length === 0 || isPaying) return null
@@ -653,10 +784,19 @@ const SalesPage: React.FC = () => {
         }
 
         setSelectedCustomerId(customerId)
+      } else if (isWholeSale && wholeSaleCustomerName.trim()) {
+        customerId = await resolveWholeSaleCustomer()
+
+        if (customerId === null) {
+          return null
+        }
+
+        setSelectedCustomerId(customerId)
       }
 
       const savedSale = await salesApi.create({
         paymentMethod,
+        isWholeSale,
         discountAmount,
         customerId,
         items: cart.map((item) => ({
@@ -729,6 +869,11 @@ const SalesPage: React.FC = () => {
       return
     }
 
+    if (isWholeSale && !wholeSaleCustomerName.trim()) {
+      toast.error('A customer name is required for a Whole Sale bill.')
+      return
+    }
+
     setIsReceiptModalOpen(true)
   }
 
@@ -745,6 +890,169 @@ const SalesPage: React.FC = () => {
       variant: 'danger',
       onConfirm: resetWorkingBill
     })
+  }
+
+  const handleWholeSaleConfirm = (input: WholeSaleCustomerInput): void => {
+    setIsWholeSale(true)
+    setWholeSaleCustomerName(input.name)
+    setWholeSaleCustomerBusinessName(input.businessName)
+    setIsWholeSaleModalOpen(false)
+    toast.success('Customer saved for whole sale bill.')
+  }
+
+  const handleWholeSaleClear = (): void => {
+    setIsWholeSale(false)
+    setWholeSaleCustomerName('')
+    setWholeSaleCustomerBusinessName('')
+    setIsWholeSaleModalOpen(false)
+    toast.info('Whole sale removed from this bill.')
+  }
+
+  const handleAddProductClick = (): void => {
+    setIsProductModalOpen(true)
+  }
+
+  const handleProductModalClose = (): void => {
+    if (isProductSaving) return
+    setIsProductModalOpen(false)
+  }
+
+  const handleProductSave = async (data: ProductFormData): Promise<void> => {
+    setIsProductSaving(true)
+
+    try {
+      const createdProduct = await productsApi.create({
+        name: data.name,
+        brandId: data.brandId,
+        categoryId: data.categoryId,
+        supplierId: data.supplierId,
+        unit: data.unit,
+        buyingPrice: data.buyingPrice,
+        sellingPrice: data.sellingPrice,
+        stockQuantity: data.stockQuantity,
+        discountPercent: data.discountPercent
+      })
+
+      setProducts((prev) => [createdProduct, ...prev])
+
+      setIsProductModalOpen(false)
+
+      toast.success(`"${data.name}" was added successfully.`)
+    } catch (error) {
+      toast.error(getErrorMessage(error))
+    } finally {
+      setIsProductSaving(false)
+    }
+  }
+
+  const handleProductsImported = (createdProducts: ProductRecord[]): void => {
+    setProducts((prev) => [...createdProducts, ...prev])
+
+    Promise.all([brandsApi.list(), categoriesApi.list(), suppliersApi.list()])
+      .then(([loadedBrands, loadedCategories, loadedSuppliers]) => {
+        setBrands(loadedBrands)
+        setCategories(loadedCategories)
+        setSuppliers(loadedSuppliers)
+      })
+      .catch((error) => {
+        toast.error(getErrorMessage(error))
+      })
+  }
+
+  const handleCreateBrand = async (name: string): Promise<BrandRecord> => {
+    try {
+      const createdBrand = await brandsApi.create({ name })
+
+      setBrands((prev) => [createdBrand, ...prev.filter((brand) => brand.id !== createdBrand.id)])
+
+      toast.success(`Brand "${createdBrand.name}" was added successfully.`)
+
+      return createdBrand
+    } catch (error) {
+      const refreshedBrands = await brandsApi.list().catch(() => null)
+
+      const existingBrand = refreshedBrands?.find(
+        (brand) => brand.name.trim().toLowerCase() === name.trim().toLowerCase()
+      )
+
+      if (existingBrand && refreshedBrands) {
+        setBrands(refreshedBrands)
+
+        toast.info(`Brand "${existingBrand.name}" already exists.`)
+
+        return existingBrand
+      }
+
+      toast.error(getErrorMessage(error))
+
+      throw error
+    }
+  }
+
+  const handleCreateCategory = async (name: string): Promise<CategoryRecord> => {
+    try {
+      const createdCategory = await categoriesApi.create({ name })
+
+      setCategories((prev) => [
+        createdCategory,
+        ...prev.filter((category) => category.id !== createdCategory.id)
+      ])
+
+      toast.success(`Category "${createdCategory.name}" was added successfully.`)
+
+      return createdCategory
+    } catch (error) {
+      const refreshedCategories = await categoriesApi.list().catch(() => null)
+
+      const existingCategory = refreshedCategories?.find(
+        (category) => category.name.trim().toLowerCase() === name.trim().toLowerCase()
+      )
+
+      if (existingCategory && refreshedCategories) {
+        setCategories(refreshedCategories)
+
+        toast.info(`Category "${existingCategory.name}" already exists.`)
+
+        return existingCategory
+      }
+
+      toast.error(getErrorMessage(error))
+
+      throw error
+    }
+  }
+
+  const handleCreateSupplier = async (name: string): Promise<SupplierRecord> => {
+    try {
+      const createdSupplier = await suppliersApi.create({ name })
+
+      setSuppliers((prev) => [
+        createdSupplier,
+        ...prev.filter((supplier) => supplier.id !== createdSupplier.id)
+      ])
+
+      toast.success(`Supplier "${createdSupplier.name}" was added successfully.`)
+
+      return createdSupplier
+    } catch (error) {
+      const refreshedSuppliers = await suppliersApi.list().catch(() => null)
+
+      const existingSupplier = refreshedSuppliers?.find(
+        (supplier) => supplier.name.trim().toLowerCase() === name.trim().toLowerCase()
+      )
+
+      if (existingSupplier && refreshedSuppliers) {
+        setSuppliers(refreshedSuppliers)
+
+        toast.info(`Supplier "${existingSupplier.name}" already exists.`)
+
+        return existingSupplier
+      }
+
+      toast.error(getErrorMessage(error))
+
+      throw error
+    }
   }
 
   const selectedAvailableQuantity = selectedProduct
@@ -799,9 +1107,21 @@ const SalesPage: React.FC = () => {
                 <h2 className="text-sm font-bold text-slate-800">Product Lookup</h2>
                 <p className="mt-0.5 text-xs text-slate-500">Search by code, barcode, name, brand or selling price</p>
               </div>
-              <span className="rounded-md bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700">
-                {hasActiveFilter ? `${matchingProducts.length} Found` : `${sellableProducts.length} In Stock`}
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="rounded-md bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700">
+                  {hasActiveFilter ? `${matchingProducts.length} Found` : `${sellableProducts.length} In Stock`}
+                </span>
+                <button
+                  type="button"
+                  className="flex items-center gap-1.5 rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400"
+                  onClick={handleAddProductClick}
+                  disabled={Boolean(completedSale)}
+                  title="Add a new product to inventory"
+                >
+                  <PackagePlus size={14} />
+                  Add Product
+                </button>
+              </div>
             </div>
 
             <div className="flex flex-col gap-2.5 md:flex-row">
@@ -940,11 +1260,60 @@ const SalesPage: React.FC = () => {
                 {cartItemCount} Items
               </span>
             </div>
+
+            <div className="mt-3 flex items-center gap-1 rounded-lg bg-slate-100 p-0.5">
+              <button
+                type="button"
+                className={`flex flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-bold transition-colors ${
+                  !isWholeSale ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+                }`}
+                onClick={() => {
+                  if (completedSale) return
+                  setIsWholeSale(false)
+                }}
+              >
+                Retail Bill
+              </button>
+              <button
+                type="button"
+                className={`flex flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-bold transition-colors ${
+                  isWholeSale ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-700'
+                }`}
+                onClick={() => {
+                  if (completedSale) return
+                  setIsWholeSaleModalOpen(true)
+                }}
+              >
+                <PackageOpen size={14} />
+                Whole Bill
+              </button>
+            </div>
+
+            {isWholeSale && (
+              <div className="mt-2 flex items-center gap-2 rounded-md border border-emerald-200 bg-emerald-50 px-2.5 py-1.5">
+                <PackageOpen size={13} className="shrink-0 text-emerald-700" />
+                <span className="min-w-0 truncate text-xs font-bold text-emerald-800">
+                  {wholeSaleCustomerName || 'Whole sale customer'}
+                </span>
+                {wholeSaleCustomerBusinessName && (
+                  <span className="min-w-0 truncate text-[0.68rem] text-emerald-600">
+                    {wholeSaleCustomerBusinessName}
+                  </span>
+                )}
+                <button
+                  type="button"
+                  className="ml-auto shrink-0 rounded-md px-1.5 py-0.5 text-[0.68rem] font-bold text-emerald-600 transition-colors hover:bg-emerald-100"
+                  onClick={() => setIsWholeSaleModalOpen(true)}
+                >
+                  Edit
+                </button>
+              </div>
+            )}
           </div>
 
           <div className="shrink-0 border-b border-slate-100 p-3">
-            <div className="grid grid-cols-2 gap-2">
-              <div ref={heldBillMenuRef} className="relative flex min-w-0">
+            <div className="flex items-stretch gap-2">
+              <div ref={heldBillMenuRef} className="relative flex min-w-0 flex-1">
                 <button
                   type="button"
                   className="flex min-w-0 flex-1 items-center justify-center gap-2 rounded-l-lg border border-emerald-200 bg-emerald-50 px-3 py-2.5 text-xs font-bold text-emerald-700 transition-colors hover:bg-emerald-100 disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-50 disabled:text-slate-400"
@@ -1015,6 +1384,20 @@ const SalesPage: React.FC = () => {
 
               <button
                 type="button"
+                onClick={() => setIsWholeSaleModalOpen(true)}
+                title="Mark this bill as a whole sale with customer name and business name"
+                className={`flex items-center justify-center gap-2 rounded-lg border px-3 py-2.5 text-xs font-bold transition-colors ${
+                  isWholeSale
+                    ? 'border-emerald-500 bg-emerald-600 text-white hover:bg-emerald-700'
+                    : 'border-slate-200 bg-white text-slate-700 hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700'
+                }`}
+              >
+                <PackageOpen size={15} />
+                <span className="truncate">Whole Sale</span>
+              </button>
+
+              <button
+                type="button"
                 className="flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs font-bold text-slate-700 transition-colors hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700"
                 onClick={handleNewBill}
               >
@@ -1034,55 +1417,72 @@ const SalesPage: React.FC = () => {
                 <p className="mt-1 max-w-64 text-xs leading-5 text-slate-500">Search a hardware item from the product panel and add it to this bill.</p>
               </div>
             ) : (
-              <div className="flex flex-col gap-2.5">
+              <div className="flex flex-col gap-1.5">
                 {cart.map((item) => {
-                  const lineGrossTotal = getCartItemGrossTotal(item)
                   const lineDiscountAmount = getCartItemDiscountAmount(item)
                   const lineTotal = getCartItemLineTotal(item)
 
                   return (
-                    <div key={item.id} className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="min-w-0">
-                          <span className="block truncate text-sm font-bold text-slate-800">{item.name}</span>
-                          <div className="mt-1 flex flex-wrap items-center gap-1.5">
-                            <span className="rounded-md bg-emerald-50 px-2 py-0.5 font-mono text-[0.66rem] font-bold text-emerald-700">{item.sku}</span>
-                            <span className="max-w-28 truncate text-[0.7rem] font-medium text-slate-400">{item.brand}</span>
+                    <div
+                      key={item.id}
+                      className="cursor-pointer rounded-lg border border-slate-200 bg-white px-3 py-2 shadow-sm transition-colors hover:border-emerald-300 hover:bg-emerald-50/30"
+                      onClick={() => handleEditCartItem(item)}
+                    >
+                      <div className="flex items-center gap-2">
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className="truncate text-[0.82rem] font-bold text-slate-800">{item.name}</span>
+                            <span className="shrink-0 rounded bg-emerald-50 px-1.5 py-0.5 font-mono text-[0.6rem] font-bold text-emerald-700">{item.sku}</span>
+                          </div>
+                          <div className="mt-0.5 flex items-center gap-2 text-[0.68rem] text-slate-400">
+                            <span>{item.brand}</span>
+                            {item.unit && <span className="rounded bg-slate-100 px-1 py-0.5 font-semibold text-slate-500">{item.unit}</span>}
                           </div>
                         </div>
 
-                        <button
-                          type="button"
-                          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:text-slate-300"
-                          onClick={() => handleRemoveItem(item.id)}
-                          disabled={Boolean(completedSale)}
-                          aria-label={`Remove ${item.name}`}
-                        >
-                          <Trash2 size={15} />
-                        </button>
+                        <div className="flex shrink-0 items-center gap-1">
+                          <button
+                            type="button"
+                            className="flex h-6 w-6 items-center justify-center rounded text-slate-400 transition-colors hover:bg-blue-50 hover:text-blue-600 disabled:cursor-not-allowed disabled:text-slate-300"
+                            onClick={(e) => { e.stopPropagation(); handleEditCartItem(item) }}
+                            disabled={Boolean(completedSale)}
+                            aria-label={`Edit ${item.name}`}
+                          >
+                            <Pencil size={12} />
+                          </button>
+                          <button
+                            type="button"
+                            className="flex h-6 w-6 items-center justify-center rounded text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:text-slate-300"
+                            onClick={(e) => { e.stopPropagation(); handleRemoveItem(item.id) }}
+                            disabled={Boolean(completedSale)}
+                            aria-label={`Remove ${item.name}`}
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        </div>
                       </div>
 
-                      <div className="mt-3 flex items-end justify-between gap-3">
-                        <div>
-                          <p className="mb-1 text-[0.65rem] font-bold uppercase tracking-wide text-slate-400">Quantity</p>
-                          <div className="flex items-center overflow-hidden rounded-lg border border-slate-200 bg-white">
+                      <div className="mt-1.5 flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-1.5">
+                          <div className="flex items-center overflow-hidden rounded-md border border-slate-200 bg-white">
                             <button
                               type="button"
-                              className="flex h-9 w-9 items-center justify-center text-slate-500 transition-colors hover:bg-emerald-50 hover:text-emerald-700 disabled:cursor-not-allowed disabled:text-slate-300"
-                              onClick={() => handleCartQuantityChange(item.id, item.quantity - 1)}
+                              className="flex h-7 w-7 items-center justify-center text-slate-500 transition-colors hover:bg-emerald-50 hover:text-emerald-700 disabled:cursor-not-allowed disabled:text-slate-300"
+                              onClick={(e) => { e.stopPropagation(); handleCartQuantityChange(item.id, item.quantity - 1) }}
                               disabled={Boolean(completedSale)}
                               aria-label={`Decrease ${item.name}`}
                             >
-                              <Minus size={14} />
+                              <Minus size={12} />
                             </button>
                             <input
                               type="number"
                               min={0.001}
                               step="any"
                               max={item.stockQuantity}
-                              className="h-9 w-16 border-x border-slate-200 bg-white text-center text-sm font-bold text-slate-800 outline-none disabled:bg-slate-50 disabled:text-slate-400"
+                              className="h-7 w-12 border-x border-slate-200 bg-white text-center text-xs font-bold text-slate-800 outline-none disabled:bg-slate-50 disabled:text-slate-400"
                               value={item.quantity}
                               disabled={Boolean(completedSale)}
+                              onClick={(e) => e.stopPropagation()}
                               onChange={(event) =>
                                 handleCartQuantityChange(
                                   item.id,
@@ -1092,30 +1492,24 @@ const SalesPage: React.FC = () => {
                             />
                             <button
                               type="button"
-                              className="flex h-9 w-9 items-center justify-center text-slate-500 transition-colors hover:bg-emerald-50 hover:text-emerald-700 disabled:cursor-not-allowed disabled:text-slate-300"
-                              onClick={() => handleCartQuantityChange(item.id, item.quantity + 1)}
+                              className="flex h-7 w-7 items-center justify-center text-slate-500 transition-colors hover:bg-emerald-50 hover:text-emerald-700 disabled:cursor-not-allowed disabled:text-slate-300"
+                              onClick={(e) => { e.stopPropagation(); handleCartQuantityChange(item.id, item.quantity + 1) }}
                               disabled={Boolean(completedSale)}
                               aria-label={`Increase ${item.name}`}
                             >
-                              <Plus size={14} />
+                              <Plus size={12} />
                             </button>
                           </div>
+                          <span className="text-[0.68rem] text-slate-400">x {formatLkr(item.price)}</span>
                         </div>
 
                         <div className="text-right">
-                          <p className="text-[0.68rem] font-medium text-slate-400">Unit {formatLkr(item.price)}</p>
-                          <p className="mt-0.5 text-sm font-bold text-slate-800">{formatLkr(lineTotal)}</p>
+                          {lineDiscountAmount > 0 && (
+                            <span className="mr-1.5 text-[0.65rem] font-semibold text-emerald-600">-{formatLkr(lineDiscountAmount)}</span>
+                          )}
+                          <span className="text-[0.75rem] font-bold text-slate-800">{formatLkr(lineTotal)}</span>
                         </div>
                       </div>
-
-                      {lineDiscountAmount > 0 && (
-                        <div className="mt-2.5 flex items-center justify-between rounded-md border border-emerald-100 bg-emerald-50 px-2.5 py-1.5 text-[0.7rem]">
-                          <span className="font-semibold text-emerald-700">Discount applied</span>
-                          <span className="font-bold text-emerald-700">-{formatLkr(lineDiscountAmount)}</span>
-                        </div>
-                      )}
-
-                      <div className="mt-2 text-right text-[0.66rem] text-slate-400">Gross {formatLkr(lineGrossTotal)}</div>
                     </div>
                   )
                 })}
@@ -1262,11 +1656,16 @@ const SalesPage: React.FC = () => {
 
       <QuantityModal
         isOpen={isQtyModalOpen}
-        productName={selectedProduct?.name || ''}
-        unitPrice={selectedProduct?.sellingPrice ?? 0}
-        initialQuantity={1}
-        maxQuantity={selectedAvailableQuantity}
-        unit={selectedProduct?.unit}
+        productName={editingCartItem?.name || selectedProduct?.name || ''}
+          unitPrice={editingCartItem?.price ?? selectedProduct?.sellingPrice ?? 0}
+        initialQuantity={editingCartItem?.quantity || 1}
+        maxQuantity={
+          editingCartItem
+            ? Math.max(1, editingCartItem.stockQuantity)
+            : selectedAvailableQuantity
+        }
+        unit={editingCartItem?.unit || selectedProduct?.unit}
+        initialDiscountAmount={editingCartItem?.discountAmount}
         onClose={handleQuantityModalClose}
         onConfirm={handleConfirmQuantity}
       />
@@ -1287,17 +1686,47 @@ const SalesPage: React.FC = () => {
         cashierName={cashierName}
         customerName={
           completedSale?.customerName ??
-          (paymentMethod === 'CREDIT' ? creditCustomerName.trim() || undefined : undefined)
+          (paymentMethod === 'CREDIT'
+            ? creditCustomerName.trim() || undefined
+            : isWholeSale
+              ? wholeSaleCustomerName.trim() || undefined
+              : undefined)
         }
         customerBusinessName={
           completedSale?.customerBusinessName ??
           (paymentMethod === 'CREDIT'
             ? creditCustomerBusinessName.trim() || undefined
-            : undefined)
+            : isWholeSale
+              ? wholeSaleCustomerBusinessName.trim() || undefined
+              : undefined)
         }
         onProcessToBill={processCurrentBill}
         onClose={() => setIsReceiptModalOpen(false)}
         onNewSale={resetWorkingBill}
+      />
+
+      <WholeSaleModal
+        isOpen={isWholeSaleModalOpen}
+        initialName={wholeSaleCustomerName}
+        initialBusinessName={wholeSaleCustomerBusinessName}
+        onClose={() => setIsWholeSaleModalOpen(false)}
+        onConfirm={handleWholeSaleConfirm}
+        onClear={isWholeSale ? handleWholeSaleClear : undefined}
+      />
+
+      <ProductModal
+        isOpen={isProductModalOpen}
+        brands={brands}
+        categories={categories}
+        suppliers={suppliers}
+        existingProductNames={products.map((product) => product.name)}
+        isSaving={isProductSaving}
+        onClose={handleProductModalClose}
+        onSave={handleProductSave}
+        onImported={handleProductsImported}
+        onCreateBrand={handleCreateBrand}
+        onCreateCategory={handleCreateCategory}
+        onCreateSupplier={handleCreateSupplier}
       />
     </div>
   )
@@ -1368,7 +1797,10 @@ function loadHeldBills(): HeldBill[] {
       cashReceivedAmount: bill.cashReceivedAmount ?? 0,
       customerId: bill.customerId ?? null,
       customerName: bill.customerName ?? '',
-      customerBusinessName: bill.customerBusinessName ?? ''
+      customerBusinessName: bill.customerBusinessName ?? '',
+      isWholeSale: bill.isWholeSale ?? false,
+      wholeSaleCustomerName: bill.wholeSaleCustomerName ?? '',
+      wholeSaleCustomerBusinessName: bill.wholeSaleCustomerBusinessName ?? ''
     }))
   } catch {
     return []
@@ -1398,7 +1830,10 @@ function loadCurrentBillDraft(): CurrentBillDraft | null {
           cashReceivedAmount: parsedValue.cashReceivedAmount ?? 0,
           customerId: parsedValue.customerId ?? null,
           customerName: parsedValue.customerName ?? '',
-          customerBusinessName: parsedValue.customerBusinessName ?? ''
+          customerBusinessName: parsedValue.customerBusinessName ?? '',
+          isWholeSale: parsedValue.isWholeSale ?? false,
+          wholeSaleCustomerName: parsedValue.wholeSaleCustomerName ?? '',
+          wholeSaleCustomerBusinessName: parsedValue.wholeSaleCustomerBusinessName ?? ''
         }
       : null
   } catch {
@@ -1412,7 +1847,8 @@ function saveCurrentBillDraft(draft: CurrentBillDraft): void {
       draft.items.length === 0 &&
       !draft.activeHeldBillId &&
       draft.discountAmount === 0 &&
-      draft.cashReceivedAmount === 0
+      draft.cashReceivedAmount === 0 &&
+      !draft.isWholeSale
     ) {
       localStorage.removeItem(CURRENT_BILL_STORAGE_KEY)
       return
@@ -1447,6 +1883,11 @@ function isCurrentBillDraft(value: unknown): value is CurrentBillDraft {
     (draft.customerName === undefined || typeof draft.customerName === 'string') &&
     (draft.customerBusinessName === undefined ||
       typeof draft.customerBusinessName === 'string') &&
+    (draft.isWholeSale === undefined || typeof draft.isWholeSale === 'boolean') &&
+    (draft.wholeSaleCustomerName === undefined ||
+      typeof draft.wholeSaleCustomerName === 'string') &&
+    (draft.wholeSaleCustomerBusinessName === undefined ||
+      typeof draft.wholeSaleCustomerBusinessName === 'string') &&
     (draft.activeHeldBillId === null || typeof draft.activeHeldBillId === 'string')
   )
 }
@@ -1454,7 +1895,7 @@ function isCurrentBillDraft(value: unknown): value is CurrentBillDraft {
 function isHeldBill(value: unknown): value is HeldBill {
   const bill = value as Partial<HeldBill>
 
-  return (
+return (
     typeof bill.id === 'string' &&
     typeof bill.name === 'string' &&
     Array.isArray(bill.items) &&
@@ -1466,7 +1907,13 @@ function isHeldBill(value: unknown): value is HeldBill {
       bill.customerId === null ||
       typeof bill.customerId === 'number') &&
     (bill.customerName === undefined || typeof bill.customerName === 'string') &&
-    (bill.customerBusinessName === undefined || typeof bill.customerBusinessName === 'string') &&
+    (bill.customerBusinessName === undefined ||
+      typeof bill.customerBusinessName === 'string') &&
+    (bill.isWholeSale === undefined || typeof bill.isWholeSale === 'boolean') &&
+    (bill.wholeSaleCustomerName === undefined ||
+      typeof bill.wholeSaleCustomerName === 'string') &&
+    (bill.wholeSaleCustomerBusinessName === undefined ||
+      typeof bill.wholeSaleCustomerBusinessName === 'string') &&
     typeof bill.createdAt === 'string' &&
     typeof bill.updatedAt === 'string'
   )
@@ -1483,7 +1930,8 @@ function isCartItem(value: unknown): value is CartItem {
     typeof item.brand === 'string' &&
     typeof item.stockQuantity === 'number' &&
     typeof item.quantity === 'number' &&
-    (item.discountAmount === undefined || typeof item.discountAmount === 'number')
+    (item.discountAmount === undefined || typeof item.discountAmount === 'number') &&
+    (item.unit === undefined || typeof item.unit === 'string')
   )
 }
 
