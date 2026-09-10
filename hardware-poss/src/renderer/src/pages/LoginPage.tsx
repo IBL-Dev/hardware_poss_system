@@ -2,15 +2,12 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   AlertCircle,
-  Boxes,
   Eye,
   EyeOff,
-  Hammer,
   HardHat,
   Loader2,
   Lock,
   LogIn,
-  PackageCheck,
   ShieldCheck,
   User,
   Wrench
