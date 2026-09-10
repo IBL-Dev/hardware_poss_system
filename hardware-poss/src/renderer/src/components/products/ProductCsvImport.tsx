@@ -30,7 +30,7 @@ interface ProductImportDraft {
   sellingPrice: number
   stockQuantity: number
   reorderLevel: number
-  discountPercent: number
+  discountAmount: number
 }
 
 interface ParsedRow {
@@ -67,9 +67,10 @@ const HEADER_ALIASES: Record<string, keyof RawRow> = {
   'selling price': 'sellingPrice',
   sellingprice: 'sellingPrice',
   price: 'sellingPrice',
-  'discount %': 'discountPercent',
-  discount: 'discountPercent',
-  'discount percent': 'discountPercent',
+  'discount %': 'discountAmount',
+  discount: 'discountAmount',
+  'discount amount': 'discountAmount',
+  'discount percent': 'discountAmount',
   'stock quantity': 'stockQuantity',
   stockquantity: 'stockQuantity',
   stock: 'stockQuantity',
@@ -89,7 +90,7 @@ interface RawRow {
   unit: string
   buyingPrice: string
   sellingPrice: string
-  discountPercent: string
+  discountAmount: string
   stockQuantity: string
   reorderLevel: string
 }
@@ -330,7 +331,7 @@ function buildRows(csvText: string, existingProductNames: string[]): ParsedRow[]
       unit: getCell(cells, columnIndexes.unit),
       buyingPrice: getCell(cells, columnIndexes.buyingPrice),
       sellingPrice: getCell(cells, columnIndexes.sellingPrice),
-      discountPercent: getCell(cells, columnIndexes.discountPercent),
+      discountAmount: getCell(cells, columnIndexes.discountAmount),
       stockQuantity: getCell(cells, columnIndexes.stockQuantity),
       reorderLevel: getCell(cells, columnIndexes.reorderLevel)
     }
@@ -399,9 +400,11 @@ function validateRow(
     return { draft: null, error: 'Invalid stock quantity.' }
   }
 
-  const discountPercent = raw.discountPercent.trim() ? parsePercentage(raw.discountPercent) : 0
-  if (discountPercent === null) {
-    return { draft: null, error: 'Invalid discount percentage.' }
+  const discountAmount = raw.discountAmount.trim()
+    ? parseNonNegativeNumber(raw.discountAmount)
+    : 0
+  if (discountAmount === null) {
+    return { draft: null, error: 'Invalid discount amount.' }
   }
 
   const reorderLevel = raw.reorderLevel.trim() ? parseNonNegativeInteger(raw.reorderLevel) : 0
@@ -421,7 +424,7 @@ function validateRow(
       sellingPrice,
       stockQuantity,
       reorderLevel,
-      discountPercent
+      discountAmount
     },
     error: null
   }
@@ -501,7 +504,7 @@ function toCreateProductInput(
     sellingPrice: draft.sellingPrice,
     stockQuantity: draft.stockQuantity,
     reorderLevel: draft.reorderLevel,
-    discountPercent: draft.discountPercent
+    discountAmount: draft.discountAmount
   }
 }
 
@@ -540,11 +543,6 @@ function parseNonNegativeInteger(value: string): number | null {
   if (value.trim().length === 0) return null
   const parsed = Number(value)
   return Number.isInteger(parsed) && parsed >= 0 ? parsed : null
-}
-
-function parsePercentage(value: string): number | null {
-  const parsed = Number(value)
-  return Number.isFinite(parsed) && parsed >= 0 && parsed <= 100 ? parsed : null
 }
 
 function parseCsv(text: string): string[][] {

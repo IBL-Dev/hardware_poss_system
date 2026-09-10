@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import {
+  CreditCard,
   FileBarChart,
   History,
   LayoutDashboard,
@@ -201,6 +202,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { path: '/sales', label: 'Sales POS', icon: ShoppingCart },
     { path: '/sales-history', label: 'History', icon: History },
+    { path: '/credit', label: 'Credit', icon: CreditCard },
     { path: '/users', label: 'Users', icon: Users },
     { path: '/products', label: 'Products', icon: Package },
     { path: '/brands', label: 'Brands', icon: Tag },

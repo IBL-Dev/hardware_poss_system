@@ -1,6 +1,7 @@
 import React from 'react'
 import { X } from 'lucide-react'
 import type { ProductRecord } from '../../../../shared/products'
+import { isWeightUnit } from '../../../../shared/products'
 import { formatLkrAmount } from '../../utils/currency'
 
 interface ProductDetailsModalProps {
@@ -32,7 +33,16 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({ produc
           <DetailRow label="Unit" value={formatStatus(product.unit)} />
           <DetailRow label="Buying Price (LKR)" value={formatLkrAmount(product.buyingPrice)} />
           <DetailRow label="Selling Price (LKR)" value={formatLkrAmount(product.sellingPrice)} />
-          <DetailRow label="Discount" value={`${product.discountPercent}%`} />
+          <DetailRow
+            label="Discount"
+            value={
+              product.discountAmount > 0
+                ? `${formatLkrAmount(product.discountAmount)} ${
+                    isWeightUnit(product.unit) ? 'per kg' : 'per item'
+                  }`
+                : '-'
+            }
+          />
           <DetailRow label="Stock" value={product.stockQuantity.toString()} />
           <DetailRow label="Reorder Level" value={product.reorderLevel.toString()} />
           <DetailRow label="Created" value={formatDate(product.createdAt)} />

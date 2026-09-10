@@ -898,7 +898,7 @@ const SalesPage: React.FC = () => {
         buyingPrice: data.buyingPrice,
         sellingPrice: data.sellingPrice,
         stockQuantity: data.stockQuantity,
-        discountPercent: data.discountPercent
+        discountAmount: data.discountAmount
       })
 
       setProducts((prev) => [createdProduct, ...prev])

@@ -22,7 +22,7 @@ interface NormalizedProductInput {
   sellingPrice: number
   stockQuantity: number
   reorderLevel: number
-  discountPercent: number
+  discountAmount: number
 }
 
 export class ProductService {
@@ -107,10 +107,10 @@ export class ProductService {
         input.reorderLevel === undefined
           ? 0
           : this.normalizeQuantity(input.reorderLevel, 'Reorder level'),
-      discountPercent:
-        input.discountPercent === undefined
+      discountAmount:
+        input.discountAmount === undefined
           ? 0
-          : this.normalizeDiscountPercent(input.discountPercent)
+          : this.normalizeMoney(input.discountAmount, 'Discount')
     }
   }
 
@@ -157,10 +157,10 @@ export class ProductService {
         input.reorderLevel === undefined
           ? existingProduct.reorderLevel
           : this.normalizeQuantity(input.reorderLevel, 'Reorder level'),
-      discountPercent:
-        input.discountPercent === undefined
-          ? existingProduct.discountPercent
-          : this.normalizeDiscountPercent(input.discountPercent)
+      discountAmount:
+        input.discountAmount === undefined
+          ? existingProduct.discountAmount
+          : this.normalizeMoney(input.discountAmount, 'Discount')
     }
   }
 
@@ -293,16 +293,6 @@ export class ProductService {
     }
 
     return normalizedValue
-  }
-
-  private normalizeDiscountPercent(value: number | undefined): number {
-    const normalizedValue = Number(value)
-
-    if (!Number.isFinite(normalizedValue) || normalizedValue < 0 || normalizedValue > 100) {
-      throw new Error('Discount must be between 0 and 100.')
-    }
-
-    return Math.round(normalizedValue * 100) / 100
   }
 
   private assertValidId(id: number, fieldName: string): void {

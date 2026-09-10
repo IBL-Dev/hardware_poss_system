@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { X } from 'lucide-react'
+import { Plus, X } from 'lucide-react'
 import { BrandSelect } from './BrandSelect'
 import { ProductCsvImport } from './ProductCsvImport'
 import { Spinner } from '../common/Spinner'
@@ -9,6 +9,7 @@ import type { BrandRecord } from '../../../../shared/brands'
 import type { CategoryRecord } from '../../../../shared/categories'
 import type { SupplierRecord } from '../../../../shared/suppliers'
 import type { ProductRecord, ProductUnit } from '../../../../shared/products'
+import { isWeightUnit } from '../../../../shared/products'
 
 export interface ProductFormData {
   name: string
@@ -19,7 +20,7 @@ export interface ProductFormData {
   buyingPrice: number
   sellingPrice: number
   stockQuantity: number
-  discountPercent: number
+  discountAmount: number
 }
 
 interface ProductFormState {
@@ -31,7 +32,7 @@ interface ProductFormState {
   buyingPrice: string
   sellingPrice: string
   stockQuantity: string
-  discountPercent: string
+  discountAmount: string
 }
 
 interface ProductModalProps {
@@ -59,7 +60,7 @@ const emptyForm: ProductFormState = {
   buyingPrice: '',
   sellingPrice: '',
   stockQuantity: '',
-  discountPercent: ''
+  discountAmount: ''
 }
 
 function toFormState(data: ProductFormData): ProductFormState {
@@ -68,7 +69,7 @@ function toFormState(data: ProductFormData): ProductFormState {
     buyingPrice: data.buyingPrice.toString(),
     sellingPrice: data.sellingPrice.toString(),
     stockQuantity: data.stockQuantity.toString(),
-    discountPercent: data.discountPercent.toString()
+    discountAmount: data.discountAmount.toString()
   }
 }
 
@@ -78,14 +79,6 @@ function parseNonNegativeNumber(value: string): number | null {
   const parsedValue = Number(value)
 
   return Number.isFinite(parsedValue) && parsedValue >= 0 ? parsedValue : null
-}
-
-function parseOptionalPercentage(value: string): number | null {
-  if (value.trim().length === 0) return 0
-
-  const parsedValue = Number(value)
-
-  return Number.isFinite(parsedValue) && parsedValue >= 0 && parsedValue <= 100 ? parsedValue : null
 }
 
 export const ProductModal: React.FC<ProductModalProps> = ({
@@ -143,11 +136,12 @@ const ProductModalContent: React.FC<Omit<ProductModalProps, 'isOpen'>> = ({
   const [form, setForm] = useState<ProductFormState>(
     initialData ? toFormState(initialData) : emptyForm
   )
+  const [quickCreate, setQuickCreate] = useState<'brand' | 'category' | null>(null)
 
   const buyingPrice = parseNonNegativeNumber(form.buyingPrice)
   const sellingPrice = parseNonNegativeNumber(form.sellingPrice)
   const stockQuantity = parseNonNegativeNumber(form.stockQuantity)
-  const discountPercent = parseOptionalPercentage(form.discountPercent)
+  const discountAmount = parseNonNegativeNumber(form.discountAmount)
 
   const isValid =
     form.name.trim().length > 0 &&
@@ -156,7 +150,7 @@ const ProductModalContent: React.FC<Omit<ProductModalProps, 'isOpen'>> = ({
     buyingPrice !== null &&
     sellingPrice !== null &&
     stockQuantity !== null &&
-    discountPercent !== null
+    discountAmount !== null
 
   const handleSave = (): void => {
     if (
@@ -164,7 +158,7 @@ const ProductModalContent: React.FC<Omit<ProductModalProps, 'isOpen'>> = ({
       buyingPrice === null ||
       sellingPrice === null ||
       stockQuantity === null ||
-      discountPercent === null
+      discountAmount === null
     ) {
       return
     }
@@ -178,7 +172,7 @@ const ProductModalContent: React.FC<Omit<ProductModalProps, 'isOpen'>> = ({
       buyingPrice,
       sellingPrice,
       stockQuantity,
-      discountPercent
+      discountAmount
     })
   }
 
@@ -249,7 +243,19 @@ const ProductModalContent: React.FC<Omit<ProductModalProps, 'isOpen'>> = ({
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-[0.85rem] font-medium text-muted">Brand</label>
+                <div className="flex items-center justify-between gap-2">
+                  <label className="text-[0.85rem] font-medium text-muted">Brand</label>
+                  {onCreateBrand && (
+                    <button
+                      type="button"
+                      className="flex items-center gap-0.5 rounded-md px-1.5 py-0.5 text-[0.72rem] font-semibold text-primary transition-colors hover:bg-hover"
+                      onClick={() => setQuickCreate('brand')}
+                    >
+                      <Plus size={12} />
+                      Add Brand
+                    </button>
+                  )}
+                </div>
                 <BrandSelect
                   brands={brands}
                   value={form.brandId}
@@ -269,7 +275,19 @@ const ProductModalContent: React.FC<Omit<ProductModalProps, 'isOpen'>> = ({
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-[0.85rem] font-medium text-muted">Category</label>
+                <div className="flex items-center justify-between gap-2">
+                  <label className="text-[0.85rem] font-medium text-muted">Category</label>
+                  {onCreateCategory && (
+                    <button
+                      type="button"
+                      className="flex items-center gap-0.5 rounded-md px-1.5 py-0.5 text-[0.72rem] font-semibold text-primary transition-colors hover:bg-hover"
+                      onClick={() => setQuickCreate('category')}
+                    >
+                      <Plus size={12} />
+                      Add Category
+                    </button>
+                  )}
+                </div>
                 <CategorySelect
                   categories={categories}
                   value={form.categoryId}
@@ -289,6 +307,7 @@ const ProductModalContent: React.FC<Omit<ProductModalProps, 'isOpen'>> = ({
                 >
                   <option value="PCS">Pieces</option>
                   <option value="KG">Kilogram</option>
+                  <option value="G">Gram</option>
                   <option value="L">Liter</option>
                   <option value="M">Meter</option>
                   <option value="FT">Feet</option>
@@ -344,16 +363,24 @@ const ProductModalContent: React.FC<Omit<ProductModalProps, 'isOpen'>> = ({
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-[0.85rem] font-medium text-muted">Discount (%)</label>
+                <div className="flex items-center justify-between gap-2">
+                  <label className="text-[0.85rem] font-medium text-muted">
+                    Discount (LKR)
+                  </label>
+                  <span className="text-[0.7rem] font-semibold text-slate-400">
+                    {isWeightUnit(form.unit) ? 'per 1 kg' : 'per 1 item'}
+                  </span>
+                </div>
                 <input
                   type="number"
                   min="0"
-                  max="100"
                   step="0.01"
-                  placeholder="0"
+                  placeholder="0.00"
                   className="rounded-md border border-line bg-bg px-3 py-2.5 text-base text-ink outline-none focus:border-primary"
-                  value={form.discountPercent}
-                  onChange={(event) => setForm({ ...form, discountPercent: event.target.value })}
+                  value={form.discountAmount}
+                  onChange={(event) =>
+                    setForm({ ...form, discountAmount: event.target.value })
+                  }
                 />
               </div>
             </div>
@@ -377,6 +404,112 @@ const ProductModalContent: React.FC<Omit<ProductModalProps, 'isOpen'>> = ({
             </div>
           </>
         )}
+      </div>
+
+      {quickCreate && (
+        <QuickCreateModal
+          title={quickCreate === 'brand' ? 'Add Brand' : 'Add Category'}
+          onCancel={() => setQuickCreate(null)}
+          onCreate={async (name) => {
+            if (quickCreate === 'brand') {
+              if (!onCreateBrand) return
+              const createdBrand = await onCreateBrand(name)
+              setForm({ ...form, brandId: createdBrand.id })
+              return
+            }
+
+            if (!onCreateCategory) return
+            const createdCategory = await onCreateCategory(name)
+            setForm({ ...form, categoryId: createdCategory.id })
+          }}
+        />
+      )}
+    </div>
+  )
+}
+
+interface QuickCreateModalProps {
+  title: string
+  onCancel: () => void
+  onCreate: (name: string) => Promise<void>
+}
+
+const QuickCreateModal: React.FC<QuickCreateModalProps> = ({ title, onCancel, onCreate }) => {
+  const [name, setName] = useState('')
+  const [error, setError] = useState('')
+  const [isCreating, setIsCreating] = useState(false)
+
+  const handleCreate = async (): Promise<void> => {
+    const trimmedName = name.trim()
+    if (!trimmedName) {
+      setError(`${title.replace('Add ', '')} name is required.`)
+      return
+    }
+
+    if (isCreating) return
+
+    setIsCreating(true)
+    setError('')
+
+    try {
+      await onCreate(trimmedName)
+      onCancel()
+    } catch (catchError) {
+      setError(catchError instanceof Error ? catchError.message : `${title} could not be added.`)
+    } finally {
+      setIsCreating(false)
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-[1100] flex items-center justify-center bg-ink/35 backdrop-blur-[2px]">
+      <div className="flex w-[min(92vw,22rem)] flex-col gap-4 rounded-lg bg-card p-6 shadow-lg">
+        <h3 className="m-0 text-lg font-bold text-ink">{title}</h3>
+
+        <label className="flex flex-col gap-1.5">
+          <span className="text-[0.85rem] font-medium text-muted">
+            {title === 'Add Brand' ? 'Brand Name' : 'Category Name'}
+          </span>
+          <input
+            type="text"
+            className="rounded-md border border-line bg-bg px-3 py-2.5 text-base text-ink outline-none focus:border-primary"
+            placeholder={title === 'Add Brand' ? 'e.g. Nestle' : 'e.g. Vegetables'}
+            value={name}
+            autoFocus
+            onChange={(event) => {
+              setName(event.target.value)
+              if (error) setError('')
+            }}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') {
+                event.preventDefault()
+                void handleCreate()
+              }
+            }}
+          />
+        </label>
+
+        {error ? <div className="text-sm font-semibold text-red-600">{error}</div> : null}
+
+        <div className="flex w-full gap-3">
+          <button
+            type="button"
+            className="flex-1 rounded-md border border-line bg-transparent py-2.5 text-[0.9rem] font-semibold text-ink transition-colors hover:bg-hover disabled:cursor-not-allowed disabled:opacity-50"
+            onClick={onCancel}
+            disabled={isCreating}
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            className="flex flex-1 items-center justify-center gap-2 rounded-md bg-primary py-2.5 text-[0.9rem] font-semibold text-white transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-70"
+            onClick={() => void handleCreate()}
+            disabled={isCreating || name.trim().length === 0}
+          >
+            {isCreating && <Spinner size={15} />}
+            Add
+          </button>
+        </div>
       </div>
     </div>
   )

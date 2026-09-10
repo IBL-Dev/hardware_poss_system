@@ -14,6 +14,7 @@ import ReportsPage from './pages/ReportsPage'
 import PurchasesPage from './pages/PurchasesPage'
 import SalesPage from './pages/SalesPage'
 import SalesHistoryPage from './pages/SalesHistoryPage'
+import CreditPage from './pages/CreditPage'
 import MainLayout from './components/layout/MainLayout'
 import { ToastProvider } from './context/ToastContext'
 import { ConfirmProvider } from './context/ConfirmContext'
@@ -99,6 +100,14 @@ function AppContent(): React.JSX.Element {
         element={
           <MainLayout>
             <SalesHistoryPage />
+          </MainLayout>
+        }
+      />
+      <SingleRoute
+        path="/credit"
+        element={
+          <MainLayout>
+            <CreditPage />
           </MainLayout>
         }
       />

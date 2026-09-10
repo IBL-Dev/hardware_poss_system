@@ -242,7 +242,7 @@ function createDatabaseSchema(database: Database.Database): void {
       selling_price REAL NOT NULL DEFAULT 0,
       stock_quantity INTEGER NOT NULL DEFAULT 0,
       reorder_level INTEGER NOT NULL DEFAULT 0,
-      discount_percent REAL NOT NULL DEFAULT 0,
+      discount_amount REAL NOT NULL DEFAULT 0,
       created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
       updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
     )
@@ -614,9 +614,10 @@ function migrateProductsTable(database: Database.Database): void {
   ensureColumn(
     database,
     'products',
-    'discount_percent',
-    'ALTER TABLE products ADD COLUMN discount_percent REAL NOT NULL DEFAULT 0'
+    'discount_amount',
+    'ALTER TABLE products ADD COLUMN discount_amount REAL NOT NULL DEFAULT 0'
   )
+  migrateProductDiscountPercent(database)
   ensureColumn(
     database,
     'products',
@@ -638,6 +639,29 @@ function migrateProductsTable(database: Database.Database): void {
 
   backfillBrandsFromLegacyBrandText(database)
   ensureColumnDropped(database, 'products', 'status')
+  ensureColumnDropped(database, 'products', 'discount_percent')
+}
+
+function migrateProductDiscountPercent(database: Database.Database): void {
+  const hasLegacyPercentColumn =
+    (
+      database
+        .prepare(
+          "SELECT COUNT(*) AS count FROM pragma_table_info('products') WHERE name = 'discount_percent'"
+        )
+        .get() as { count: number }
+    ).count > 0
+
+  if (!hasLegacyPercentColumn) {
+    return
+  }
+
+  database.exec(`
+    UPDATE products
+    SET discount_amount = ROUND(selling_price * discount_percent / 100, 2)
+    WHERE discount_percent > 0
+      AND discount_amount = 0
+  `)
 }
 
 function backfillBrandsFromLegacyBrandText(database: Database.Database): void {

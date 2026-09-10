@@ -24,11 +24,8 @@ import { formatLkrAmount } from '../utils/currency'
 import type { BrandRecord } from '../../../shared/brands'
 import type { CategoryRecord } from '../../../shared/categories'
 import type { SupplierRecord } from '../../../shared/suppliers'
-import type {
-  CreateProductInput,
-  ProductRecord,
-  UpdateProductInput
-} from '../../../shared/products'
+import type { CreateProductInput, ProductRecord, UpdateProductInput } from '../../../shared/products'
+import { isWeightUnit } from '../../../shared/products'
 
 const ProductsPage: React.FC = () => {
   const [products, setProducts] = useState<ProductRecord[]>([])
@@ -163,12 +160,15 @@ const ProductsPage: React.FC = () => {
       )
     },
     {
-      key: 'discountPercent',
+      key: 'discountAmount',
       header: 'DISCOUNT',
       render: (item) =>
-        item.discountPercent > 0 ? (
+        item.discountAmount > 0 ? (
           <span className="inline-flex items-center rounded-md border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-700">
-            {item.discountPercent}% OFF
+            {formatLkrAmount(item.discountAmount)}
+            <span className="ml-1 font-semibold text-amber-600">
+              {isWeightUnit(item.unit) ? '/kg' : '/item'}
+            </span>
           </span>
         ) : (
           <span className="text-sm text-slate-400">-</span>
@@ -809,7 +809,7 @@ const ProductsPage: React.FC = () => {
                 buyingPrice: editingProduct.buyingPrice,
                 sellingPrice: editingProduct.sellingPrice,
                 stockQuantity: editingProduct.stockQuantity,
-                discountPercent: editingProduct.discountPercent
+                discountAmount: editingProduct.discountAmount
               }
             : undefined
         }
@@ -852,7 +852,7 @@ function buildProductPayload(
     buyingPrice: data.buyingPrice,
     sellingPrice: data.sellingPrice,
     stockQuantity: data.stockQuantity,
-    discountPercent: data.discountPercent
+    discountAmount: data.discountAmount
   }
 }
 

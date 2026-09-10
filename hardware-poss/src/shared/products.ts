@@ -1,6 +1,10 @@
-export const PRODUCT_UNITS = ['PCS', 'KG', 'L', 'M', 'FT', 'BOX', 'PACK', 'SET', 'ROLL', 'SHEET', 'BAG', 'TUBE', 'CAN', 'BOTTLE', 'DOZEN'] as const
+export const PRODUCT_UNITS = ['PCS', 'KG', 'G', 'L', 'M', 'FT', 'BOX', 'PACK', 'SET', 'ROLL', 'SHEET', 'BAG', 'TUBE', 'CAN', 'BOTTLE', 'DOZEN'] as const
 
 export type ProductUnit = (typeof PRODUCT_UNITS)[number]
+
+export function isWeightUnit(unit: ProductUnit): boolean {
+  return unit === 'KG' || unit === 'G'
+}
 
 export interface ProductRecord {
   id: number
@@ -18,7 +22,7 @@ export interface ProductRecord {
   sellingPrice: number
   stockQuantity: number
   reorderLevel: number
-  discountPercent: number
+  discountAmount: number
   createdAt: string
   updatedAt: string
 }
@@ -35,7 +39,7 @@ export interface CreateProductInput {
   sellingPrice: number
   stockQuantity: number
   reorderLevel?: number
-  discountPercent?: number
+  discountAmount?: number
 }
 
 export interface UpdateProductInput {
@@ -50,7 +54,7 @@ export interface UpdateProductInput {
   sellingPrice?: number
   stockQuantity?: number
   reorderLevel?: number
-  discountPercent?: number
+  discountAmount?: number
 }
 
 export interface ExportProductsCsvResult {

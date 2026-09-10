@@ -17,7 +17,7 @@ interface ProductRow {
   selling_price: number
   stock_quantity: number
   reorder_level: number
-  discount_percent: number
+  discount_amount: number
   created_at: string
   updated_at: string
 }
@@ -34,7 +34,7 @@ interface SaveProductPersistence {
   sellingPrice: number
   stockQuantity: number
   reorderLevel: number
-  discountPercent: number
+  discountAmount: number
 }
 
 export class ProductRepository {
@@ -87,7 +87,7 @@ export class ProductRepository {
               selling_price,
               stock_quantity,
               reorder_level,
-              discount_percent
+              discount_amount
             )
             VALUES (
               @sku,
@@ -101,7 +101,7 @@ export class ProductRepository {
               @sellingPrice,
               @stockQuantity,
               @reorderLevel,
-              @discountPercent
+              @discountAmount
             )
           `
         )
@@ -154,7 +154,7 @@ export class ProductRepository {
                 selling_price = @sellingPrice,
                 stock_quantity = @stockQuantity,
                 reorder_level = @reorderLevel,
-                discount_percent = @discountPercent,
+                discount_amount = @discountAmount,
                 updated_at = CURRENT_TIMESTAMP
               WHERE id = @id
             `
@@ -252,7 +252,7 @@ function productSelectSql(whereOrOrderBy = ''): string {
       p.selling_price,
       p.stock_quantity,
       p.reorder_level,
-      p.discount_percent,
+      p.discount_amount,
       p.created_at,
       p.updated_at
     FROM products p
@@ -280,7 +280,7 @@ function mapProductRow(row: ProductRow): ProductRecord {
     sellingPrice: row.selling_price,
     stockQuantity: row.stock_quantity,
     reorderLevel: row.reorder_level,
-    discountPercent: row.discount_percent,
+    discountAmount: row.discount_amount,
     createdAt: row.created_at,
     updatedAt: row.updated_at
   }
