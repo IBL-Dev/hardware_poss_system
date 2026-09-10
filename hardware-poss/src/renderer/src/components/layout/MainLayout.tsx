@@ -2,16 +2,15 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import {
   FileBarChart,
+  History,
   LayoutDashboard,
   Package,
-  ReceiptText,
   ShoppingCart,
   Tag,
   Users,
   FolderTree,
   Truck,
   Keyboard,
-  CreditCard,
   ShoppingBag
 } from 'lucide-react'
 import { CashDrawerModal } from '../sales/CashDrawerModal'
@@ -201,8 +200,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const navItems = [
     { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { path: '/sales', label: 'Sales POS', icon: ShoppingCart },
-    { path: '/sales-history', label: 'History', icon: ReceiptText },
-    { path: '/credit-bills', label: 'Credit Bills', icon: CreditCard },
+    { path: '/sales-history', label: 'History', icon: History },
     { path: '/users', label: 'Users', icon: Users },
     { path: '/products', label: 'Products', icon: Package },
     { path: '/brands', label: 'Brands', icon: Tag },

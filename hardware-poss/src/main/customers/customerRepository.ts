@@ -4,6 +4,7 @@ import type { CustomerRecord } from '../../shared/customers'
 interface CustomerRow {
   id: number
   name: string
+  nic: string
   business_name: string
   phone: string
   email: string
@@ -15,6 +16,7 @@ interface CustomerRow {
 
 interface SaveCustomerPersistence {
   name: string
+  nic: string
   businessName: string
   phone: string
   email: string
@@ -29,7 +31,7 @@ export class CustomerRepository {
     const rows = this.database
       .prepare(
         `
-          SELECT id, name, business_name, phone, email, address, notes, created_at, updated_at
+          SELECT id, name, nic, business_name, phone, email, address, notes, created_at, updated_at
           FROM customers
           ORDER BY name ASC
         `
@@ -43,7 +45,7 @@ export class CustomerRepository {
     const row = this.database
       .prepare(
         `
-          SELECT id, name, business_name, phone, email, address, notes, created_at, updated_at
+          SELECT id, name, nic, business_name, phone, email, address, notes, created_at, updated_at
           FROM customers
           WHERE id = ?
         `
@@ -57,7 +59,7 @@ export class CustomerRepository {
     const row = this.database
       .prepare(
         `
-          SELECT id, name, business_name, phone, email, address, notes, created_at, updated_at
+          SELECT id, name, nic, business_name, phone, email, address, notes, created_at, updated_at
           FROM customers
           WHERE lower(name) = lower(?)
         `
@@ -71,8 +73,8 @@ export class CustomerRepository {
     const result = this.database
       .prepare(
         `
-          INSERT INTO customers (name, business_name, phone, email, address, notes)
-          VALUES (@name, @businessName, @phone, @email, @address, @notes)
+          INSERT INTO customers (name, nic, business_name, phone, email, address, notes)
+          VALUES (@name, @nic, @businessName, @phone, @email, @address, @notes)
         `
       )
       .run(input)
@@ -87,6 +89,7 @@ export class CustomerRepository {
           UPDATE customers
           SET
             name = @name,
+            nic = @nic,
             business_name = @businessName,
             phone = @phone,
             email = @email,
@@ -120,6 +123,7 @@ function mapCustomerRow(row: CustomerRow): CustomerRecord {
   return {
     id: row.id,
     name: row.name,
+    nic: row.nic,
     businessName: row.business_name,
     phone: row.phone,
     email: row.email,

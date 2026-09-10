@@ -190,6 +190,7 @@ function createDatabaseSchema(database: Database.Database): void {
     CREATE TABLE IF NOT EXISTS customers (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL COLLATE NOCASE UNIQUE,
+      nic TEXT NOT NULL DEFAULT '',
       business_name TEXT NOT NULL DEFAULT '',
       phone TEXT NOT NULL DEFAULT '',
       email TEXT NOT NULL DEFAULT '',
@@ -199,6 +200,13 @@ function createDatabaseSchema(database: Database.Database): void {
       updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
     )
   `)
+
+  ensureColumn(
+    database,
+    'customers',
+    'nic',
+    "ALTER TABLE customers ADD COLUMN nic TEXT NOT NULL DEFAULT ''"
+  )
 
   ensureColumn(
     database,
@@ -255,7 +263,6 @@ function createDatabaseSchema(database: Database.Database): void {
       discount_amount REAL NOT NULL DEFAULT 0,
       total REAL NOT NULL DEFAULT 0,
       item_count INTEGER NOT NULL DEFAULT 0,
-      is_whole_sale INTEGER NOT NULL DEFAULT 0,
       paid_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
     )
   `)
@@ -272,15 +279,8 @@ function createDatabaseSchema(database: Database.Database): void {
     'daily_bill_number',
     'ALTER TABLE sales ADD COLUMN daily_bill_number INTEGER NOT NULL DEFAULT 0'
   )
-  ensureColumn(
-    database,
-    'sales',
-    'is_whole_sale',
-    'ALTER TABLE sales ADD COLUMN is_whole_sale INTEGER NOT NULL DEFAULT 0'
-  )
 
   migrateSalesTable(database)
-  backfillWholeSaleFlags(database)
 
   database.exec(`
     CREATE TABLE IF NOT EXISTS sale_items (
@@ -507,17 +507,16 @@ function migrateSalesTable(database: Database.Database): void {
         total REAL NOT NULL DEFAULT 0,
         item_count INTEGER NOT NULL DEFAULT 0,
         paid_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        customer_id INTEGER REFERENCES customers(id) ON DELETE SET NULL,
-        is_whole_sale INTEGER NOT NULL DEFAULT 0
+        customer_id INTEGER REFERENCES customers(id) ON DELETE SET NULL
       )
     `)
 
     database.exec(`
       INSERT INTO sales_new (
-        id, sale_number, daily_bill_number, payment_method, subtotal, tax, discount_amount, total, item_count, paid_at, customer_id, is_whole_sale
+        id, sale_number, daily_bill_number, payment_method, subtotal, tax, discount_amount, total, item_count, paid_at, customer_id
       )
       SELECT 
-        id, sale_number, daily_bill_number, payment_method, subtotal, tax, discount_amount, total, item_count, paid_at, customer_id, is_whole_sale 
+        id, sale_number, daily_bill_number, payment_method, subtotal, tax, discount_amount, total, item_count, paid_at, customer_id 
       FROM sales
     `)
 
@@ -525,21 +524,6 @@ function migrateSalesTable(database: Database.Database): void {
     database.exec('ALTER TABLE sales_new RENAME TO sales')
     database.exec('CREATE INDEX IF NOT EXISTS sales_paid_at_idx ON sales(paid_at)')
   }
-}
-
-// Marks previously recorded whole-sale transactions as wholesale.
-// Before the is_whole_sale column existed, whole-sale bills were only
-// distinguishable by the linked customer having a business name.
-function backfillWholeSaleFlags(database: Database.Database): void {
-  database.exec(`
-    UPDATE sales
-    SET is_whole_sale = 1
-    WHERE customer_id IS NOT NULL
-      AND is_whole_sale = 0
-      AND customer_id IN (
-        SELECT id FROM customers WHERE TRIM(IFNULL(business_name, '')) != ''
-      )
-  `)
 }
 
 function migrateStockMovementsTable(database: Database.Database): void {

@@ -74,7 +74,6 @@ export class SaleService {
       total,
       itemCount,
       items,
-      isWholeSale: Boolean(input.isWholeSale),
       customerId: input.customerId ?? null
     })
   }

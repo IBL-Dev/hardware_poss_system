@@ -5,8 +5,8 @@ import {
   Check,
   Clock,
   CreditCard,
+  History,
   Minus,
-  PackageOpen,
   PackagePlus,
   PackageSearch,
   Pencil,
@@ -17,15 +17,15 @@ import {
   Search,
   ShoppingCart,
   Trash2,
+  UserPlus,
   X
 } from 'lucide-react'
 import { SearchableSelect } from '../components/common/SearchableSelect'
 import { CreditCustomerPicker, type CreditCustomerPick } from '../components/sales/CreditCustomerPicker'
+import { AddCustomerModal } from '../components/sales/AddCustomerModal'
+import { BillHistoryPanel } from '../components/sales/BillHistoryPanel'
+import { SaleDetailsModal } from '../components/sales/SaleDetailsModal'
 import { QuantityModal, type QuantitySelection } from '../components/sales/QuantityModal'
-import {
-  WholeSaleModal,
-  type WholeSaleCustomerInput
-} from '../components/sales/WholeSaleModal'
 import { ReceiptModal } from '../components/sales/ReceiptModal'
 import { ProductModal, type ProductFormData } from '../components/products/ProductModal'
 import { onPosShortcutEvent } from '../shortcuts/posShortcutEvents'
@@ -66,10 +66,9 @@ interface HeldBill {
   cashReceivedAmount: number
   customerId: number | null
   customerName: string
+  customerNic: string
+  customerPhone: string
   customerBusinessName: string
-  isWholeSale: boolean
-  wholeSaleCustomerName: string
-  wholeSaleCustomerBusinessName: string
   createdAt: string
   updatedAt: string
 }
@@ -82,10 +81,9 @@ interface CurrentBillDraft {
   activeHeldBillId: string | null
   customerId: number | null
   customerName: string
+  customerNic: string
+  customerPhone: string
   customerBusinessName: string
-  isWholeSale: boolean
-  wholeSaleCustomerName: string
-  wholeSaleCustomerBusinessName: string
 }
 
 const HELD_BILLS_STORAGE_KEY = 'grocery-pos-held-bills'
@@ -110,9 +108,18 @@ const SalesPage: React.FC = () => {
   const [creditCustomerName, setCreditCustomerName] = useState<string>(
     () => loadCurrentBillDraft()?.customerName ?? ''
   )
+  const [creditCustomerNic, setCreditCustomerNic] = useState<string>(
+    () => loadCurrentBillDraft()?.customerNic ?? ''
+  )
+  const [creditCustomerPhone, setCreditCustomerPhone] = useState<string>(
+    () => loadCurrentBillDraft()?.customerPhone ?? ''
+  )
   const [creditCustomerBusinessName, setCreditCustomerBusinessName] = useState<string>(
     () => loadCurrentBillDraft()?.customerBusinessName ?? ''
   )
+  const [activePanelTab, setActivePanelTab] = useState<'current' | 'history'>('current')
+  const [isAddCustomerModalOpen, setIsAddCustomerModalOpen] = useState(false)
+  const [historyViewSale, setHistoryViewSale] = useState<SaleRecord | null>(null)
   const [highlightedIndex, setHighlightedIndex] = useState(0)
   const [cart, setCart] = useState<CartItem[]>(() => loadCurrentBillDraft()?.items ?? [])
   const [heldBills, setHeldBills] = useState<HeldBill[]>(loadHeldBills)
@@ -127,16 +134,6 @@ const SalesPage: React.FC = () => {
   const [editingCartItem, setEditingCartItem] = useState<CartItem | null>(null)
   const [isQtyModalOpen, setIsQtyModalOpen] = useState(false)
   const [isReceiptModalOpen, setIsReceiptModalOpen] = useState(false)
-  const [isWholeSale, setIsWholeSale] = useState<boolean>(
-    () => loadCurrentBillDraft()?.isWholeSale ?? false
-  )
-  const [wholeSaleCustomerName, setWholeSaleCustomerName] = useState<string>(
-    () => loadCurrentBillDraft()?.wholeSaleCustomerName ?? ''
-  )
-  const [wholeSaleCustomerBusinessName, setWholeSaleCustomerBusinessName] = useState<string>(
-    () => loadCurrentBillDraft()?.wholeSaleCustomerBusinessName ?? ''
-  )
-  const [isWholeSaleModalOpen, setIsWholeSaleModalOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [isPaying, setIsPaying] = useState(false)
   const [paymentMethod, setPaymentMethod] = useState<SalePaymentMethod>(
@@ -278,10 +275,9 @@ const SalesPage: React.FC = () => {
       activeHeldBillId,
       customerId: selectedCustomerId,
       customerName: creditCustomerName,
-      customerBusinessName: creditCustomerBusinessName,
-      isWholeSale,
-      wholeSaleCustomerName,
-      wholeSaleCustomerBusinessName
+      customerNic: creditCustomerNic,
+      customerPhone: creditCustomerPhone,
+      customerBusinessName: creditCustomerBusinessName
     })
   }, [
     cart,
@@ -292,10 +288,9 @@ const SalesPage: React.FC = () => {
     activeHeldBillId,
     selectedCustomerId,
     creditCustomerName,
+    creditCustomerNic,
+    creditCustomerPhone,
     creditCustomerBusinessName,
-    isWholeSale,
-    wholeSaleCustomerName,
-    wholeSaleCustomerBusinessName,
     completedSale
   ])
 
@@ -566,11 +561,9 @@ const SalesPage: React.FC = () => {
     setCashReceivedInput('')
     setSelectedCustomerId(null)
     setCreditCustomerName('')
+    setCreditCustomerNic('')
+    setCreditCustomerPhone('')
     setCreditCustomerBusinessName('')
-    setIsWholeSale(false)
-    setWholeSaleCustomerName('')
-    setWholeSaleCustomerBusinessName('')
-    setIsWholeSaleModalOpen(false)
     setIsReceiptModalOpen(false)
     setActiveHeldBillId(null)
     setIsHeldBillMenuOpen(false)
@@ -601,10 +594,9 @@ const SalesPage: React.FC = () => {
         paymentMethod === 'CASH' && cashReceivedInput.trim() ? cashReceivedAmount : 0,
       customerId: selectedCustomerId,
       customerName: creditCustomerName,
+      customerNic: creditCustomerNic,
+      customerPhone: creditCustomerPhone,
       customerBusinessName: creditCustomerBusinessName,
-      isWholeSale,
-      wholeSaleCustomerName,
-      wholeSaleCustomerBusinessName,
       createdAt: currentHeldBill?.createdAt ?? now,
       updatedAt: now
     }
@@ -630,14 +622,13 @@ const SalesPage: React.FC = () => {
     completedSale,
     creditCustomerBusinessName,
     creditCustomerName,
+    creditCustomerNic,
+    creditCustomerPhone,
     discountAmount,
     heldBills,
-    isWholeSale,
     paymentMethod,
     resetWorkingBill,
-    toast,
-    wholeSaleCustomerBusinessName,
-    wholeSaleCustomerName
+    toast
   ])
 
   useEffect(() => onPosShortcutEvent('pos:hold-invoice', handleHoldBill), [handleHoldBill])
@@ -658,10 +649,9 @@ const SalesPage: React.FC = () => {
       setCashReceivedInput(formatMoneyInput(heldBillToResume.cashReceivedAmount ?? 0))
       setSelectedCustomerId(heldBillToResume.customerId ?? null)
       setCreditCustomerName(heldBillToResume.customerName ?? '')
+      setCreditCustomerNic(heldBillToResume.customerNic ?? '')
+      setCreditCustomerPhone(heldBillToResume.customerPhone ?? '')
       setCreditCustomerBusinessName(heldBillToResume.customerBusinessName ?? '')
-      setIsWholeSale(heldBillToResume.isWholeSale ?? false)
-      setWholeSaleCustomerName(heldBillToResume.wholeSaleCustomerName ?? '')
-      setWholeSaleCustomerBusinessName(heldBillToResume.wholeSaleCustomerBusinessName ?? '')
       setCompletedSale(null)
       setIsReceiptModalOpen(false)
       setSearchQuery('')
@@ -719,48 +709,56 @@ const SalesPage: React.FC = () => {
     const name = creditCustomerName.trim()
     if (!name) return null
 
+    const nic = creditCustomerNic.trim()
+    const phone = creditCustomerPhone.trim()
     const businessName = creditCustomerBusinessName.trim()
     const existing = customers.find((customer) => customer.name.toLowerCase() === name.toLowerCase())
 
     if (existing) {
+      const changes: Record<string, string> = {}
+
+      if (nic && nic.toLowerCase() !== existing.nic.toLowerCase()) {
+        changes.nic = nic
+      }
+
+      if (phone && phone !== existing.phone) {
+        changes.phone = phone
+      }
+
       if (businessName && businessName.toLowerCase() !== existing.businessName.toLowerCase()) {
-        await customersApi.update(existing.id, { name, businessName })
+        changes.businessName = businessName
+      }
+
+      if (Object.keys(changes).length > 0) {
+        await customersApi.update(existing.id, changes)
         setCustomers((prev) =>
-          prev.map((customer) => (customer.id === existing.id ? { ...customer, businessName } : customer))
+          prev.map((customer) =>
+            customer.id === existing.id ? { ...customer, ...changes } : customer
+          )
         )
       }
 
       return existing.id
     }
 
-    const created = await customersApi.create({ name, businessName })
+    const created = await customersApi.create({ name, nic, phone, businessName })
     setCustomers((prev) => [...prev, created])
 
     return created.id
   }
 
-  const resolveWholeSaleCustomer = async (): Promise<number | null> => {
-    const name = wholeSaleCustomerName.trim()
-    if (!name) return null
-
-    const businessName = wholeSaleCustomerBusinessName.trim()
-    const existing = customers.find((customer) => customer.name.toLowerCase() === name.toLowerCase())
-
-    if (existing) {
-      if (businessName && businessName.toLowerCase() !== existing.businessName.toLowerCase()) {
-        await customersApi.update(existing.id, { name, businessName })
-        setCustomers((prev) =>
-          prev.map((customer) => (customer.id === existing.id ? { ...customer, businessName } : customer))
-        )
-      }
-
-      return existing.id
-    }
-
-    const created = await customersApi.create({ name, businessName })
-    setCustomers((prev) => [...prev, created])
-
-    return created.id
+  const handleAddCustomerSaved = (customer: CustomerRecord): void => {
+    setCustomers((prev) =>
+      prev.some((customerRecord) => customerRecord.id === customer.id)
+        ? prev.map((customerRecord) => (customerRecord.id === customer.id ? customer : customerRecord))
+        : [customer, ...prev]
+    )
+    setSelectedCustomerId(customer.id)
+    setCreditCustomerName(customer.name)
+    setCreditCustomerNic(customer.nic)
+    setCreditCustomerPhone(customer.phone)
+    setCreditCustomerBusinessName(customer.businessName)
+    setIsAddCustomerModalOpen(false)
   }
 
   const processCurrentBill = async (): Promise<SaleRecord | null> => {
@@ -784,19 +782,10 @@ const SalesPage: React.FC = () => {
         }
 
         setSelectedCustomerId(customerId)
-      } else if (isWholeSale && wholeSaleCustomerName.trim()) {
-        customerId = await resolveWholeSaleCustomer()
-
-        if (customerId === null) {
-          return null
-        }
-
-        setSelectedCustomerId(customerId)
       }
 
       const savedSale = await salesApi.create({
         paymentMethod,
-        isWholeSale,
         discountAmount,
         customerId,
         items: cart.map((item) => ({
@@ -869,11 +858,6 @@ const SalesPage: React.FC = () => {
       return
     }
 
-    if (isWholeSale && !wholeSaleCustomerName.trim()) {
-      toast.error('A customer name is required for a Whole Sale bill.')
-      return
-    }
-
     setIsReceiptModalOpen(true)
   }
 
@@ -890,22 +874,6 @@ const SalesPage: React.FC = () => {
       variant: 'danger',
       onConfirm: resetWorkingBill
     })
-  }
-
-  const handleWholeSaleConfirm = (input: WholeSaleCustomerInput): void => {
-    setIsWholeSale(true)
-    setWholeSaleCustomerName(input.name)
-    setWholeSaleCustomerBusinessName(input.businessName)
-    setIsWholeSaleModalOpen(false)
-    toast.success('Customer saved for whole sale bill.')
-  }
-
-  const handleWholeSaleClear = (): void => {
-    setIsWholeSale(false)
-    setWholeSaleCustomerName('')
-    setWholeSaleCustomerBusinessName('')
-    setIsWholeSaleModalOpen(false)
-    toast.info('Whole sale removed from this bill.')
   }
 
   const handleAddProductClick = (): void => {
@@ -1241,6 +1209,39 @@ const SalesPage: React.FC = () => {
         </section>
 
         <section className="flex min-h-0 flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-md">
+          <div className="flex shrink-0 items-center gap-1 border-b border-slate-200 bg-slate-50 px-3 pt-2">
+            <button
+              type="button"
+              className={`flex items-center gap-1.5 rounded-t-lg border-b-2 px-3 py-2 text-xs font-bold transition-colors ${
+                activePanelTab === 'current'
+                  ? 'border-emerald-600 bg-white text-emerald-700'
+                  : 'border-transparent text-slate-500 hover:text-slate-700'
+              }`}
+              onClick={() => setActivePanelTab('current')}
+              aria-selected={activePanelTab === 'current'}
+              role="tab"
+            >
+              <ShoppingCart size={14} />
+              Current Bill
+            </button>
+            <button
+              type="button"
+              className={`flex items-center gap-1.5 rounded-t-lg border-b-2 px-3 py-2 text-xs font-bold transition-colors ${
+                activePanelTab === 'history'
+                  ? 'border-emerald-600 bg-white text-emerald-700'
+                  : 'border-transparent text-slate-500 hover:text-slate-700'
+              }`}
+              onClick={() => setActivePanelTab('history')}
+              aria-selected={activePanelTab === 'history'}
+              role="tab"
+            >
+              <History size={14} />
+              History
+            </button>
+          </div>
+
+          {activePanelTab === 'current' && (
+            <>
           <div className="shrink-0 border-b border-slate-100 px-4 py-3.5">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
@@ -1260,55 +1261,6 @@ const SalesPage: React.FC = () => {
                 {cartItemCount} Items
               </span>
             </div>
-
-            <div className="mt-3 flex items-center gap-1 rounded-lg bg-slate-100 p-0.5">
-              <button
-                type="button"
-                className={`flex flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-bold transition-colors ${
-                  !isWholeSale ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'
-                }`}
-                onClick={() => {
-                  if (completedSale) return
-                  setIsWholeSale(false)
-                }}
-              >
-                Retail Bill
-              </button>
-              <button
-                type="button"
-                className={`flex flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-bold transition-colors ${
-                  isWholeSale ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-700'
-                }`}
-                onClick={() => {
-                  if (completedSale) return
-                  setIsWholeSaleModalOpen(true)
-                }}
-              >
-                <PackageOpen size={14} />
-                Whole Bill
-              </button>
-            </div>
-
-            {isWholeSale && (
-              <div className="mt-2 flex items-center gap-2 rounded-md border border-emerald-200 bg-emerald-50 px-2.5 py-1.5">
-                <PackageOpen size={13} className="shrink-0 text-emerald-700" />
-                <span className="min-w-0 truncate text-xs font-bold text-emerald-800">
-                  {wholeSaleCustomerName || 'Whole sale customer'}
-                </span>
-                {wholeSaleCustomerBusinessName && (
-                  <span className="min-w-0 truncate text-[0.68rem] text-emerald-600">
-                    {wholeSaleCustomerBusinessName}
-                  </span>
-                )}
-                <button
-                  type="button"
-                  className="ml-auto shrink-0 rounded-md px-1.5 py-0.5 text-[0.68rem] font-bold text-emerald-600 transition-colors hover:bg-emerald-100"
-                  onClick={() => setIsWholeSaleModalOpen(true)}
-                >
-                  Edit
-                </button>
-              </div>
-            )}
           </div>
 
           <div className="shrink-0 border-b border-slate-100 p-3">
@@ -1381,20 +1333,6 @@ const SalesPage: React.FC = () => {
                   </div>
                 )}
               </div>
-
-              <button
-                type="button"
-                onClick={() => setIsWholeSaleModalOpen(true)}
-                title="Mark this bill as a whole sale with customer name and business name"
-                className={`flex items-center justify-center gap-2 rounded-lg border px-3 py-2.5 text-xs font-bold transition-colors ${
-                  isWholeSale
-                    ? 'border-emerald-500 bg-emerald-600 text-white hover:bg-emerald-700'
-                    : 'border-slate-200 bg-white text-slate-700 hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700'
-                }`}
-              >
-                <PackageOpen size={15} />
-                <span className="truncate">Whole Sale</span>
-              </button>
 
               <button
                 type="button"
@@ -1589,18 +1527,36 @@ const SalesPage: React.FC = () => {
 
             {paymentMethod === 'CREDIT' && (
               <div className="mt-3">
-                <p className="mb-1.5 text-[0.68rem] font-bold uppercase tracking-wider text-slate-400">Credit Customer</p>
+                <div className="mb-1.5 flex items-center justify-between gap-2">
+                  <p className="text-[0.68rem] font-bold uppercase tracking-wider text-slate-400">
+                    Credit Customer
+                  </p>
+                  <button
+                    type="button"
+                    className="flex items-center gap-1 rounded-md border border-emerald-200 bg-emerald-50 px-2 py-1 text-[0.68rem] font-bold text-emerald-700 transition-colors hover:bg-emerald-100 disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-50 disabled:text-slate-400"
+                    onClick={() => setIsAddCustomerModalOpen(true)}
+                    disabled={Boolean(completedSale)}
+                    title="Add or search a customer by name, NIC or phone"
+                  >
+                    <UserPlus size={13} />
+                    Add Customer
+                  </button>
+                </div>
 
                 <CreditCustomerPicker
                   customers={customers}
                   value={{
                     customerId: selectedCustomerId,
                     name: creditCustomerName,
+                    nic: creditCustomerNic,
+                    phone: creditCustomerPhone,
                     businessName: creditCustomerBusinessName
                   }}
                   onChange={(pick: CreditCustomerPick) => {
                     setSelectedCustomerId(pick.customerId)
                     setCreditCustomerName(pick.name)
+                    setCreditCustomerNic(pick.nic)
+                    setCreditCustomerPhone(pick.phone)
                     setCreditCustomerBusinessName(pick.businessName)
                   }}
                   disabled={Boolean(completedSale)}
@@ -1651,6 +1607,10 @@ const SalesPage: React.FC = () => {
                   : `PREVIEW BILL • LKR ${formatLkr(total)}`}
             </button>
           </div>
+            </>
+          )}
+
+          {activePanelTab === 'history' && <BillHistoryPanel onView={setHistoryViewSale} />}
         </section>
       </div>
 
@@ -1686,32 +1646,17 @@ const SalesPage: React.FC = () => {
         cashierName={cashierName}
         customerName={
           completedSale?.customerName ??
-          (paymentMethod === 'CREDIT'
-            ? creditCustomerName.trim() || undefined
-            : isWholeSale
-              ? wholeSaleCustomerName.trim() || undefined
-              : undefined)
+          (paymentMethod === 'CREDIT' ? creditCustomerName.trim() || undefined : undefined)
         }
         customerBusinessName={
           completedSale?.customerBusinessName ??
           (paymentMethod === 'CREDIT'
             ? creditCustomerBusinessName.trim() || undefined
-            : isWholeSale
-              ? wholeSaleCustomerBusinessName.trim() || undefined
-              : undefined)
+            : undefined)
         }
         onProcessToBill={processCurrentBill}
         onClose={() => setIsReceiptModalOpen(false)}
         onNewSale={resetWorkingBill}
-      />
-
-      <WholeSaleModal
-        isOpen={isWholeSaleModalOpen}
-        initialName={wholeSaleCustomerName}
-        initialBusinessName={wholeSaleCustomerBusinessName}
-        onClose={() => setIsWholeSaleModalOpen(false)}
-        onConfirm={handleWholeSaleConfirm}
-        onClear={isWholeSale ? handleWholeSaleClear : undefined}
       />
 
       <ProductModal
@@ -1727,6 +1672,15 @@ const SalesPage: React.FC = () => {
         onCreateBrand={handleCreateBrand}
         onCreateCategory={handleCreateCategory}
         onCreateSupplier={handleCreateSupplier}
+      />
+
+      <SaleDetailsModal sale={historyViewSale} onClose={() => setHistoryViewSale(null)} />
+
+      <AddCustomerModal
+        isOpen={isAddCustomerModalOpen}
+        customers={customers}
+        onClose={() => setIsAddCustomerModalOpen(false)}
+        onSaved={handleAddCustomerSaved}
       />
     </div>
   )
@@ -1797,10 +1751,9 @@ function loadHeldBills(): HeldBill[] {
       cashReceivedAmount: bill.cashReceivedAmount ?? 0,
       customerId: bill.customerId ?? null,
       customerName: bill.customerName ?? '',
-      customerBusinessName: bill.customerBusinessName ?? '',
-      isWholeSale: bill.isWholeSale ?? false,
-      wholeSaleCustomerName: bill.wholeSaleCustomerName ?? '',
-      wholeSaleCustomerBusinessName: bill.wholeSaleCustomerBusinessName ?? ''
+      customerNic: bill.customerNic ?? '',
+      customerPhone: bill.customerPhone ?? '',
+      customerBusinessName: bill.customerBusinessName ?? ''
     }))
   } catch {
     return []
@@ -1830,10 +1783,9 @@ function loadCurrentBillDraft(): CurrentBillDraft | null {
           cashReceivedAmount: parsedValue.cashReceivedAmount ?? 0,
           customerId: parsedValue.customerId ?? null,
           customerName: parsedValue.customerName ?? '',
-          customerBusinessName: parsedValue.customerBusinessName ?? '',
-          isWholeSale: parsedValue.isWholeSale ?? false,
-          wholeSaleCustomerName: parsedValue.wholeSaleCustomerName ?? '',
-          wholeSaleCustomerBusinessName: parsedValue.wholeSaleCustomerBusinessName ?? ''
+          customerNic: parsedValue.customerNic ?? '',
+          customerPhone: parsedValue.customerPhone ?? '',
+          customerBusinessName: parsedValue.customerBusinessName ?? ''
         }
       : null
   } catch {
@@ -1847,8 +1799,7 @@ function saveCurrentBillDraft(draft: CurrentBillDraft): void {
       draft.items.length === 0 &&
       !draft.activeHeldBillId &&
       draft.discountAmount === 0 &&
-      draft.cashReceivedAmount === 0 &&
-      !draft.isWholeSale
+      draft.cashReceivedAmount === 0
     ) {
       localStorage.removeItem(CURRENT_BILL_STORAGE_KEY)
       return
@@ -1881,13 +1832,10 @@ function isCurrentBillDraft(value: unknown): value is CurrentBillDraft {
       draft.customerId === null ||
       typeof draft.customerId === 'number') &&
     (draft.customerName === undefined || typeof draft.customerName === 'string') &&
+    (draft.customerNic === undefined || typeof draft.customerNic === 'string') &&
+    (draft.customerPhone === undefined || typeof draft.customerPhone === 'string') &&
     (draft.customerBusinessName === undefined ||
       typeof draft.customerBusinessName === 'string') &&
-    (draft.isWholeSale === undefined || typeof draft.isWholeSale === 'boolean') &&
-    (draft.wholeSaleCustomerName === undefined ||
-      typeof draft.wholeSaleCustomerName === 'string') &&
-    (draft.wholeSaleCustomerBusinessName === undefined ||
-      typeof draft.wholeSaleCustomerBusinessName === 'string') &&
     (draft.activeHeldBillId === null || typeof draft.activeHeldBillId === 'string')
   )
 }
@@ -1907,13 +1855,10 @@ return (
       bill.customerId === null ||
       typeof bill.customerId === 'number') &&
     (bill.customerName === undefined || typeof bill.customerName === 'string') &&
+    (bill.customerNic === undefined || typeof bill.customerNic === 'string') &&
+    (bill.customerPhone === undefined || typeof bill.customerPhone === 'string') &&
     (bill.customerBusinessName === undefined ||
       typeof bill.customerBusinessName === 'string') &&
-    (bill.isWholeSale === undefined || typeof bill.isWholeSale === 'boolean') &&
-    (bill.wholeSaleCustomerName === undefined ||
-      typeof bill.wholeSaleCustomerName === 'string') &&
-    (bill.wholeSaleCustomerBusinessName === undefined ||
-      typeof bill.wholeSaleCustomerBusinessName === 'string') &&
     typeof bill.createdAt === 'string' &&
     typeof bill.updatedAt === 'string'
   )

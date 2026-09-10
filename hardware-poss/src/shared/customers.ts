@@ -1,6 +1,7 @@
 export interface CustomerRecord {
   id: number
   name: string
+  nic: string
   businessName: string
   phone: string
   email: string
@@ -12,6 +13,7 @@ export interface CustomerRecord {
 
 export interface CreateCustomerInput {
   name: string
+  nic?: string
   businessName?: string
   phone?: string
   email?: string
@@ -21,6 +23,7 @@ export interface CreateCustomerInput {
 
 export interface UpdateCustomerInput {
   name?: string
+  nic?: string
   businessName?: string
   phone?: string
   email?: string

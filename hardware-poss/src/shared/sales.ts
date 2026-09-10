@@ -32,7 +32,6 @@ export interface SaleRecord {
   itemCount: number
   paidAt: string
   items: SaleItemRecord[]
-  isWholeSale: boolean
   customerId: number | null
   customerName: string | null
   customerBusinessName: string | null
@@ -46,7 +45,6 @@ export interface CreateSaleItemInput {
 
 export interface CreateSaleInput {
   paymentMethod: SalePaymentMethod
-  isWholeSale?: boolean
   discountAmount?: number
   items: CreateSaleItemInput[]
   customerId?: number | null

@@ -1,10 +1,12 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { Briefcase, UserRound, Users } from 'lucide-react'
+import { UserRound, Users } from 'lucide-react'
 import type { CustomerRecord } from '../../../../shared/customers'
 
 export interface CreditCustomerPick {
   customerId: number | null
   name: string
+  nic: string
+  phone: string
   businessName: string
 }
 
@@ -35,7 +37,7 @@ export const CreditCustomerPicker: React.FC<CreditCustomerPickerProps> = ({
 
     return customers
       .filter((customer) =>
-        `${customer.name} ${customer.businessName} ${customer.phone} ${customer.email}`
+        `${customer.name} ${customer.nic} ${customer.businessName} ${customer.phone} ${customer.email}`
           .toLowerCase()
           .includes(normalizedName)
       )
@@ -50,6 +52,8 @@ export const CreditCustomerPicker: React.FC<CreditCustomerPickerProps> = ({
     onChange({
       customerId: exactCustomer ? exactCustomer.id : null,
       name,
+      nic: exactCustomer ? exactCustomer.nic : value.nic,
+      phone: exactCustomer ? exactCustomer.phone : value.phone,
       businessName: exactCustomer ? exactCustomer.businessName : value.businessName
     })
     setHighlightedIndex(0)
@@ -60,6 +64,8 @@ export const CreditCustomerPicker: React.FC<CreditCustomerPickerProps> = ({
     onChange({
       customerId: customer.id,
       name: customer.name,
+      nic: customer.nic,
+      phone: customer.phone,
       businessName: customer.businessName
     })
     setIsOpen(false)
@@ -170,7 +176,7 @@ export const CreditCustomerPicker: React.FC<CreditCustomerPickerProps> = ({
                     {customer.name}
                   </span>
                   <span className="mt-0.5 block truncate text-[0.72rem] text-slate-500">
-                    {[customer.businessName, customer.phone, customer.email]
+                    {[customer.nic, customer.businessName, customer.phone, customer.email]
                       .filter(Boolean)
                       .join(' · ') || 'No contact details'}
                   </span>
@@ -179,22 +185,6 @@ export const CreditCustomerPicker: React.FC<CreditCustomerPickerProps> = ({
             ))}
           </div>
         )}
-      </label>
-
-      <label className="relative block">
-        <Briefcase
-          size={15}
-          className="pointer-events-none absolute top-1/2 left-3 z-10 -translate-y-1/2 text-emerald-600"
-        />
-
-        <input
-          type="text"
-          className="h-11 w-full rounded-lg border border-slate-200 bg-white pl-9 pr-3 text-sm font-semibold text-slate-800 outline-none transition-colors focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/10 disabled:bg-slate-50 disabled:text-slate-400"
-          placeholder="Business / company name (optional)"
-          value={value.businessName}
-          disabled={disabled}
-          onChange={(event) => onChange({ ...value, businessName: event.target.value })}
-        />
       </label>
     </div>
   )
