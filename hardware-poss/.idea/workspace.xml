@@ -6,24 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="2b038783-d0e2-4a9b-bf5b-0feca423ebff" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/database.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/database.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/products/productIpc.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/products/productIpc.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/products/productRepository.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/products/productRepository.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/products/productService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/products/productService.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/purchases/purchaseIpc.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/purchases/purchaseIpc.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/reports/reportIpc.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/reports/reportIpc.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/src/api/purchasesApi.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/src/api/purchasesApi.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/src/components/layout/MainLayout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/src/components/layout/MainLayout.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/src/components/products/ProductCsvImport.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/src/components/products/ProductCsvImport.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/src/components/products/ProductDetailsModal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/src/components/products/ProductDetailsModal.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/src/components/products/ProductModal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/src/components/products/ProductModal.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/src/components/purchases/PurchaseDetailsModal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/src/components/purchases/PurchaseDetailsModal.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/src/components/purchases/PurchaseModal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/src/components/purchases/PurchaseModal.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/src/pages/ProductsPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/src/pages/ProductsPage.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/src/pages/PurchasesPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/src/pages/PurchasesPage.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/src/pages/SalesPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/src/pages/SalesPage.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/shared/products.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/shared/products.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/shared/purchases.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/shared/purchases.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
