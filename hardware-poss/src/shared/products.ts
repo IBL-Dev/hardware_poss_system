@@ -6,6 +6,8 @@ export function isWeightUnit(unit: ProductUnit): boolean {
   return unit === 'KG' || unit === 'G'
 }
 
+export type ProductDiscountType = 'amount' | 'percent'
+
 export interface ProductRecord {
   id: number
   sku: string
@@ -22,6 +24,7 @@ export interface ProductRecord {
   sellingPrice: number
   stockQuantity: number
   reorderLevel: number
+  discountType: ProductDiscountType
   discountAmount: number
   createdAt: string
   updatedAt: string
@@ -39,6 +42,7 @@ export interface CreateProductInput {
   sellingPrice: number
   stockQuantity: number
   reorderLevel?: number
+  discountType?: ProductDiscountType
   discountAmount?: number
 }
 
@@ -54,6 +58,7 @@ export interface UpdateProductInput {
   sellingPrice?: number
   stockQuantity?: number
   reorderLevel?: number
+  discountType?: ProductDiscountType
   discountAmount?: number
 }
 
@@ -69,4 +74,18 @@ export interface ProductApi {
   update: (id: number, input: UpdateProductInput) => Promise<ProductRecord>
   delete: (id: number) => Promise<void>
   exportCsv: () => Promise<ExportProductsCsvResult>
+}
+
+export function isProductDiscountPercent(type: ProductDiscountType | undefined | null): boolean {
+  return type === 'percent'
+}
+
+export function getProductDiscountLkr(
+  product: Pick<ProductRecord, 'discountType' | 'discountAmount' | 'sellingPrice'>
+): number {
+  if (isProductDiscountPercent(product.discountType)) {
+    return Math.round(product.sellingPrice * product.discountAmount) / 100
+  }
+
+  return product.discountAmount
 }

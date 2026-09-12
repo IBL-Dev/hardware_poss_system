@@ -1,5 +1,7 @@
-import React from 'react'
-import { FileText, RotateCcw, X } from 'lucide-react'
+import React, { useState } from 'react'
+import { Download, FileText, RotateCcw, X } from 'lucide-react'
+import { useToast } from '../../context/ToastContext'
+import { purchasesApi } from '../../api/purchasesApi'
 import { formatLkr } from '../../utils/currency'
 import type {
   PurchasePaymentMethod,
@@ -19,6 +21,28 @@ export const PurchaseDetailsModal: React.FC<PurchaseDetailsModalProps> = ({
   purchase,
   onClose
 }) => {
+  const toast = useToast()
+  const [isDownloading, setIsDownloading] = useState(false)
+
+  const handleDownloadReceipt = async (): Promise<void> => {
+    if (!purchase || isDownloading) return
+
+    setIsDownloading(true)
+    try {
+      const result = await purchasesApi.downloadReceipt(purchase.id)
+
+      if (result.saved && result.filePath) {
+        toast.success(`Purchase receipt downloaded to ${result.filePath}`)
+      } else {
+        toast.info('Purchase receipt download cancelled.')
+      }
+    } catch (error) {
+      toast.error(getErrorMessage(error))
+    } finally {
+      setIsDownloading(false)
+    }
+  }
+
   if (!purchase) return null
 
   return (
@@ -29,14 +53,25 @@ export const PurchaseDetailsModal: React.FC<PurchaseDetailsModalProps> = ({
             <h3 className="m-0 truncate text-xl font-bold text-ink">{purchase.purchaseNumber}</h3>
             <p className="mt-1 text-sm text-muted">{purchase.supplierName || 'No supplier'}</p>
           </div>
-          <button
-            type="button"
-            className="flex h-8 w-8 items-center justify-center rounded-md text-muted transition-colors hover:bg-hover hover:text-ink"
-            onClick={onClose}
-            aria-label="Close"
-          >
-            <X size={18} />
-          </button>
+          <div className="flex shrink-0 items-center gap-2">
+            <button
+              type="button"
+              className="inline-flex h-9 items-center justify-center gap-2 rounded-md border border-line bg-bg px-3 text-sm font-semibold text-ink transition-colors hover:bg-hover disabled:cursor-not-allowed disabled:opacity-50"
+              onClick={handleDownloadReceipt}
+              disabled={isDownloading}
+            >
+              <Download size={15} />
+              {isDownloading ? 'Downloading...' : 'Download Receipt'}
+            </button>
+            <button
+              type="button"
+              className="flex h-8 w-8 items-center justify-center rounded-md text-muted transition-colors hover:bg-hover hover:text-ink"
+              onClick={onClose}
+              aria-label="Close"
+            >
+              <X size={18} />
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -349,4 +384,8 @@ function formatDateTime(value: string): string {
   const date = new Date(value.replace(' ', 'T'))
 
   return Number.isNaN(date.getTime()) ? value : date.toLocaleString()
+}
+
+function getErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : 'Something went wrong. Please try again.'
 }

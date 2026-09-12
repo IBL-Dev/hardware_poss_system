@@ -215,7 +215,6 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   return (
     <div className="flex min-h-screen flex-col bg-bg text-ink">
       <header className="relative flex h-16 items-center bg-brand px-6 shadow-md">
-
         <nav className="flex h-full gap-1">
           {navItems.map((item) => {
             const Icon = item.icon
@@ -258,13 +257,16 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         {showShortcuts && (
           <div
             ref={shortcutDropdownRef}
-            className="absolute right-6 top-20 z-10 w-80 rounded-md border border-white/20 bg-white/5 p-4 shadow-lg backdrop-blur-sm"
+            className="absolute right-6 top-20 z-50 w-80 rounded-lg border border-line bg-card p-4 shadow-xl"
           >
-            <h3 className="text-sm font-semibold mb-2 text-ink">Keyboard Shortcuts</h3>
-            <ul className="text-xs text-ink/80 space-y-1">
+            <h3 className="mb-3 text-sm font-semibold text-ink">Keyboard Shortcuts</h3>
+            <ul className="space-y-1.5 text-xs text-muted">
               {shortcutCommands.map((command) => (
-                <li key={command.id}>
-                  <span className="font-medium text-ink">{command.display}</span>: {command.label}
+                <li key={command.id} className="flex items-baseline gap-2">
+                  <kbd className="rounded-sm border border-line bg-bg px-1.5 py-0.5 font-medium text-ink">
+                    {command.display}
+                  </kbd>
+                  <span>{command.label}</span>
                 </li>
               ))}
             </ul>

@@ -162,3 +162,8 @@ export interface PurchaseReturnFilters {
   dateFrom?: string
   dateTo?: string
 }
+
+export interface DownloadPurchaseReceiptResult {
+  saved: boolean
+  filePath?: string
+}

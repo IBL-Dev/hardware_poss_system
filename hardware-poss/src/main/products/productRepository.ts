@@ -1,5 +1,5 @@
 import type Database from 'better-sqlite3'
-import type { ProductRecord, ProductUnit } from '../../shared/products'
+import type { ProductDiscountType, ProductRecord, ProductUnit } from '../../shared/products'
 
 interface ProductRow {
   id: number
@@ -17,6 +17,7 @@ interface ProductRow {
   selling_price: number
   stock_quantity: number
   reorder_level: number
+  discount_type: ProductDiscountType
   discount_amount: number
   created_at: string
   updated_at: string
@@ -34,6 +35,7 @@ interface SaveProductPersistence {
   sellingPrice: number
   stockQuantity: number
   reorderLevel: number
+  discountType: ProductDiscountType
   discountAmount: number
 }
 
@@ -87,6 +89,7 @@ export class ProductRepository {
               selling_price,
               stock_quantity,
               reorder_level,
+              discount_type,
               discount_amount
             )
             VALUES (
@@ -101,6 +104,7 @@ export class ProductRepository {
               @sellingPrice,
               @stockQuantity,
               @reorderLevel,
+              @discountType,
               @discountAmount
             )
           `
@@ -154,6 +158,7 @@ export class ProductRepository {
                 selling_price = @sellingPrice,
                 stock_quantity = @stockQuantity,
                 reorder_level = @reorderLevel,
+                discount_type = @discountType,
                 discount_amount = @discountAmount,
                 updated_at = CURRENT_TIMESTAMP
               WHERE id = @id
@@ -252,6 +257,7 @@ function productSelectSql(whereOrOrderBy = ''): string {
       p.selling_price,
       p.stock_quantity,
       p.reorder_level,
+      p.discount_type,
       p.discount_amount,
       p.created_at,
       p.updated_at
@@ -280,6 +286,7 @@ function mapProductRow(row: ProductRow): ProductRecord {
     sellingPrice: row.selling_price,
     stockQuantity: row.stock_quantity,
     reorderLevel: row.reorder_level,
+    discountType: row.discount_type,
     discountAmount: row.discount_amount,
     createdAt: row.created_at,
     updatedAt: row.updated_at

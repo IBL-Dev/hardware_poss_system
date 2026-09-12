@@ -6,7 +6,24 @@
   <component name="ChangeListManager">
     <list default="true" id="2b038783-d0e2-4a9b-bf5b-0feca423ebff" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/src/components/sales/QuantityModal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/src/components/sales/QuantityModal.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/database.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/database.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/products/productIpc.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/products/productIpc.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/products/productRepository.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/products/productRepository.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/products/productService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/products/productService.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/purchases/purchaseIpc.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/purchases/purchaseIpc.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/reports/reportIpc.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/reports/reportIpc.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/src/api/purchasesApi.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/src/api/purchasesApi.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/src/components/layout/MainLayout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/src/components/layout/MainLayout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/src/components/products/ProductCsvImport.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/src/components/products/ProductCsvImport.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/src/components/products/ProductDetailsModal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/src/components/products/ProductDetailsModal.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/src/components/products/ProductModal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/src/components/products/ProductModal.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/src/components/purchases/PurchaseDetailsModal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/src/components/purchases/PurchaseDetailsModal.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/src/components/purchases/PurchaseModal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/src/components/purchases/PurchaseModal.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/src/pages/ProductsPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/src/pages/ProductsPage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/src/pages/PurchasesPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/src/pages/PurchasesPage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/src/pages/SalesPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/src/pages/SalesPage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/shared/products.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/shared/products.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/shared/purchases.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/shared/purchases.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -29,23 +46,23 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.4039604267940358" />
-      <entry key="MS500" value="3.3580696725242567" />
-      <entry key="S2" value="9.372446058200309" />
-      <entry key="S5" value="16.905730216061546" />
-      <entry key="S10" value="25.612389863509506" />
-      <entry key="S30" value="51.42633785274897" />
-      <entry key="S60" value="78.96305326416751" />
-      <entry key="M2" value="126.07547051608373" />
-      <entry key="M5" value="231.6542194890316" />
-      <entry key="M10" value="345.9680268204164" />
-      <entry key="M15" value="424.85420621475805" />
-      <entry key="M30" value="589.9890601092523" />
-      <entry key="H1" value="860.8098752026881" />
-      <entry key="H2" value="1326.5160725115593" />
-      <entry key="H4" value="1951.4836104402452" />
-      <entry key="D1" value="3159.8654765675037" />
-      <entry key="W1" value="3497.2760535572525" />
+      <entry key="MS100" value="1.5524374870578619" />
+      <entry key="MS500" value="4.334423071438682" />
+      <entry key="S2" value="11.589671603336669" />
+      <entry key="S5" value="19.722312113962637" />
+      <entry key="S10" value="25.055698725495574" />
+      <entry key="S30" value="30.58750144052084" />
+      <entry key="S60" value="35.064604507074186" />
+      <entry key="M2" value="43.33153758994667" />
+      <entry key="M5" value="68.66425620713764" />
+      <entry key="M10" value="102.53014174468818" />
+      <entry key="M15" value="129.94841247975376" />
+      <entry key="M30" value="234.97904604930278" />
+      <entry key="H1" value="507.065973647836" />
+      <entry key="H2" value="1030.792048055845" />
+      <entry key="H4" value="1780.3729966836322" />
+      <entry key="D1" value="3356.300573516635" />
+      <entry key="W1" value="3821.7824298786677" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
@@ -53,37 +70,37 @@
       <entry key="S2" value="0.0" />
       <entry key="S5" value="0.0" />
       <entry key="S10" value="0.0" />
-      <entry key="S30" value="2.0236922267530844E-301" />
-      <entry key="S60" value="4.4985466839335654E-151" />
-      <entry key="M2" value="6.707120607185492E-76" />
-      <entry key="M5" value="8.52343093337042E-31" />
-      <entry key="M10" value="9.232242919989827E-16" />
-      <entry key="M15" value="9.481378456438706E-11" />
-      <entry key="M30" value="9.737237008740326E-6" />
-      <entry key="H1" value="0.0031204546157156065" />
-      <entry key="H2" value="0.05586102949029383" />
-      <entry key="H4" value="0.23634938013520065" />
-      <entry key="D1" value="0.7863074876436046" />
-      <entry key="W1" value="0.9662391499242214" />
+      <entry key="S30" value="0.0" />
+      <entry key="S60" value="1.6373435699834262E-180" />
+      <entry key="M2" value="1.2795872654818353E-90" />
+      <entry key="M5" value="1.1036413498806977E-36" />
+      <entry key="M10" value="1.0505433593529934E-18" />
+      <entry key="M15" value="1.0334179193885312E-12" />
+      <entry key="M30" value="1.0165716499039636E-6" />
+      <entry key="H1" value="0.0010082517790234876" />
+      <entry key="H2" value="0.031752980632114514" />
+      <entry key="H4" value="0.17819366047116916" />
+      <entry key="D1" value="0.750151027050817" />
+      <entry key="W1" value="0.9597632161756967" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="1.3467769646685421" />
-      <entry key="MS500" value="3.3305866504534674" />
-      <entry key="S2" value="9.353225889476716" />
-      <entry key="S5" value="16.89166796239552" />
-      <entry key="S10" value="25.60158119320175" />
-      <entry key="S30" value="51.418582616501325" />
-      <entry key="S60" value="78.9559708256741" />
-      <entry key="M2" value="126.06885821741125" />
-      <entry key="M5" value="231.64944651095175" />
-      <entry key="M10" value="345.9647976962949" />
-      <entry key="M15" value="424.85171609532176" />
-      <entry key="M30" value="589.9874694372666" />
-      <entry key="H1" value="860.8118434614361" />
-      <entry key="H2" value="1326.5710295259219" />
-      <entry key="H4" value="1951.7192878335597" />
-      <entry key="D1" value="3160.6516014593326" />
-      <entry key="W1" value="3498.242263802426" />
+      <entry key="MS100" value="1.5124985354952694" />
+      <entry key="MS500" value="4.309758234395592" />
+      <entry key="S2" value="11.571802908931492" />
+      <entry key="S5" value="19.710014182139357" />
+      <entry key="S10" value="25.047869656955427" />
+      <entry key="S30" value="30.58431788353669" />
+      <entry key="S60" value="35.06279128167086" />
+      <entry key="M2" value="43.330414309039746" />
+      <entry key="M5" value="68.66351621318049" />
+      <entry key="M10" value="102.52957282406823" />
+      <entry key="M15" value="129.9479180354593" />
+      <entry key="M30" value="234.9785513414966" />
+      <entry key="H1" value="507.0663896712037" />
+      <entry key="H2" value="1030.823153099506" />
+      <entry key="H4" value="1780.55060851129" />
+      <entry key="D1" value="3357.050536434708" />
+      <entry key="W1" value="3822.7421623593277" />
     </decayedShown>
   </component>
   <component name="NoctuleProjectWorkspaceSettings">

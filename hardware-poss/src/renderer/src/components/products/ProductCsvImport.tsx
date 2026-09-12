@@ -9,7 +9,7 @@ import { useToast } from '../../context/ToastContext'
 import { PRODUCT_UNITS } from '../../../../shared/products'
 import type { BrandRecord } from '../../../../shared/brands'
 import type { CategoryRecord } from '../../../../shared/categories'
-import type { CreateProductInput, ProductRecord, ProductUnit } from '../../../../shared/products'
+import type { CreateProductInput, ProductDiscountType, ProductRecord, ProductUnit } from '../../../../shared/products'
 
 interface ProductCsvImportProps {
   brands: BrandRecord[]
@@ -30,6 +30,7 @@ interface ProductImportDraft {
   sellingPrice: number
   stockQuantity: number
   reorderLevel: number
+  discountType: ProductDiscountType
   discountAmount: number
 }
 
@@ -67,6 +68,9 @@ const HEADER_ALIASES: Record<string, keyof RawRow> = {
   'selling price': 'sellingPrice',
   sellingprice: 'sellingPrice',
   price: 'sellingPrice',
+  'discount type': 'discountType',
+  discount_type: 'discountType',
+  'discount value': 'discountAmount',
   'discount %': 'discountAmount',
   discount: 'discountAmount',
   'discount amount': 'discountAmount',
@@ -90,6 +94,7 @@ interface RawRow {
   unit: string
   buyingPrice: string
   sellingPrice: string
+  discountType: string
   discountAmount: string
   stockQuantity: string
   reorderLevel: string
@@ -331,6 +336,7 @@ function buildRows(csvText: string, existingProductNames: string[]): ParsedRow[]
       unit: getCell(cells, columnIndexes.unit),
       buyingPrice: getCell(cells, columnIndexes.buyingPrice),
       sellingPrice: getCell(cells, columnIndexes.sellingPrice),
+      discountType: getCell(cells, columnIndexes.discountType),
       discountAmount: getCell(cells, columnIndexes.discountAmount),
       stockQuantity: getCell(cells, columnIndexes.stockQuantity),
       reorderLevel: getCell(cells, columnIndexes.reorderLevel)
@@ -400,11 +406,19 @@ function validateRow(
     return { draft: null, error: 'Invalid stock quantity.' }
   }
 
+  const discountType = parseDiscountType(raw.discountType)
+  if (discountType === null) {
+    return { draft: null, error: 'Invalid discount type.' }
+  }
+
   const discountAmount = raw.discountAmount.trim()
     ? parseNonNegativeNumber(raw.discountAmount)
     : 0
   if (discountAmount === null) {
     return { draft: null, error: 'Invalid discount amount.' }
+  }
+  if (discountType === 'percent' && discountAmount > 100) {
+    return { draft: null, error: 'Percentage discount cannot exceed 100%.' }
   }
 
   const reorderLevel = raw.reorderLevel.trim() ? parseNonNegativeInteger(raw.reorderLevel) : 0
@@ -424,6 +438,7 @@ function validateRow(
       sellingPrice,
       stockQuantity,
       reorderLevel,
+      discountType,
       discountAmount
     },
     error: null
@@ -504,6 +519,7 @@ function toCreateProductInput(
     sellingPrice: draft.sellingPrice,
     stockQuantity: draft.stockQuantity,
     reorderLevel: draft.reorderLevel,
+    discountType: draft.discountType,
     discountAmount: draft.discountAmount
   }
 }
@@ -543,6 +559,17 @@ function parseNonNegativeInteger(value: string): number | null {
   if (value.trim().length === 0) return null
   const parsed = Number(value)
   return Number.isInteger(parsed) && parsed >= 0 ? parsed : null
+}
+
+function parseDiscountType(value: string): ProductDiscountType | null {
+  const normalized = value.trim().toLowerCase().replace(/%/g, '')
+
+  if (!normalized) return 'amount'
+  if (normalized === 'amount' || normalized === 'fixed' || normalized === 'lkr') return 'amount'
+  if (normalized === 'percent' || normalized === 'percentage' || normalized === 'pct') {
+    return 'percent'
+  }
+  return null
 }
 
 function parseCsv(text: string): string[][] {

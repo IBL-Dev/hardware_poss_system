@@ -8,7 +8,7 @@ import { SupplierSelect } from './SupplierSelect'
 import type { BrandRecord } from '../../../../shared/brands'
 import type { CategoryRecord } from '../../../../shared/categories'
 import type { SupplierRecord } from '../../../../shared/suppliers'
-import type { ProductRecord, ProductUnit } from '../../../../shared/products'
+import type { ProductRecord, ProductDiscountType, ProductUnit } from '../../../../shared/products'
 import { isWeightUnit } from '../../../../shared/products'
 
 export interface ProductFormData {
@@ -20,6 +20,7 @@ export interface ProductFormData {
   buyingPrice: number
   sellingPrice: number
   stockQuantity: number
+  discountType: ProductDiscountType
   discountAmount: number
 }
 
@@ -32,6 +33,7 @@ interface ProductFormState {
   buyingPrice: string
   sellingPrice: string
   stockQuantity: string
+  discountType: ProductDiscountType
   discountAmount: string
 }
 
@@ -60,6 +62,7 @@ const emptyForm: ProductFormState = {
   buyingPrice: '',
   sellingPrice: '',
   stockQuantity: '',
+  discountType: 'amount',
   discountAmount: ''
 }
 
@@ -150,7 +153,8 @@ const ProductModalContent: React.FC<Omit<ProductModalProps, 'isOpen'>> = ({
     buyingPrice !== null &&
     sellingPrice !== null &&
     stockQuantity !== null &&
-    discountAmount !== null
+    discountAmount !== null &&
+    (form.discountType !== 'percent' || discountAmount <= 100)
 
   const handleSave = (): void => {
     if (
@@ -172,6 +176,7 @@ const ProductModalContent: React.FC<Omit<ProductModalProps, 'isOpen'>> = ({
       buyingPrice,
       sellingPrice,
       stockQuantity,
+      discountType: form.discountType,
       discountAmount
     })
   }
@@ -364,24 +369,62 @@ const ProductModalContent: React.FC<Omit<ProductModalProps, 'isOpen'>> = ({
 
               <div className="flex flex-col gap-1.5">
                 <div className="flex items-center justify-between gap-2">
-                  <label className="text-[0.85rem] font-medium text-muted">
-                    Discount (LKR)
-                  </label>
+                  <label className="text-[0.85rem] font-medium text-muted">Discount</label>
                   <span className="text-[0.7rem] font-semibold text-slate-400">
                     {isWeightUnit(form.unit) ? 'per 1 kg' : 'per 1 item'}
                   </span>
                 </div>
-                <input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  placeholder="0.00"
-                  className="rounded-md border border-line bg-bg px-3 py-2.5 text-base text-ink outline-none focus:border-primary"
-                  value={form.discountAmount}
-                  onChange={(event) =>
-                    setForm({ ...form, discountAmount: event.target.value })
-                  }
-                />
+                <div className="flex overflow-hidden rounded-md border border-line bg-bg">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setForm({
+                        ...form,
+                        discountType: 'amount'
+                      })
+                    }
+                    className={`h-10 flex-1 text-[0.85rem] font-bold transition-colors ${
+                      form.discountType === 'amount'
+                        ? 'bg-primary text-white'
+                        : 'text-muted hover:bg-hover hover:text-ink'
+                    }`}
+                  >
+                    Fixed (LKR)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setForm({
+                        ...form,
+                        discountType: 'percent'
+                      })
+                    }
+                    className={`h-10 flex-1 text-[0.85rem] font-bold transition-colors ${
+                      form.discountType === 'percent'
+                        ? 'bg-primary text-white'
+                        : 'text-muted hover:bg-hover hover:text-ink'
+                    }`}
+                  >
+                    Percentage (%)
+                  </button>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <input
+                    type="number"
+                    min="0"
+                    max={form.discountType === 'percent' ? 100 : undefined}
+                    step="0.01"
+                    placeholder="0.00"
+                    className="w-full rounded-md border border-line bg-bg px-3 py-2.5 text-base text-ink outline-none focus:border-primary"
+                    value={form.discountAmount}
+                    onChange={(event) =>
+                      setForm({ ...form, discountAmount: event.target.value })
+                    }
+                  />
+                  <span className="shrink-0 text-[0.8rem] font-semibold text-slate-400">
+                    {form.discountType === 'percent' ? '%' : 'LKR'}
+                  </span>
+                </div>
               </div>
             </div>
 

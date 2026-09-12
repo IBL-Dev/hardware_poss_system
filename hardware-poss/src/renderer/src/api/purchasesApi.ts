@@ -4,7 +4,8 @@ import type {
   PurchaseFilters,
   PurchaseRecord,
   PurchaseReturnFilters,
-  PurchaseReturnRecord
+  PurchaseReturnRecord,
+  DownloadPurchaseReceiptResult
 } from '../../../shared/purchases'
 
 const ipcRenderer = window.electron?.ipcRenderer
@@ -24,6 +25,10 @@ export const purchasesApi = {
 
   delete: async (id: number): Promise<void> => {
     return ipcRenderer.invoke('purchases:delete', id)
+  },
+
+  downloadReceipt: async (id: number): Promise<DownloadPurchaseReceiptResult> => {
+    return ipcRenderer.invoke('purchases:download-receipt', id)
   },
 
   listReturns: async (filters?: PurchaseReturnFilters): Promise<PurchaseReturnRecord[]> => {

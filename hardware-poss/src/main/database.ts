@@ -617,6 +617,12 @@ function migrateProductsTable(database: Database.Database): void {
     'discount_amount',
     'ALTER TABLE products ADD COLUMN discount_amount REAL NOT NULL DEFAULT 0'
   )
+  ensureColumn(
+    database,
+    'products',
+    'discount_type',
+    "ALTER TABLE products ADD COLUMN discount_type TEXT NOT NULL DEFAULT 'amount'"
+  )
   migrateProductDiscountPercent(database)
   ensureColumn(
     database,

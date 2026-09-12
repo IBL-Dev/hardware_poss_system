@@ -1,12 +1,11 @@
-import { app, BrowserWindow, dialog, ipcMain } from 'electron'
+import { BrowserWindow, dialog, ipcMain } from 'electron'
 import type { SaveDialogOptions } from 'electron'
-import { readFile, writeFile } from 'fs/promises'
-import { join } from 'path'
-import logoPath from '../../../resources/hardware_icon.png?asset'
+import { writeFile } from 'fs/promises'
 import { getDatabase } from '../database'
 import { ProductRepository } from '../products/productRepository'
 import { SaleRepository } from '../sales/saleRepository'
 import { SaleService } from '../sales/saleService'
+import { createPdfBuffer, escapeHtml, getReportLogoDataUrl } from '../pdf'
 import type { DailySalesSummary, PaymentSummary, SalesReportSummary } from '../../shared/sales'
 import {
   SALES_REPORT_TYPES,
@@ -87,47 +86,6 @@ function normalizeReportInput(input: DownloadSalesReportInput): DownloadSalesRep
     dateFrom,
     dateTo,
     periodLabel: periodLabel || `${dateFrom} to ${dateTo}`
-  }
-}
-
-async function createPdfBuffer(html: string): Promise<Buffer> {
-  const reportWindow = new BrowserWindow({
-    width: 794,
-    height: 1123,
-    show: false,
-    autoHideMenuBar: true,
-    webPreferences: {
-      contextIsolation: true,
-      nodeIntegration: false,
-      sandbox: true
-    }
-  })
-
-  try {
-    await reportWindow.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(html)}`)
-    await reportWindow.webContents.executeJavaScript(
-      'document.fonts ? document.fonts.ready.then(() => true) : true'
-    )
-
-    try {
-      return await reportWindow.webContents.printToPDF({
-        pageSize: 'A4',
-        printBackground: true,
-        margins: {
-          marginType: 'none'
-        }
-      })
-    } catch (error) {
-      if (!isPdfMarginError(error)) {
-        throw error
-      }
-
-      return await reportWindow.webContents.printToPDF({
-        printBackground: true
-      })
-    }
-  } finally {
-    reportWindow.destroy()
   }
 }
 
@@ -474,23 +432,6 @@ function buildSalesReportHtml(report: ReportModel): string {
 </html>`
 }
 
-function isPdfMarginError(error: unknown): boolean {
-  return error instanceof Error && error.message.toLowerCase().includes('margins')
-}
-
-async function getReportLogoDataUrl(): Promise<string> {
-  try {
-    const logo = await readFile(getHardwareIconPath())
-    return `data:image/png;base64,${logo.toString('base64')}`
-  } catch {
-    return ''
-  }
-}
-
-function getHardwareIconPath(): string {
-  return app.isPackaged ? join(process.resourcesPath, 'hardware_icon.png') : logoPath
-}
-
 function reportLogo(logoDataUrl: string): string {
   if (!logoDataUrl) {
     return '<div class="logo-fallback">GP</div>'
@@ -655,13 +596,4 @@ function formatPaymentMethod(value: string): string {
 
 function formatDateTime(date: Date): string {
   return date.toLocaleString()
-}
-
-function escapeHtml(value: string): string {
-  return value
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#039;')
 }

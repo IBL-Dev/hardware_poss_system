@@ -2,6 +2,7 @@ import { BrandRepository } from '../brands/brandRepository'
 import {
   CreateProductInput,
   PRODUCT_UNITS,
+  ProductDiscountType,
   ProductRecord,
   ProductUnit,
   UpdateProductInput
@@ -22,6 +23,7 @@ interface NormalizedProductInput {
   sellingPrice: number
   stockQuantity: number
   reorderLevel: number
+  discountType: ProductDiscountType
   discountAmount: number
 }
 
@@ -107,6 +109,7 @@ export class ProductService {
         input.reorderLevel === undefined
           ? 0
           : this.normalizeQuantity(input.reorderLevel, 'Reorder level'),
+      discountType: this.normalizeDiscountType(input.discountType),
       discountAmount:
         input.discountAmount === undefined
           ? 0
@@ -157,11 +160,19 @@ export class ProductService {
         input.reorderLevel === undefined
           ? existingProduct.reorderLevel
           : this.normalizeQuantity(input.reorderLevel, 'Reorder level'),
+      discountType:
+        input.discountType === undefined
+          ? existingProduct.discountType
+          : this.normalizeDiscountType(input.discountType),
       discountAmount:
         input.discountAmount === undefined
           ? existingProduct.discountAmount
           : this.normalizeMoney(input.discountAmount, 'Discount')
     }
+  }
+
+  private normalizeDiscountType(value: ProductDiscountType | undefined): ProductDiscountType {
+    return value === 'percent' ? 'percent' : 'amount'
   }
 
   private assertBrandRequired(brandId: number | null): void {

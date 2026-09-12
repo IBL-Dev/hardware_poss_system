@@ -1,8 +1,15 @@
 import React, { useState } from 'react'
 import { Building2, FileText, Paperclip, Plus, Trash2, Truck, User, X } from 'lucide-react'
 import { Spinner } from '../common/Spinner'
+import { ProductModal, ProductFormData } from '../products/ProductModal'
 import { suppliersApi } from '../../api/suppliersApi'
+import { productsApi } from '../../api/productsApi'
+import { brandsApi } from '../../api/brandsApi'
+import { categoriesApi } from '../../api/categoriesApi'
+import { useToast } from '../../context/ToastContext'
 import type { ProductRecord } from '../../../../shared/products'
+import type { BrandRecord } from '../../../../shared/brands'
+import type { CategoryRecord } from '../../../../shared/categories'
 import type { SupplierRecord } from '../../../../shared/suppliers'
 import type {
   CreatePurchaseItemInput,
@@ -40,10 +47,13 @@ interface PurchaseModalProps {
   isOpen: boolean
   suppliers: SupplierRecord[]
   products: ProductRecord[]
+  brands: BrandRecord[]
+  categories: CategoryRecord[]
   initialData?: PurchaseFormData
   isSaving?: boolean
   onClose: () => void
   onSave: (data: PurchaseFormData) => void
+  onProductCreated?: (product: ProductRecord) => void
 }
 
 interface ProductLine {
@@ -84,10 +94,13 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
   isOpen,
   suppliers,
   products,
+  brands,
+  categories,
   initialData,
   isSaving = false,
   onClose,
-  onSave
+  onSave,
+  onProductCreated
 }) => {
   if (!isOpen) return null
 
@@ -96,10 +109,13 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
       key={initialData ? `purchase-${initialData.supplierName}` : 'new-purchase'}
       suppliers={suppliers}
       products={products}
+      brands={brands}
+      categories={categories}
       initialData={initialData}
       isSaving={isSaving}
       onClose={onClose}
       onSave={onSave}
+      onProductCreated={onProductCreated}
     />
   )
 }
@@ -107,12 +123,18 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
 const PurchaseModalContent: React.FC<Omit<PurchaseModalProps, 'isOpen'>> = ({
   suppliers,
   products,
+  brands,
+  categories,
   initialData,
   isSaving = false,
   onClose,
-  onSave
+  onSave,
+  onProductCreated
 }) => {
+  const toast = useToast()
   const [availableSuppliers, setAvailableSuppliers] = useState<SupplierRecord[]>(suppliers)
+  const [brandList, setBrandList] = useState<BrandRecord[]>(brands)
+  const [categoryList, setCategoryList] = useState<CategoryRecord[]>(categories)
   const [supplierId, setSupplierId] = useState(
     initialData?.supplierId?.toString() ??
       (suppliers.length === 1 ? suppliers[0].id.toString() : '')
@@ -151,7 +173,7 @@ const PurchaseModalContent: React.FC<Omit<PurchaseModalProps, 'isOpen'>> = ({
           quantity: item.quantity.toString(),
           unitPrice: item.unitPrice.toString()
         }))
-      : [{ productId: '', quantity: '1', unitPrice: '' }]
+      : []
   )
   const [payments, setPayments] = useState<PaymentLine[]>(
     initialData?.payments && initialData.payments.length > 0
@@ -171,6 +193,8 @@ const PurchaseModalContent: React.FC<Omit<PurchaseModalProps, 'isOpen'>> = ({
     address: ''
   })
   const [isAddingSupplier, setIsAddingSupplier] = useState(false)
+  const [isProductModalOpen, setIsProductModalOpen] = useState(false)
+  const [isCreatingProduct, setIsCreatingProduct] = useState(false)
 
   const handleSupplierChange = (value: string): void => {
     setSupplierId(value)
@@ -185,10 +209,6 @@ const PurchaseModalContent: React.FC<Omit<PurchaseModalProps, 'isOpen'>> = ({
       setAddress(supplier.address)
       setBusinessLocation((current) => current || supplier.address)
     }
-  }
-
-  const addLine = (): void => {
-    setLines((current) => [...current, { productId: '', quantity: '1', unitPrice: '' }])
   }
 
   const updateLine = (index: number, patch: Partial<ProductLine>): void => {
@@ -259,6 +279,142 @@ const PurchaseModalContent: React.FC<Omit<PurchaseModalProps, 'isOpen'>> = ({
       setShowQuickSupplier(false)
     } finally {
       setIsAddingSupplier(false)
+    }
+  }
+
+  const handleCloseProductModal = (): void => {
+    if (isCreatingProduct) return
+    setIsProductModalOpen(false)
+  }
+
+  const handleCreateProduct = async (data: ProductFormData): Promise<void> => {
+    setIsCreatingProduct(true)
+    try {
+      const createdProduct = await productsApi.create(data)
+
+      onProductCreated?.(createdProduct)
+      setLines((current) => [
+        ...current,
+        {
+          productId: createdProduct.id.toString(),
+          quantity: '1',
+          unitPrice: createdProduct.buyingPrice.toString()
+        }
+      ])
+      setIsProductModalOpen(false)
+      toast.success(`Product "${createdProduct.name}" was added successfully.`)
+    } catch (error) {
+      toast.error(getErrorMessage(error))
+    } finally {
+      setIsCreatingProduct(false)
+    }
+  }
+
+  const handleProductsImported = (createdProducts: ProductRecord[]): void => {
+    createdProducts.forEach((product) => onProductCreated?.(product))
+
+    if (createdProducts.length > 0) {
+      const lastProduct = createdProducts[createdProducts.length - 1]
+      setLines((current) => [
+        ...current,
+        {
+          productId: lastProduct.id.toString(),
+          quantity: '1',
+          unitPrice: lastProduct.buyingPrice.toString()
+        }
+      ])
+    }
+    setIsProductModalOpen(false)
+    toast.success(`${createdProducts.length} product(s) were added successfully.`)
+  }
+
+  const handleCreateBrand = async (name: string): Promise<BrandRecord> => {
+    try {
+      const createdBrand = await brandsApi.create({ name })
+
+      setBrandList((current) =>
+        [...current, createdBrand].sort((left, right) => left.name.localeCompare(right.name))
+      )
+      toast.success(`Brand "${createdBrand.name}" was added successfully.`)
+
+      return createdBrand
+    } catch (error) {
+      const refreshedBrands = await brandsApi.list().catch(() => null)
+
+      const existingBrand = refreshedBrands?.find(
+        (brand) => brand.name.trim().toLowerCase() === name.trim().toLowerCase()
+      )
+
+      if (existingBrand && refreshedBrands) {
+        setBrandList(refreshedBrands)
+        toast.info(`Brand "${existingBrand.name}" already exists.`)
+
+        return existingBrand
+      }
+
+      toast.error(getErrorMessage(error))
+
+      throw error
+    }
+  }
+
+  const handleCreateCategory = async (name: string): Promise<CategoryRecord> => {
+    try {
+      const createdCategory = await categoriesApi.create({ name })
+
+      setCategoryList((current) =>
+        [...current, createdCategory].sort((left, right) => left.name.localeCompare(right.name))
+      )
+      toast.success(`Category "${createdCategory.name}" was added successfully.`)
+
+      return createdCategory
+    } catch (error) {
+      const refreshedCategories = await categoriesApi.list().catch(() => null)
+
+      const existingCategory = refreshedCategories?.find(
+        (category) => category.name.trim().toLowerCase() === name.trim().toLowerCase()
+      )
+
+      if (existingCategory && refreshedCategories) {
+        setCategoryList(refreshedCategories)
+        toast.info(`Category "${existingCategory.name}" already exists.`)
+
+        return existingCategory
+      }
+
+      toast.error(getErrorMessage(error))
+
+      throw error
+    }
+  }
+
+  const handleCreateSupplier = async (name: string): Promise<SupplierRecord> => {
+    try {
+      const createdSupplier = await suppliersApi.create({ name })
+
+      setAvailableSuppliers((current) =>
+        [...current, createdSupplier].sort((left, right) => left.name.localeCompare(right.name))
+      )
+      toast.success(`Supplier "${createdSupplier.name}" was added successfully.`)
+
+      return createdSupplier
+    } catch (error) {
+      const refreshedSuppliers = await suppliersApi.list().catch(() => null)
+
+      const existingSupplier = refreshedSuppliers?.find(
+        (supplier) => supplier.name.trim().toLowerCase() === name.trim().toLowerCase()
+      )
+
+      if (existingSupplier && refreshedSuppliers) {
+        setAvailableSuppliers(refreshedSuppliers)
+        toast.info(`Supplier "${existingSupplier.name}" already exists.`)
+
+        return existingSupplier
+      }
+
+      toast.error(getErrorMessage(error))
+
+      throw error
     }
   }
 
@@ -643,7 +799,7 @@ const PurchaseModalContent: React.FC<Omit<PurchaseModalProps, 'isOpen'>> = ({
             <button
               type="button"
               className="inline-flex h-9 items-center justify-center gap-2 rounded-md border border-line bg-white px-4 text-sm font-semibold text-ink transition-colors hover:bg-hover"
-              onClick={addLine}
+              onClick={() => setIsProductModalOpen(true)}
             >
               <Plus size={15} />
               Add New Product
@@ -651,6 +807,14 @@ const PurchaseModalContent: React.FC<Omit<PurchaseModalProps, 'isOpen'>> = ({
           </div>
 
           <div className="mt-4 flex flex-col gap-2.5">
+            {lines.length === 0 && (
+              <div className="flex flex-col items-center justify-center gap-2 rounded-md border border-dashed border-line bg-card px-4 py-8 text-center">
+                <p className="text-sm font-medium text-ink">No items yet</p>
+                <p className="text-xs text-muted">
+                  Add a new product to start listing the purchased items.
+                </p>
+              </div>
+            )}
             {lines.map((line, index) => {
               const product = products.find((item) => item.id.toString() === line.productId)
               const lineTotal = (Number(line.quantity) || 0) * (Number(line.unitPrice) || 0)
@@ -728,7 +892,6 @@ const PurchaseModalContent: React.FC<Omit<PurchaseModalProps, 'isOpen'>> = ({
                     type="button"
                     className="flex h-11 w-11 items-center justify-center self-end rounded-md text-muted transition-colors hover:bg-danger/10 hover:text-danger disabled:cursor-not-allowed disabled:opacity-40"
                     onClick={() => removeLine(index)}
-                    disabled={lines.length === 1}
                     aria-label="Remove product line"
                   >
                     <Trash2 size={16} />
@@ -910,6 +1073,21 @@ const PurchaseModalContent: React.FC<Omit<PurchaseModalProps, 'isOpen'>> = ({
           </button>
         </div>
       </div>
+
+      <ProductModal
+        isOpen={isProductModalOpen}
+        brands={brandList}
+        categories={categoryList}
+        suppliers={availableSuppliers}
+        existingProductNames={products.map((product) => product.name)}
+        isSaving={isCreatingProduct}
+        onClose={handleCloseProductModal}
+        onSave={handleCreateProduct}
+        onImported={handleProductsImported}
+        onCreateBrand={handleCreateBrand}
+        onCreateCategory={handleCreateCategory}
+        onCreateSupplier={handleCreateSupplier}
+      />
     </div>
   )
 }
@@ -955,4 +1133,8 @@ function getTodayInputValue(): string {
   const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60_000)
 
   return localDate.toISOString().slice(0, 10)
+}
+
+function getErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : 'Something went wrong. Please try again.'
 }

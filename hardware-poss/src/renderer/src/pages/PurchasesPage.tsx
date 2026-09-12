@@ -30,8 +30,12 @@ import { useToast } from '../context/ToastContext'
 import { purchasesApi } from '../api/purchasesApi'
 import { suppliersApi } from '../api/suppliersApi'
 import { productsApi } from '../api/productsApi'
+import { brandsApi } from '../api/brandsApi'
+import { categoriesApi } from '../api/categoriesApi'
 import { formatLkr } from '../utils/currency'
 import type { ProductRecord } from '../../../shared/products'
+import type { BrandRecord } from '../../../shared/brands'
+import type { CategoryRecord } from '../../../shared/categories'
 import type { SupplierRecord } from '../../../shared/suppliers'
 import type {
   CreatePurchaseInput,
@@ -65,6 +69,8 @@ const PurchasesPage: React.FC = () => {
   const [returns, setReturns] = useState<PurchaseReturnRecord[]>([])
   const [suppliers, setSuppliers] = useState<SupplierRecord[]>([])
   const [products, setProducts] = useState<ProductRecord[]>([])
+  const [brands, setBrands] = useState<BrandRecord[]>([])
+  const [categories, setCategories] = useState<CategoryRecord[]>([])
   const [activeView, setActiveView] = useState<PurchaseView>('purchases')
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
@@ -94,16 +100,29 @@ const PurchasesPage: React.FC = () => {
         dateTo: returnFilters.dateTo
       }),
       suppliersApi.list(),
-      productsApi.list()
+      productsApi.list(),
+      brandsApi.list(),
+      categoriesApi.list()
     ])
-      .then(([loadedPurchases, loadedReturns, loadedSuppliers, loadedProducts]) => {
-        if (isActive) {
-          setPurchases(loadedPurchases)
-          setReturns(loadedReturns)
-          setSuppliers(loadedSuppliers)
-          setProducts(loadedProducts)
+      .then(
+        ([
+          loadedPurchases,
+          loadedReturns,
+          loadedSuppliers,
+          loadedProducts,
+          loadedBrands,
+          loadedCategories
+        ]) => {
+          if (isActive) {
+            setPurchases(loadedPurchases)
+            setReturns(loadedReturns)
+            setSuppliers(loadedSuppliers)
+            setProducts(loadedProducts)
+            setBrands(loadedBrands)
+            setCategories(loadedCategories)
+          }
         }
-      })
+      )
       .catch((error) => {
         if (isActive) toast.error(getErrorMessage(error))
       })
@@ -274,6 +293,10 @@ const PurchasesPage: React.FC = () => {
     }
 
     setIsPurchaseModalOpen(true)
+  }
+
+  const handleProductCreated = (createdProduct: ProductRecord): void => {
+    setProducts((prev) => [createdProduct, ...prev])
   }
 
   const handlePurchaseModalClose = (): void => {
@@ -831,9 +854,12 @@ const PurchasesPage: React.FC = () => {
         isOpen={isPurchaseModalOpen}
         suppliers={suppliers}
         products={products}
+        brands={brands}
+        categories={categories}
         isSaving={isSaving}
         onClose={handlePurchaseModalClose}
         onSave={handlePurchaseSave}
+        onProductCreated={handleProductCreated}
       />
 
       <PurchaseReturnModal

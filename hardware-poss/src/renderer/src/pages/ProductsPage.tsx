@@ -25,7 +25,7 @@ import type { BrandRecord } from '../../../shared/brands'
 import type { CategoryRecord } from '../../../shared/categories'
 import type { SupplierRecord } from '../../../shared/suppliers'
 import type { CreateProductInput, ProductRecord, UpdateProductInput } from '../../../shared/products'
-import { isWeightUnit } from '../../../shared/products'
+import { isProductDiscountPercent, isWeightUnit } from '../../../shared/products'
 
 const ProductsPage: React.FC = () => {
   const [products, setProducts] = useState<ProductRecord[]>([])
@@ -165,7 +165,9 @@ const ProductsPage: React.FC = () => {
       render: (item) =>
         item.discountAmount > 0 ? (
           <span className="inline-flex items-center rounded-md border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-700">
-            {formatLkrAmount(item.discountAmount)}
+            {isProductDiscountPercent(item.discountType)
+              ? `${item.discountAmount}%`
+              : formatLkrAmount(item.discountAmount)}
             <span className="ml-1 font-semibold text-amber-600">
               {isWeightUnit(item.unit) ? '/kg' : '/item'}
             </span>
@@ -809,6 +811,7 @@ const ProductsPage: React.FC = () => {
                 buyingPrice: editingProduct.buyingPrice,
                 sellingPrice: editingProduct.sellingPrice,
                 stockQuantity: editingProduct.stockQuantity,
+                discountType: editingProduct.discountType,
                 discountAmount: editingProduct.discountAmount
               }
             : undefined
@@ -852,6 +855,7 @@ function buildProductPayload(
     buyingPrice: data.buyingPrice,
     sellingPrice: data.sellingPrice,
     stockQuantity: data.stockQuantity,
+    discountType: data.discountType,
     discountAmount: data.discountAmount
   }
 }

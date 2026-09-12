@@ -40,6 +40,7 @@ import { salesApi } from '../api/salesApi'
 import { formatLkr } from '../utils/currency'
 import type { CustomerRecord } from '../../../shared/customers'
 import type { ProductRecord } from '../../../shared/products'
+import { getProductDiscountLkr } from '../../../shared/products'
 import type { BrandRecord } from '../../../shared/brands'
 import type { CategoryRecord } from '../../../shared/categories'
 import type { SupplierRecord } from '../../../shared/suppliers'
@@ -1625,7 +1626,15 @@ const SalesPage: React.FC = () => {
             : selectedAvailableQuantity
         }
         unit={editingCartItem?.unit || selectedProduct?.unit}
-        initialDiscountAmount={editingCartItem?.discountAmount}
+        initialDiscountAmount={
+          editingCartItem
+            ? editingCartItem.quantity > 0
+              ? roundMoney(editingCartItem.discountAmount / editingCartItem.quantity)
+              : 0
+            : selectedProduct
+              ? getProductDiscountLkr(selectedProduct)
+              : 0
+        }
         onClose={handleQuantityModalClose}
         onConfirm={handleConfirmQuantity}
       />
