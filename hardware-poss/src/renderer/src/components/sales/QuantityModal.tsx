@@ -73,9 +73,11 @@ const QuantityModalContent: React.FC<Omit<QuantityModalProps, 'isOpen'>> = ({
   const quantity = parseQuantityInput(quantityInput)
   const lineGrossTotal = roundMoney(unitPrice * quantity)
 
+  const fixedPerUnitDiscount = clampMoney(parseMoneyInput(discountAmountInput), unitPrice)
+
   const discountAmount =
     discountMode === 'amount'
-      ? clampMoney(parseMoneyInput(discountAmountInput), lineGrossTotal)
+      ? clampMoney(roundMoney(fixedPerUnitDiscount * quantity), lineGrossTotal)
       : clampMoney(
           roundMoney((lineGrossTotal * parsePercentInput(discountPercentInput)) / 100),
           lineGrossTotal
@@ -189,7 +191,9 @@ const QuantityModalContent: React.FC<Omit<QuantityModalProps, 'isOpen'>> = ({
                 )
                 setDiscountMode('percent')
               } else {
-                setDiscountAmountInput(discountAmount > 0 ? String(discountAmount) : '')
+                setDiscountAmountInput(
+                  discountAmount > 0 && quantity > 0 ? String(roundMoney(discountAmount / quantity)) : ''
+                )
                 setDiscountMode('amount')
               }
             }}
@@ -212,7 +216,11 @@ const QuantityModalContent: React.FC<Omit<QuantityModalProps, 'isOpen'>> = ({
                 type="button"
                 onClick={() => {
                   if (discountMode !== 'amount') {
-                    setDiscountAmountInput(discountAmount > 0 ? String(discountAmount) : '')
+                    setDiscountAmountInput(
+                      discountAmount > 0 && quantity > 0
+                        ? String(roundMoney(discountAmount / quantity))
+                        : ''
+                    )
                     setDiscountMode('amount')
                   }
                 }}
@@ -255,7 +263,7 @@ const QuantityModalContent: React.FC<Omit<QuantityModalProps, 'isOpen'>> = ({
                 ref={discountInputRef}
                 type="number"
                 min="0"
-                max={lineGrossTotal}
+                max={Math.max(0, unitPrice)}
                 step="0.01"
                 className="h-10 w-full flex-1 rounded-md border border-line bg-white px-2 text-right text-sm font-semibold text-ink outline-none transition-colors focus:border-primary"
                 placeholder="0.00"
